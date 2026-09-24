@@ -105,6 +105,7 @@ window.Editor = (function(){
   /* ================= NOUVELLE INTERFACE : barre latérale + une section à la fois ================= */
 
   var activeSection = null;   // id de la section affichée, ou null = vue d'ensemble
+  var activeChild = null;     // id du sous-tableau affiché dans une section à cartes
   var SECTION_COLORS = ["coral","amber","green","teal","blue","violet","pink","indigo"];
   var TAGCOLOR_TO_SECTION = {blue:"blue", mauve:"violet", green:"green", yellow:"amber", orange:"coral", pink:"pink"};
 
@@ -192,6 +193,30 @@ window.Editor = (function(){
     return {total:1, filled: has ? 1 : 0};
   }
   function sectionProgress(sec){ return sec.kind === "table" ? tableProgress(sec.obj) : diagramProgress(sec.obj); }
+  function sectionChildren(t){
+    return state.tables.filter(function(x){ return x.parentId === t.id; }).map(function(x){ return {kind:"table", id:x.id, obj:x}; })
+      .concat(state.diagrams.filter(function(x){ return x.parentId === t.id; }).map(function(x){ return {kind:"diagram", id:x.id, obj:x}; }));
+  }
+  function isCardSection(t){ return !!t && !(t.columns || []).length && t.cards !== false && sectionChildren(t).length >= 2; }
+  function directChildFor(id){
+    var current = state.tables.find(function(t){ return t.id === id; });
+    if (current && current.parentId){
+      while (current.parentId){
+        var parent = state.tables.find(function(t){ return t.id === current.parentId; });
+        if (!parent || !parent.parentId) return current.id;
+        current = parent;
+      }
+    }
+    current = state.diagrams.find(function(d){ return d.id === id; });
+    if (current && current.parentId){
+      while (current.parentId){
+        var diagramParent = state.tables.find(function(t){ return t.id === current.parentId; });
+        if (!diagramParent || !diagramParent.parentId) return current.id;
+        current = diagramParent;
+      }
+    }
+    return null;
+  }
   function pct(p){ return p.total ? Math.round(100 * p.filled / p.total) : 0; }
   function progressBar(p, cls){
     var bar = el("div", {class:"pbar " + (cls || ""), role:"progressbar", "aria-valuemin":"0", "aria-valuemax":"100", "aria-valuenow": String(pct(p))});
@@ -210,11 +235,26 @@ window.Editor = (function(){
   /* ---------- mémoire de la section ouverte (par projet, sur cet appareil) ---------- */
   function viewKey(){ return "atelier-recherche:view:" + (ctx && ctx.id); }
   function setSection(id, opts){
+    var ae = document.activeElement;
+    if (ae && ae.isContentEditable && document.getElementById("app").contains(ae)) ae.blur();
     activeSection = id;
+    if (!(opts && opts.child)) activeChild = null;
     try { if (id) localStorage.setItem(viewKey(), id); else localStorage.removeItem(viewKey()); } catch(e){}
     document.body.classList.remove("nav-open");
     render();
     if (!(opts && opts.keepScroll)) window.scrollTo(0, 0);
+  }
+  function setChild(id){
+    var ae = document.activeElement;
+    if (ae && ae.isContentEditable && document.getElementById("app").contains(ae)) ae.blur();
+    activeChild = id;
+    try {
+      if (id) localStorage.setItem(viewKey() + ":child:" + activeSection, id);
+      else localStorage.removeItem(viewKey() + ":child:" + activeSection);
+    } catch(e){}
+    document.body.classList.remove("nav-open");
+    render();
+    window.scrollTo(0, 0);
   }
 
   /* ---------- rendu principal ---------- */
@@ -225,6 +265,10 @@ window.Editor = (function(){
     normalizeOrder();
     var secs = topSections();
     if (activeSection && !secs.some(function(s){ return s.id===activeSection; })) activeSection = null;
+    if (activeSection && activeChild){
+      var activeTop = state.tables.find(function(t){ return t.id === activeSection; });
+      if (!activeTop || !isCardSection(activeTop) || directChildFor(activeChild) !== activeChild) activeChild = null;
+    }
 
     var shell = el("div", {class:"ed-shell"});
     shell.appendChild(el("div", {class:"nav-scrim", onclick:function(){ document.body.classList.remove("nav-open"); }}));
@@ -276,16 +320,16 @@ window.Editor = (function(){
       ]);
       li.appendChild(handle); li.appendChild(item);
       makeReorderable(handle, li, s.id);
-      if (activeSection === s.id && s.kind === "table"){
+      if (activeSection === s.id && s.kind === "table" && isCardSection(s.obj)){
         var kids = navNodeForTable(s.obj, 0).children;
         if (kids.length){
           var sub = el("ul", {class:"sb-sub"});
-          (function build(nodes, depth){
-            nodes.forEach(function(n){
-              sub.appendChild(el("li", {}, [el("button", {class:"sb-subitem", type:"button", style:"padding-left:" + (10 + depth*12) + "px", text:n.title, onclick:function(){ goToBlock(n.kind, n.id); }})]));
-              if (n.children.length && depth < 2) build(n.children, depth + 1);
-            });
-          })(kids, 0);
+          kids.forEach(function(n, childIndex){
+            var childObj = state.tables.find(function(t){ return t.id === n.id; }) || state.diagrams.find(function(d){ return d.id === n.id; });
+            var short = childObj && childObj.title ? shortChildTitle(childObj.title, childIndex) : n.title;
+            var childColor = childObj && childObj.color && TAGCOLOR_TO_SECTION[childObj.color] ? TAGCOLOR_TO_SECTION[childObj.color] : sectionColor({id:n.id, obj:childObj}, childIndex);
+            sub.appendChild(el("li", {}, [el("button", {class:"sb-subitem" + (activeChild === n.id ? " active" : ""), type:"button", style:"padding-left:10px", onclick:function(){ setChild(n.id); }}, [el("span", {class:"sb-child-dot", "data-sec":childColor}), el("span", {text:short})])]));
+          });
           li.appendChild(sub);
         }
       }
@@ -407,6 +451,13 @@ window.Editor = (function(){
     if (activeSection){
       var idx = secs.findIndex(function(s){ return s.id===activeSection; });
       crumb.appendChild(el("span", {class:"hb-count", text:"Section " + (idx+1) + " sur " + secs.length}));
+      if (activeChild){
+        var child = state.tables.find(function(t){ return t.id === activeChild; }) || state.diagrams.find(function(d){ return d.id === activeChild; });
+        var parent = state.tables.find(function(t){ return t.id === activeSection; });
+        var childCount = parent ? sectionChildren(parent).length : 0;
+        var childIndex = parent ? sectionChildren(parent).findIndex(function(c){ return c.id === activeChild; }) : -1;
+        if (child) crumb.appendChild(el("span", {class:"hb-count", text:" › Chapitre " + (childIndex + 1) + " sur " + childCount}));
+      }
     } else {
       crumb.appendChild(el("span", {class:"hb-count", text:"Vue d'ensemble"}));
     }
@@ -495,6 +546,11 @@ window.Editor = (function(){
   function renderSectionView(content, secs){
     var idx = secs.findIndex(function(s){ return s.id===activeSection; });
     var s = secs[idx];
+    if (s.kind === "table" && isCardSection(s.obj)){
+      if (activeChild){ renderChildView(content, secs, s, idx); }
+      else renderSectionCards(content, s, idx);
+      return;
+    }
     var color = sectionColor(s, idx);
     try { localStorage.setItem(viewKey() + ":last", s.id); } catch(e){}
     var p = sectionProgress(s);
@@ -507,10 +563,6 @@ window.Editor = (function(){
     ]);
     content.appendChild(head);
     content.appendChild(renderTagsRow());
-    if (s.kind === "table"){
-      var overview = renderSectionOverview(s.obj);
-      if (overview) content.appendChild(overview);
-    }
     var board = el("div", {class:"board", "data-sec": color});
     board.appendChild(s.kind === "table" ? renderTable(s.obj, {top:true}) : renderDiagram(s.obj, {top:true}));
     content.appendChild(board);
@@ -519,6 +571,136 @@ window.Editor = (function(){
     var prev = secs[idx-1], next = secs[idx+1];
     pager.appendChild(prev ? el("button", {class:"pg-btn", type:"button", onclick:function(){ setSection(prev.id); }}, [icon("back"), el("span", {}, [el("small", {text:"Précédente"}), el("strong", {text:titleOf(prev.obj)})])]) : el("span"));
     pager.appendChild(next ? el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setSection(next.id); }}, [el("span", {}, [el("small", {text:"Suivante"}), el("strong", {text:titleOf(next.obj)})]), icon("next")]) : el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setSection(null); }}, [el("span", {}, [el("small", {text:"Terminé"}), el("strong", {text:"Retour à la vue d'ensemble"})]), icon("grid")]));
+    content.appendChild(pager);
+  }
+
+  function shortChildTitle(title, index){
+    var m = /^\s*Chapitre\s+(\d+)\s*[—-]\s*(.*)$/i.exec(stripHtml(title || ""));
+    return m ? String(Number(m[1])) + " · " + m[2] : String(index + 1) + " · " + titleOf({title:title});
+  }
+  function childDisplay(child, index){
+    var title = titleOf(child.obj);
+    var m = /^\s*Chapitre\s+(\d+)\s*[—-]\s*(.*)$/i.exec(title);
+    return {number:m ? String(m[1]).padStart(2, "0") : String(index + 1).padStart(2, "0"), title:m ? m[2] : title};
+  }
+  function tagCountsFor(items){
+    var counts = {};
+    items.forEach(function(row){ Object.keys(row.cells || {}).forEach(function(cid){
+      (row.cells[cid].tags || []).forEach(function(tagId){ counts[tagId] = (counts[tagId] || 0) + 1; });
+    }); });
+    return counts;
+  }
+  function tagPills(counts){
+    return state.tags.filter(function(tag){ return counts[tag.id]; }).map(function(tag){
+      var pill = el("span", {class:"mini-tag", text:tag.label + " " + counts[tag.id]});
+      pill.style.background = "var(--tag-" + tag.color + "-bg)";
+      pill.style.color = "var(--tag-" + tag.color + ")";
+      return pill;
+    });
+  }
+  function summaryStats(table){
+    var refs = (table.rows || []).filter(function(row){ return !row.kind; });
+    var summaryCol = (table.columns || []).find(function(col){ return /r[ée]sum[ée]/i.test(col.label || ""); });
+    var columns = summaryCol ? [summaryCol] : answerColumns(table);
+    var filled = 0;
+    columns.forEach(function(col){ refs.forEach(function(row){ if (row.cells[col.id] && stripHtml(row.cells[col.id].text).trim()) filled++; }); });
+    return {refs:refs.length, filled:filled, total:refs.length * columns.length, hasSummary:!!summaryCol};
+  }
+  function renderSectionCards(content, sec, idx){
+    var root = sec.obj, children = sectionChildren(root), color = sectionColor(sec, idx), p = sectionProgress(sec);
+    try { localStorage.setItem(viewKey() + ":last", sec.id); } catch(e){}
+    var hero = el("section", {class:"ov-hero", "data-sec":color});
+    hero.appendChild(el("div", {class:"eyebrow", text:"Section " + (idx + 1)}));
+    var h1 = el("h1", {contenteditable:"true", spellcheck:"false", class:"ov-title", text:root.title});
+    plainPaste(h1);
+    h1.addEventListener("input", function(){ root.title = h1.textContent; dirty = true; });
+    h1.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); h1.blur(); } });
+    h1.addEventListener("blur", function(){ root.title = h1.textContent.trim() || "Section sans titre"; scheduleSave(true); var label = document.querySelector(".sb-item.active .sb-label"); if (label) label.textContent = titleOf(root); });
+    hero.appendChild(h1);
+    var sectionMore = iconBtn("more", "Options de la section", null, "section-cards-more");
+    sectionMore.addEventListener("click", function(){
+      openMenu(sectionMore, null, [{icon:"check", label:"Afficher les sous-tableaux en cartes", run:function(){ root.cards = false; scheduleSave(true); setSection(root.id); }}]);
+    });
+    hero.appendChild(sectionMore);
+    var totalRefs = 0, totalSummaries = 0, complete = 0, hasSources = false;
+    children.forEach(function(child){
+      if (child.kind === "table"){
+        var stats = summaryStats(child.obj); totalRefs += stats.refs; totalSummaries += stats.filled;
+        hasSources = hasSources || child.obj.columns.some(function(col){ return /^sources?$/i.test(col.label || ""); });
+        if (pct(tableProgress(child.obj)) === 100) complete++;
+      } else if (pct(sectionProgress(child)) === 100) complete++;
+    });
+    hero.appendChild(el("div", {class:"ov-stats"}, [
+      stat(pct(p) + " %", "de la section", progressBar(p, "big")),
+      stat(complete + " / " + children.length, "chapitres complets"),
+      stat(String(totalRefs), hasSources ? "références" : "lignes"),
+      stat(String(totalSummaries), "résumés rédigés")
+    ]));
+    content.appendChild(hero);
+    var last = null; try { last = localStorage.getItem(viewKey() + ":child:" + sec.id); } catch(e){}
+    var lastChild = last && children.find(function(child){ return child.id === last; });
+    if (lastChild) content.appendChild(el("button", {class:"ov-resume", type:"button", onclick:function(){ setChild(lastChild.id); }}, [
+      el("span", {class:"ov-resume-k", text:"Reprendre là où tu étais"}), el("strong", {text:titleOf(lastChild.obj)}), icon("next")
+    ]));
+    content.appendChild(renderTagsRow());
+    var grid = el("div", {class:"ov-grid"});
+    children.forEach(function(child, childIndex){
+      var childProgress = sectionProgress(child), display = childDisplay(child, childIndex), stats = child.kind === "table" ? summaryStats(child.obj) : null;
+      var card = el("button", {class:"ov-card", type:"button", "data-sec":child.kind === "table" && child.obj.color && TAGCOLOR_TO_SECTION[child.obj.color] ? TAGCOLOR_TO_SECTION[child.obj.color] : sectionColor(child, childIndex), onclick:function(){ setChild(child.id); }}, [
+        el("div", {class:"ov-card-top"}, [el("span", {class:"ov-num", text:display.number}), progressRing(childProgress, 30)]),
+        el("div", {class:"ov-card-title", text:display.title}),
+        el("div", {class:"ov-card-meta", text:child.kind === "diagram" ? child.obj.nodes.length + " élément(s)" : (stats.hasSummary ? stats.filled + " / " + stats.refs + " résumés rédigés" : stats.filled + " / " + stats.total + " cases remplies")}),
+        child.kind === "table" ? el("div", {class:"tagbar card-tags"}, tagPills(tagCountsFor((child.obj.rows || []).filter(function(row){ return !row.kind; })))) : null,
+        progressBar(childProgress)
+      ]);
+      grid.appendChild(card);
+    });
+    var addCard = el("div", {class:"ov-card ov-add"}, [
+      btn("plus", "+ Nouveau chapitre", function(){ addChildTable(root, children); }, "ghost"),
+      btn("canvas", "+ Espace libre", function(){ addChildDiagram(root); }, "ghost")
+    ]);
+    grid.appendChild(addCard); content.appendChild(grid);
+  }
+  function addChildTable(root, children){
+    var first = children.find(function(child){ return child.kind === "table"; });
+    var columns = (first && first.obj.columns.length ? first.obj.columns : [{id:uid("col"),label:"Colonne 1"},{id:uid("col"),label:"Colonne 2"}]).map(function(col){ return {id:uid("col"), label:col.label}; });
+    var row = {id:uid("row"), cells:{}};
+    columns.forEach(function(col){ row.cells[col.id] = {text:"", tags:[]}; });
+    var count = state.tables.filter(function(t){ return t.parentId === root.id; }).length + 1;
+    var child = {id:uid("tbl"), parentId:root.id, title:"Chapitre " + count + " — Nouveau chapitre", columns:columns, rows:[row]};
+    if (first && first.obj.rowLines) child.rowLines = first.obj.rowLines;
+    insertNestedChildAfterFocus(state.tables, child, root.id, "table");
+    scheduleSave(true); setChild(child.id);
+  }
+  function addChildDiagram(root){
+    var d = {id:uid("dgr"), parentId:root.id, title:"Nouvel espace libre", nodes:[], arrows:[], notes:[]};
+    insertNestedChildAfterFocus(state.diagrams, d, root.id, "diagram");
+    scheduleSave(true); setChild(d.id);
+  }
+  function renderChildView(content, secs, sec, idx){
+    var children = sectionChildren(sec.obj), childIndex = children.findIndex(function(child){ return child.id === activeChild; });
+    var child = children[childIndex];
+    if (!child){ activeChild = null; renderSectionCards(content, sec, idx); return; }
+    try { localStorage.setItem(viewKey() + ":child:" + sec.id, child.id); } catch(e){}
+    var display = childDisplay(child, childIndex), color = child.kind === "table" && child.obj.color && TAGCOLOR_TO_SECTION[child.obj.color] ? TAGCOLOR_TO_SECTION[child.obj.color] : sectionColor(child, childIndex), p = sectionProgress(child);
+    var crumb = el("nav", {class:"breadcrumb", "aria-label":"Fil d'Ariane"}, [
+      el("button", {type:"button", text:"Vue d'ensemble", onclick:function(){ setSection(null); }}),
+      el("span", {text:"›"}), el("button", {type:"button", text:(idx + 1) + " · " + titleOf(sec.obj), onclick:function(){ setChild(null); }}),
+      el("span", {text:"›"}), el("strong", {text:display.number + " · " + display.title})
+    ]);
+    content.appendChild(crumb);
+    content.appendChild(el("div", {class:"sec-head", "data-sec":color}, [
+      el("div", {class:"sec-num", text:display.number}),
+      el("div", {class:"sec-meta"}, [el("div", {class:"sec-kicker", text:"Section " + (idx + 1) + " · Chapitre"}), el("div", {class:"sec-progress"}, [progressBar(p), el("span", {text:p.total ? p.filled + " / " + p.total + " remplies" : ""})])])
+    ]));
+    content.appendChild(renderTagsRow());
+    var board = el("div", {class:"board", "data-sec":color});
+    board.appendChild(child.kind === "table" ? renderTable(child.obj, {top:true}) : renderDiagram(child.obj, {top:true}));
+    content.appendChild(board);
+    var pager = el("nav", {class:"sec-pager", "aria-label":"Chapitres précédent et suivant"});
+    var previous = children[childIndex - 1], next = children[childIndex + 1];
+    pager.appendChild(previous ? el("button", {class:"pg-btn", type:"button", onclick:function(){ setChild(previous.id); }}, [icon("back"), el("span", {}, [el("small", {text:"Chapitre précédent"}), el("strong", {text:childDisplay(previous, childIndex - 1).number + " · " + childDisplay(previous, childIndex - 1).title})])]) : el("span"));
+    pager.appendChild(next ? el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setChild(next.id); }}, [el("span", {}, [el("small", {text:"Chapitre suivant"}), el("strong", {text:childDisplay(next, childIndex + 1).number + " · " + childDisplay(next, childIndex + 1).title})]), icon("next")]) : el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setChild(null); }}, [el("span", {}, [el("small", {text:"Terminé"}), el("strong", {text:"Retour aux chapitres"})]), icon("grid")]));
     content.appendChild(pager);
   }
 
@@ -561,46 +743,6 @@ window.Editor = (function(){
     overlay.appendChild(m);
     overlay.addEventListener("mousedown", function(e){ if (e.target===overlay) closeIt(); });
     document.body.appendChild(overlay);
-  }
-
-  function renderSectionOverview(parent){
-    var children = state.tables.filter(function(t){ return t.parentId === parent.id; });
-    if (children.length < 2) return null;
-    var key = "atelier-recherche:overview:" + (ctx && ctx.id) + ":" + parent.id;
-    var collapsed = false;
-    try { collapsed = localStorage.getItem(key) === "hidden"; } catch(e){}
-    var wrap = el("section", {class:"section-overview"});
-    var toggle = el("button", {class:"section-overview-toggle", type:"button", "aria-expanded":String(!collapsed)}, [
-      el("strong", {text:"Vue d'ensemble"}), el("span", {text:collapsed ? "Afficher la vue d'ensemble" : "Masquer la vue d'ensemble"})
-    ]);
-    toggle.addEventListener("click", function(){
-      try { localStorage.setItem(key, collapsed ? "shown" : "hidden"); } catch(e){}
-      render();
-    });
-    wrap.appendChild(toggle);
-    if (collapsed) return wrap;
-    var table = el("table", {class:"section-overview-table"});
-    table.appendChild(el("thead", {}, [el("tr", {}, [
-      el("th", {text:"Chapitre"}), el("th", {text:"Références"}), el("th", {text:"Repères"}), el("th", {text:"Résumés"})
-    ])]));
-    var body = el("tbody"), totals = {refs:0, summaries:0};
-    children.forEach(function(child){
-      var refs = (child.rows || []).filter(function(r){ return !r.kind; });
-      var summaryCol = (child.columns || []).find(function(c){ return /r[ée]sum[ée]/i.test(c.label || ""); });
-      var summaries = summaryCol ? refs.filter(function(r){ return r.cells[summaryCol.id] && stripHtml(r.cells[summaryCol.id].text).trim(); }).length : 0;
-      var counts = {};
-      refs.forEach(function(r){ Object.keys(r.cells || {}).forEach(function(cid){ (r.cells[cid].tags || []).forEach(function(tagId){ counts[tagId] = (counts[tagId] || 0) + 1; }); }); });
-      totals.refs += refs.length; totals.summaries += summaries;
-      var tagText = state.tags.map(function(tag){ return counts[tag.id] ? tag.label + " " + counts[tag.id] : ""; }).filter(Boolean).join(" · ");
-      body.appendChild(el("tr", {"data-overview-table":child.id}, [
-        el("th", {scope:"row"}, [el("button", {class:"overview-link", type:"button", text:titleOf(child), onclick:function(){ goToBlock("table", child.id); }})]),
-        el("td", {text:String(refs.length)}), el("td", {text:tagText || "—"}),
-        el("td", {class:"overview-summary"}, [el("span", {text:summaries + " / " + refs.length}), progressBar({total:refs.length, filled:summaries})])
-      ]));
-    });
-    body.appendChild(el("tr", {class:"overview-total"}, [el("th", {scope:"row", text:"Total"}), el("td", {text:String(totals.refs)}), el("td", {text:""}), el("td", {text:totals.summaries + " / " + totals.refs})]));
-    table.appendChild(body); wrap.appendChild(table);
-    return wrap;
   }
 
   /* ---------------- full-width reorderable board ---------------- */
@@ -1218,6 +1360,8 @@ window.Editor = (function(){
         {icon:"table", label:"Ajouter un sous-tableau", run:addSubTable},
         {icon:"canvas", label:"Ajouter un espace libre", run:addSubDiagram},
         {sep:true},
+        (!nested && !t.columns.length && sectionChildren(t).length >= 2) ? {icon:isCardSection(t) ? "check" : null, label:"Afficher les sous-tableaux en cartes", run:function(){ t.cards = isCardSection(t) ? false : true; scheduleSave(true); render(); }} : null,
+        (!nested && !t.columns.length && sectionChildren(t).length >= 2) ? {sep:true} : null,
         {icon:t.rowLines === "strong" ? "check" : null, label:"Lignes de séparation marquées", run:function(){ t.rowLines = t.rowLines === "strong" ? "" : "strong"; scheduleSave(true); render(); }},
         {sep:true},
         {icon:"palette", label:"Changer la couleur", run:function(){ openTableColorPopover(moreBtn, t); }},
@@ -1949,8 +2093,12 @@ window.Editor = (function(){
   }
   function ensureSectionFor(kind, id){
     var top = topLevelAncestorId(kind, id);
-    if (top && activeSection && activeSection !== top){ setSection(top, {keepScroll:true}); return true; }
-    if (top && !activeSection){ setSection(top, {keepScroll:true}); return true; }
+    if (top && activeSection !== top){ setSection(top, {keepScroll:true}); return true; }
+    var topTable = state.tables.find(function(t){ return t.id === top; });
+    var child = topTable && isCardSection(topTable) ? directChildFor(id) : null;
+    // La future navigation en fichiers cliquables doit réutiliser activeChild ici,
+    // plutôt que créer un second état de navigation.
+    if (child && activeChild !== child){ setChild(child); return true; }
     return false;
   }
   function goToBlock(kind, id){
@@ -2050,7 +2198,8 @@ window.Editor = (function(){
     if (!state || !activeSection) return;
     var sec = topSections().find(function(s){ return s.id === activeSection; });
     if (!sec) return;
-    var p = sectionProgress(sec);
+    var current = activeChild ? (state.tables.find(function(t){ return t.id === activeChild; }) || state.diagrams.find(function(d){ return d.id === activeChild; })) : null;
+    var p = current ? sectionProgress({kind:state.tables.indexOf(current) >= 0 ? "table" : "diagram", obj:current}) : sectionProgress(sec);
     var progress = document.querySelector(".sec-progress");
     if (progress){
       var fill = progress.querySelector(".pbar > span");
@@ -2060,18 +2209,6 @@ window.Editor = (function(){
       var label = progress.children[1];
       if (label) label.textContent = p.total ? p.filled + " / " + p.total + " remplies" : "";
     }
-    Array.prototype.forEach.call(document.querySelectorAll("tr[data-overview-table]"), function(row){
-      var table = state.tables.find(function(t){ return t.id === row.getAttribute("data-overview-table"); });
-      if (!table) return;
-      var refs = (table.rows || []).filter(function(r){ return !r.kind; });
-      var summaryCol = (table.columns || []).find(function(c){ return /r[ée]sum[ée]/i.test(c.label || ""); });
-      var filled = summaryCol ? refs.filter(function(r){ return r.cells[summaryCol.id] && stripHtml(r.cells[summaryCol.id].text).trim(); }).length : 0;
-      var summary = row.querySelector(".overview-summary");
-      if (summary){
-        var text = summary.querySelector("span"); if (text) text.textContent = filled + " / " + refs.length;
-        var fill = summary.querySelector(".pbar > span"); if (fill) fill.style.width = (refs.length ? Math.round(100 * filled / refs.length) : 0) + "%";
-      }
-    });
   }
 
   /* ---------------- persistence ---------------- */
@@ -2147,8 +2284,12 @@ window.Editor = (function(){
     lastFocus = {kind:null, tableId:null, rowId:null, colId:null, diagramId:null};
     document.body.classList.add("in-editor");
     activeSection = null;
+    activeChild = null;
     if (ctx.keepSection) activeSection = ctx.keepSection;
     else { try { activeSection = localStorage.getItem(viewKey()) || null; } catch(e){} }
+    if (activeSection){
+      try { activeChild = localStorage.getItem(viewKey() + ":child:" + activeSection) || null; } catch(e){}
+    }
     render();
     window.scrollTo(0,0);
   }
