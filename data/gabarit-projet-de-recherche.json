@@ -1,0 +1,3544 @@
+{
+ "title": "Titre de ton projet de recherche",
+ "sub": "",
+ "showIntro": true,
+ "order": [
+  "t6",
+  "tint",
+  "tintro",
+  "t5",
+  "t1",
+  "tobj",
+  "tconcepts",
+  "tcadretheo",
+  "t2",
+  "t3",
+  "tanalyse",
+  "tdiscussion",
+  "tconclusion"
+ ],
+ "tags": [
+  {
+   "id": "tag-concept",
+   "label": "concept clé",
+   "color": "blue"
+  },
+  {
+   "id": "tag-terrain",
+   "label": "terrain",
+   "color": "green"
+  },
+  {
+   "id": "tag-developper",
+   "label": "à développer",
+   "color": "yellow"
+  },
+  {
+   "id": "tag-methodo",
+   "label": "méthodologie",
+   "color": "mauve"
+  },
+  {
+   "id": "tag-posture",
+   "label": "posture / épistémologie",
+   "color": "orange"
+  },
+  {
+   "id": "tag-verifier",
+   "label": "à vérifier",
+   "color": "pink"
+  }
+ ],
+ "tables": [
+  {
+   "id": "tintro",
+   "title": "Introduction",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "notes-tintro",
+   "parentId": "tintro",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Dans l'introduction, amener le sujet à l'aide d'un exemple concret pour poser ensuite le problème : la question de recherche (Gaudet &amp; Robert, 2018).",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mue9zeoi3oabk",
+     "cells": {
+      "c1": {
+       "text": "Présenter brièvement les objectifs.",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "tbl_mud3p7taiqwgt",
+   "parentId": "tintro",
+   "title": "Rédaction de l'introduction",
+   "columns": [
+    {
+     "id": "col_mud3p7tb5ahkx",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "row_mud3p7tbv78ea",
+     "cells": {
+      "col_mud3p7tb5ahkx": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "mauve"
+  },
+  {
+   "id": "t1",
+   "title": "Question de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Question de recherche"
+    },
+    {
+     "id": "col_muedt37mqzyd3",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muedt37mqzyd3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-t1",
+   "parentId": "t1",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Rédaction"
+    },
+    {
+     "id": "col_muek5iseffdwq",
+     "label": "Réflexions"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muek5iseffdwq": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "tobj",
+   "title": "Objectifs",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Objectifs généraux"
+    },
+    {
+     "id": "c2",
+     "label": "Questions réflexives"
+    },
+    {
+     "id": "c3",
+     "label": "Réponses"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Objectifs généraux",
+       "tags": []
+      },
+      "c2": {
+       "text": "Pourquoi est-il important de poser cette question de recherche?<div><br></div><div><br></div><div>Il existe plusieurs interprétations/définitions possibles qui varient selon la discipline. La pertinence théorique est de définir cette étape sur le plan conceptuel.\n\n-&gt; Objectifs pratiques, sociaux, etc. pourraient être d'analyser les conséquences d'une redéfinition sur des politiques ou services.<br></div>",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mued7ge8sa4p7",
+     "cells": {
+      "c1": {
+       "text": "Objectifs théoriques",
+       "tags": []
+      },
+      "c2": {
+       "text": "À quelle discussion théorique et conceptuelle est-ce que je contribue ?<div><br></div><div>-&gt; Une autre interprétation du phénomène est nécessaire.</div>",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mued7sfonpf1y",
+     "cells": {
+      "c1": {
+       "text": "Objectifs empiriques",
+       "tags": []
+      },
+      "c2": {
+       "text": "<div>Quelles données aimerais-je produire ?</div><div><br></div>-&gt; Décrire un nouveau phénomène.",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mued822iu7fll",
+     "cells": {
+      "c1": {
+       "text": "Objectif social",
+       "tags": []
+      },
+      "c2": {
+       "text": "À qui s'adresse ma recherche, à qui peut-elle servir ?",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mued8fyb75uam",
+     "cells": {
+      "c1": {
+       "text": "Objectifs personnels",
+       "tags": []
+      },
+      "c2": {
+       "text": "Quelle est ma motivation personnelle dans ce projet ?",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-tobj",
+   "parentId": "tobj",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Rédaction"
+    },
+    {
+     "id": "col_muek6twt7solr",
+     "label": "Réflexions"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muek6twt7solr": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "tobj-axes",
+   "parentId": "tobj",
+   "title": "Axes de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Axes de recherche"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "tconcepts",
+   "title": "Concepts",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Contexte conceptuel"
+    },
+    {
+     "id": "c2",
+     "label": "Contenu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Cadre conceptuel",
+       "tags": []
+      },
+      "c2": {
+       "text": "Les concepts développés dans la revue théorique donnent le cadre conceptuel de la recherche.",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Expose le problème théorique",
+       "tags": []
+      },
+      "c2": {
+       "text": "Exposer le problème théorique : présenter les différents concepts — les outils, les auxiliaires — qui permettent d'observer le phénomène. C'est l'application du problème de recherche.<div><br></div><div>Les concepts sont généralements présentés dans ce qui s'appel le cadre théorique ou le cadre conceptuel. Ils présentent ce que nous savons sur notre objet de recherche à partir des débats théoriques et de la littérature scientifique.<br></div>",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_muekgra4els31",
+     "cells": {
+      "c1": {
+       "text": "Définit les concepts de la question<div><br></div>",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-tconcepts",
+   "parentId": "tconcepts",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "tconcepts-liste",
+   "parentId": "tconcepts",
+   "title": "Liste des concepts",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Concepts"
+    },
+    {
+     "id": "col_mue9d2ku6bff9",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_mue9d2ku6bff9": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "tcadretheo",
+   "title": "Cadre théorique",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Section"
+    },
+    {
+     "id": "c2",
+     "label": "Contenu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Cadre théorique — synthèse",
+       "tags": []
+      },
+      "c2": {
+       "text": "Le mécanisme sur lequel s'appuie le cadre théorique pour étudier le problème.<div><br></div><div>Le cadre théorique est un vaste paradigme sur lequel le chercheur s'appuie pour étudier un problème.<br></div>",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_muekakx8hgek1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t2",
+   "title": "Problématique de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Section"
+    },
+    {
+     "id": "c2",
+     "label": "Contenu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Problématique",
+       "tags": []
+      },
+      "c2": {
+       "text": "Justifier et expliquer en quoi le problème importe pour ma recherche. Mène vers la contribution et l'originalité.",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Phénomène",
+       "tags": []
+      },
+      "c2": {
+       "text": "Phénomène synchronique : comment interpréter le sens d'une situation, d'une représentation, d'une pratique?<div><br></div><div>Est-ce que je m'intéresse aux interactions, aux pratiques ou aux représentations dans le temps et l'espace?</div><div><br></div><div>Est-ce que je m'intéresse aux discours, aux représentations ou à l'image partagée ?</div>",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Hypothèses",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-t2",
+   "parentId": "t2",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Dans la méthodologie : préciser les propositions hypothétiques et typologiques mobilisées. Comment introduire et contextualiser ? Que révèlent les réponses ? Quels critères de choix, quels outils, comment le matériel sera-t-il analysé ?",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_muejrar6wx4z5",
+     "cells": {
+      "c1": {
+       "text": "L'argumentaire développé dans la problématique et le cadre théorique mène à la présentation de la question de recherche de la section méthodologie.\n\nBut: Présenter l'opérationalisation du problème théorique. Ce qui mène à la présentations des hypothèses.",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "t3",
+   "title": "Méthodologie",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Section"
+    },
+    {
+     "id": "c2",
+     "label": "Contenu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Terrain",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Outils",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Rédaction",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-t3",
+   "parentId": "t3",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Rédaction"
+    },
+    {
+     "id": "col_muekmumzr6bkj",
+     "label": "Réflexions"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muekmumzr6bkj": {
+       "text": "Est-ce que je veux analyser un récit ?<div>-&gt; analyse de discours</div><div>-&gt; Implique entretiens</div><div>-&gt; J'analyse le discours ou j'appuie mes hypothèses grâce au discours après mes observations ?</div>",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_muekq2w9flj86",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muekmumzr6bkj": {
+       "text": "Est-ce que je m'appuie sur une variable indépendante qui agirait sur une variable dépendante ? Vigilance à ne pas glisser vers une logique causale si ma posture est compréhensive.",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_muel6n7qcrdra",
+     "cells": {
+      "c1": {
+       "text": "Dans la méthodologie, il faut préciser et évoquer des propositions hypothétiques avec lesquelles je vais travailler. <div><br></div><div>La méthodologie justifie tous les choix faits.<br><div><br></div><div>-&gt; Quelles sont les réponses provisoires à la question de recherche ?</div><div><br></div><div>But : Lancer des pistes qui serviront à explorer le matériel à l'étude.</div></div>",
+       "tags": []
+      },
+      "col_muekmumzr6bkj": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mueld1bd5bha9",
+     "cells": {
+      "c1": {
+       "text": "Pourquoi mon approche méthodologique est la plus pertinente pour ce travail de recherche ? (Il faut justifier)<div><br></div><div>Selon quels critères de sélection ? (pourquoi)</div><div><br></div><div>Quels outils seront employés ?</div><div><br></div><div>Comment le matériel sera analusé ?</div>",
+       "tags": []
+      },
+      "col_muekmumzr6bkj": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "t3a",
+   "parentId": "t3",
+   "title": "Types de méthodologie - comment?",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Type"
+    },
+    {
+     "id": "c2",
+     "label": "Définition"
+    },
+    {
+     "id": "c3",
+     "label": "Réflexion"
+    },
+    {
+     "id": "c4",
+     "label": "Note"
+    },
+    {
+     "id": "c5",
+     "label": "Référence"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Ethnographie",
+       "tags": []
+      },
+      "c2": {
+       "text": "Manière de décrire systématiquement des cultures.<div><br></div><div>-&gt; par l'observation participante  : décrire le contexte tel qu'il est vécu par celles et ceux qui le vivent.</div>",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      },
+      "c4": {
+       "text": "",
+       "tags": []
+      },
+      "c5": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "row_mueli09gvhyaw",
+     "cells": {
+      "c1": {
+       "text": "École sémiotique d'ethnographie",
+       "tags": []
+      },
+      "c2": {
+       "text": "Associée à la description de la signification. <div><br></div><div>-&gt; La culture est un ensemble de signes qui doit être interprété à la fois par les membres et par l'ethnographe.</div><div><br></div><div>-&gt; Vise les comportements et les points de vue que tiennent les personnes sur ces mêmes comportements.</div><div><br></div><div>-&gt; décrire le contexte, l'épérience vécue pour créer un récit vivant et vraisemblant.</div>",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      },
+      "c4": {
+       "text": "",
+       "tags": []
+      },
+      "c5": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Entretiens",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      },
+      "c4": {
+       "text": "",
+       "tags": []
+      },
+      "c5": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Observation participante",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      },
+      "c4": {
+       "text": "",
+       "tags": []
+      },
+      "c5": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "mauve"
+  },
+  {
+   "id": "t3b",
+   "parentId": "t3",
+   "title": "Outils par méthodologie",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Type de méthodologie"
+    },
+    {
+     "id": "c2",
+     "label": "Moyens"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Ethnographie",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Entretiens",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Observation participante",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "yellow"
+  },
+  {
+   "id": "t3c",
+   "parentId": "t3",
+   "title": "Enjeux éthiques",
+   "columns": [],
+   "rows": [],
+   "color": "orange"
+  },
+  {
+   "id": "t3c-identification",
+   "parentId": "t3c",
+   "title": "1. Identification",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "t3c-id-responsable",
+   "parentId": "t3c-identification",
+   "title": "1.1 Responsable du projet",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Information"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Nom",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Programme d'études",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Courriel",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Téléphone",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r5",
+     "cells": {
+      "c1": {
+       "text": "Nom du directeur de recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r6",
+     "cells": {
+      "c1": {
+       "text": "Département",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r7",
+     "cells": {
+      "c1": {
+       "text": "Courriel du directeur de recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-id-conflits",
+   "parentId": "t3c-identification",
+   "title": "1.2 Conflits d'intérêts",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Conflits d'intérêts",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-id-projet",
+   "parentId": "t3c-identification",
+   "title": "1.3 Projet",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Titre",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Le projet est-il financé ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "Oui ou non. Par qui — indiquer l'organisme et le numéro de subvention / bourse.",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Date prévue du début du recrutement",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Date prévue de la fin de la recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r5",
+     "cells": {
+      "c1": {
+       "text": "Évaluation scientifique",
+       "tags": []
+      },
+      "c2": {
+       "text": "Quelle instance a examiné la valeur scientifique du projet ?",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-id-equipe",
+   "parentId": "t3c-identification",
+   "title": "1.4 Équipe de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Identifier chacune des personnes de l'équipe de recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Formation en éthique",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Engagement à la confidentialité",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-id-partenaires",
+   "parentId": "t3c-identification",
+   "title": "1.5 Partenaires",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "S'agit-il d'un projet multicentrique ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Est-ce que d'autres institutions, organismes, établissements ou unités administratives de l'UQTR sont impliqués ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Le projet nécessite-t-il des autorisations d'accès particulières ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-projet",
+   "parentId": "t3c",
+   "title": "2. Projet",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "t3c-proj-resume",
+   "parentId": "t3c-projet",
+   "title": "2.1 Résumé",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Donner un aperçu global des objectifs de recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Donner un aperçu global de votre méthodologie",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Donner un aperçu global de la population visée",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-proj-problematique",
+   "parentId": "t3c-projet",
+   "title": "2.2 Problématique et/ou cadre théorique",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Maximum 20 lignes",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-proj-objectifs",
+   "parentId": "t3c-projet",
+   "title": "2.3 Objectif, hypothèse ou question de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Maximum 20 lignes",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-proj-pertinence",
+   "parentId": "t3c-projet",
+   "title": "2.4 Pertinence du projet et/ou retombée anticipée",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Maximum 15 lignes",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-methodologie",
+   "parentId": "t3c",
+   "title": "3. Méthodologie",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "t3c-meth-devis",
+   "parentId": "t3c-methodologie",
+   "title": "3.1 Devis de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Rétrospective, projet pilote, étude avec groupe contrôle, cohorte, etc.",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-meth-deroulement",
+   "parentId": "t3c-methodologie",
+   "title": "3.2 Déroulement des activités indiquant les participants",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Formation de deux semaines avec pré-test et post-test, une séance d'une heure et demie.",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-meth-outils",
+   "parentId": "t3c-methodologie",
+   "title": "3.3 Outils de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Sélectionnez tous les types d'outils qui seront utilisés dans le cadre de votre projet.",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Pour chacun des outils que vous avez sélectionnés, donnez une description détaillée.",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-meth-analyse",
+   "parentId": "t3c-methodologie",
+   "title": "3.4 Plan d'analyse des données",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Donnez une description sommaire des paramètres d'analyse et des méthodes statistiques qui seront utilisées.",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-participants",
+   "parentId": "t3c",
+   "title": "4. Participants",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "t3c-part-requis",
+   "parentId": "t3c-participants",
+   "title": "4.1 Participants requis",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Indiquer la taille de l'échantillon",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-recrutement",
+   "parentId": "t3c-participants",
+   "title": "4.2 Sollicitation et recrutement",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Présentez vos critères d'inclusion et d'exclusion",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Décrire les outils, les moyens, la façon",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Indiquer comment, par qui, la stratégie",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-presentation",
+   "parentId": "t3c-participants",
+   "title": "4.3 Présentation du projet",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Préciser quand, comment et par qui",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-divulgation",
+   "parentId": "t3c-participants",
+   "title": "4.4 Divulgation partielle",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Des informations concernant le but véritable de la recherche seront cachées aux participants",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-vulnerable",
+   "parentId": "t3c-participants",
+   "title": "4.5 Population vulnérable",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "La recherche inclut-elle des populations vulnérables ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Précisez les moyens que vous comptez utiliser",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-autochtone",
+   "parentId": "t3c-participants",
+   "title": "4.6 Premier peuple",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "La recherche se déroule en contexte autochtone",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-communaute",
+   "parentId": "t3c-participants",
+   "title": "4.7 Implication de la communauté d'appartenance",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "La recherche implique-t-elle l'accord de la communauté à laquelle appartiennent les participants ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-dependance",
+   "parentId": "t3c-participants",
+   "title": "4.8 Lien de dépendance",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "La recherche inclut-elle un lien de dépendance entre le chercheur et les participants ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Étudiant-professeur",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Employé-employeur",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Affectif",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r5",
+     "cells": {
+      "c1": {
+       "text": "Autre",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r6",
+     "cells": {
+      "c1": {
+       "text": "Si oui, précisez",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-compensation",
+   "parentId": "t3c-participants",
+   "title": "4.9 Compensation, incitatif, rémunération",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Le projet prévoit-il une compensation ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-risques",
+   "parentId": "t3c-participants",
+   "title": "4.10 Risques et inconvénients",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Présenter les inconvénients",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Indiquer les stratégies utilisées",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Indiquer les personnes",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-decouverte",
+   "parentId": "t3c-participants",
+   "title": "4.11 Découverte fortuite significative",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Dans le cadre de ce projet de recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-avantages",
+   "parentId": "t3c-participants",
+   "title": "4.12 Avantages",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Préciser la nature des avantages",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-resultats",
+   "parentId": "t3c-participants",
+   "title": "4.13 Informations sur les résultats de la recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Les résultats de la recherche sont-ils communiqués aux participants ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-part-consentement",
+   "parentId": "t3c-participants",
+   "title": "4.14 Documentation de consentement",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Obtiendrez-vous un consentement écrit des participants de la recherche ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-confidentialite",
+   "parentId": "t3c",
+   "title": "5. Confidentialité et protection des données",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "t3c-confid-donnees",
+   "parentId": "t3c-confidentialite",
+   "title": "5.1 Confidentialité des données et des renseignements personnels",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Indiquer comment seront protégés les renseignements personnels",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-confid-conservation",
+   "parentId": "t3c-confidentialite",
+   "title": "5.2 Protection et conservation des données de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Plan de gestion des données de recherche",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-confid-ulterieure",
+   "parentId": "t3c-confidentialite",
+   "title": "5.3 Utilisation ultérieure",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Est-ce que les données pourraient être utilisées dans une recherche ultérieure ?",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-confid-diffusion",
+   "parentId": "t3c-confidentialite",
+   "title": "5.4 Moyens de diffusion des résultats",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Libellé"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Lister les moyens de diffusion prévus",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-references",
+   "parentId": "t3c",
+   "title": "6. Références",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Références"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-documents",
+   "parentId": "t3c",
+   "title": "7. Documents",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "t3c-doc-checklist",
+   "parentId": "t3c-documents",
+   "title": "7.1 Liste de vérification des documents",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Document"
+    },
+    {
+     "id": "c2",
+     "label": "Notes"
+    },
+    {
+     "id": "c3",
+     "label": "Rédaction"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "☐ Lettre d'information",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "☐ Formulaire de consentement",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "☐ Formulaire d'assentiment (si participant·es mineur·es)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "☐ Formulaire de retrait de données (facultatif)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r5",
+     "cells": {
+      "c1": {
+       "text": "☐ Guide d'entretien",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r6",
+     "cells": {
+      "c1": {
+       "text": "☐ Autres outils de collecte (guide d'atelier, questionnaire…)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-lettre",
+   "parentId": "t3c-documents",
+   "title": "Lettre d'information",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Élément à remplir"
+    },
+    {
+     "id": "c2",
+     "label": "Détail / contenu prévu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Titre du projet",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Présentation du projet",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Activités proposées aux participant·es",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Modalités éthiques annoncées",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r5",
+     "cells": {
+      "c1": {
+       "text": "Coordonnées de contact",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-consent-parent",
+   "parentId": "t3c-documents",
+   "title": "Formulaire de consentement",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Élément à remplir"
+    },
+    {
+     "id": "c2",
+     "label": "Détail / contenu prévu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Titre du projet (rappel)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Identification du ou de la participant·e (ou du parent / tuteur·trice)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Identification de l'enfant (si mineur·e)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Déclarations à cocher",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r5",
+     "cells": {
+      "c1": {
+       "text": "Signature et date",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r6",
+     "cells": {
+      "c1": {
+       "text": "Courriel (facultatif)",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-assentiment",
+   "parentId": "t3c-documents",
+   "title": "Formulaire d'assentiment (si participant·es mineur·es)",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Élément à remplir"
+    },
+    {
+     "id": "c2",
+     "label": "Détail / contenu prévu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Présentation simplifiée du projet",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Choix de participation",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Prénom ou pseudonyme",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Signature et date",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-retrait",
+   "parentId": "t3c-documents",
+   "title": "Formulaire de retrait de données (facultatif)",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Élément à remplir"
+    },
+    {
+     "id": "c2",
+     "label": "Détail / contenu prévu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Identification",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Date et signature",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Options de retrait à cocher",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-atelier",
+   "parentId": "t3c-documents",
+   "title": "Guide d'activité / d'atelier (pour chercheur·e)",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Élément à remplir"
+    },
+    {
+     "id": "c2",
+     "label": "Détail / contenu prévu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Durée",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Objectif",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Matériel prévu",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Déroulement",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "t3c-entretien",
+   "parentId": "t3c-documents",
+   "title": "Guide d'entretien",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Élément à remplir"
+    },
+    {
+     "id": "c2",
+     "label": "Détail / contenu prévu"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Durée",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "Question 1",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r3",
+     "cells": {
+      "c1": {
+       "text": "Question 2",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r4",
+     "cells": {
+      "c1": {
+       "text": "Question 3",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "tanalyse",
+   "title": "Analyse des données",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Analyse des données"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-tanalyse",
+   "parentId": "tanalyse",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "tdiscussion",
+   "title": "Discussion",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Discussion"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-tdiscussion",
+   "parentId": "tdiscussion",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "tconclusion",
+   "title": "Conclusion",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Conclusion"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-tconclusion",
+   "parentId": "tconclusion",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "notes-tcadretheo",
+   "parentId": "tcadretheo",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "t4",
+   "parentId": "tcadretheo",
+   "title": "Théories mobilisées",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Théorie / auteur·e·s"
+    },
+    {
+     "id": "c2",
+     "label": "Idée clé"
+    },
+    {
+     "id": "c3",
+     "label": "Réflexion"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "mauve"
+  },
+  {
+   "id": "t5",
+   "title": "Posture de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Posture ontologique"
+    },
+    {
+     "id": "c2",
+     "label": "Posture épistémologique"
+    },
+    {
+     "id": "c3",
+     "label": "Approche"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "Quelle est la nature de la réalité que j'étudie ? (ex. constructivisme, réalisme…)",
+       "tags": []
+      },
+      "c2": {
+       "text": "Comment puis-je connaître cette réalité ? (ex. interprétativisme, positivisme…)",
+       "tags": []
+      },
+      "c3": {
+       "text": "Quelle approche en découle ? (ex. compréhensive, explicative…)",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "r2",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      },
+      "c3": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "notes-t5",
+   "parentId": "t5",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Rédaction"
+    },
+    {
+     "id": "col_muedfupp217xq",
+     "label": "Réflexions"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muedfupp217xq": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "t6",
+   "title": "Notes de rédaction & réflexions",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Notes"
+    },
+    {
+     "id": "c2",
+     "label": "Se rattache à"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "tint",
+   "title": "Intuitions de recherche",
+   "columns": [],
+   "rows": []
+  },
+  {
+   "id": "notes-tint",
+   "parentId": "tint",
+   "title": "Notes",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Rédaction"
+    },
+    {
+     "id": "col_muejy6daes01u",
+     "label": "Réflexion"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "col_muejy6daes01u": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "blue"
+  },
+  {
+   "id": "tint-mes",
+   "parentId": "tint",
+   "title": "Mes intuitions de recherche",
+   "columns": [
+    {
+     "id": "c1",
+     "label": "Réflexion"
+    },
+    {
+     "id": "c2",
+     "label": "Référence"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "c1": {
+       "text": "",
+       "tags": []
+      },
+      "c2": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "mauve"
+  },
+  {
+   "id": "tint-modelisation",
+   "parentId": "tint",
+   "title": "Modélisation",
+   "columns": [
+    {
+     "id": "col_mudcrchlaojb4",
+     "label": "Modélisation"
+    },
+    {
+     "id": "col_mudcu7fy12g0q",
+     "label": "Explications"
+    }
+   ],
+   "rows": [
+    {
+     "id": "r1",
+     "cells": {
+      "col_mudcrchlaojb4": {
+       "text": "",
+       "tags": []
+      },
+      "col_mudcu7fy12g0q": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "color": "green"
+  }
+ ],
+ "diagrams": [
+  {
+   "id": "diagram",
+   "parentId": "tint-modelisation",
+   "title": "Schéma de mon processus",
+   "nodes": [],
+   "arrows": [],
+   "notes": [
+    {
+     "id": "note1",
+     "text": ""
+    }
+   ]
+  }
+ ],
+ "links": []
+}
