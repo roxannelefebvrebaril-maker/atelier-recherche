@@ -157,7 +157,14 @@ Inspire-toi de l'**ambiance**. Ne reproduis ni les illustrations, ni les logos, 
 
 ## 5. Façon de travailler
 
-Procède **par étapes**. Après chacune, fais un commit avec un message clair en français, puis montre-moi ce qui a changé. **Ne fais pas de push** : je synchronise moi-même avec « Sync Changes ».
+Procède **par étapes**. À la fin de chaque étape, **une fois les tests ci-dessous réussis** :
+
+1. publie-la toi-même dans le terminal de VS Code :
+   `git add -A && git commit -m "<message clair en français>" && git push` ;
+2. Vercel redéploie alors automatiquement l'app en ligne (environ 1 minute) ;
+3. montre-moi ce qui a changé et rappelle-moi d'aller vérifier l'app en ligne.
+
+Ne publie jamais une étape qui a des erreurs dans la console ou qui fait échouer un test. Dans ce cas, corrige d'abord.
 
 1. **Jetons et typographie** : nouvelle palette, polices, fond, cartes, boutons, dans `theme.css` et `index.html`. Aucun changement de comportement.
 2. **Vue d'ensemble et bibliothèque** : carte « hero » en dégradé, tuiles de statistiques, cartes-dossiers pour les sections et pour les projets de la bibliothèque (`app.js`).

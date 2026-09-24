@@ -1,0 +1,11 @@
+{
+  // Après chaque « Commit », VS Code envoie aussitôt sur GitHub (push) → Vercel redéploie tout seul.
+  "git.postCommitCommand": "sync",
+  // « Commit » inclut automatiquement tous les fichiers modifiés (pas besoin de « Stage »).
+  "git.enableSmartCommit": true,
+  "git.smartCommitChanges": "all",
+  // Pas de fenêtre de confirmation avant la synchronisation.
+  "git.confirmSync": false,
+  // Vérifie régulièrement s'il y a du nouveau sur GitHub.
+  "git.autofetch": true
+}
