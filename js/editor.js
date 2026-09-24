@@ -3,6 +3,7 @@ window.Editor = (function(){
 
   var TAG_COLORS = ["blue","mauve","green","yellow","orange","pink"];
   var state = null;
+  var lastSavedJson = null; // what was last written — lets a blur with no real change skip saving
   var persist = null;   // function(state) -> saves to the local store (set by open())
   var ctx = null;       // {id, kind, onBack, onExport} supplied by the app shell
   var armedEntity = null;
@@ -551,7 +552,7 @@ window.Editor = (function(){
   }
 
   function renderTop(){
-    var status = el("div", {class:"status " + saveStatus}, [
+    var status = el("div", {class:"status " + (CLOUD_CLASS[saveStatus] || saveStatus), title:"État de l'enregistrement"}, [
       el("span", {class:"dot"}),
       el("span", {text: STATUS_LABELS[saveStatus] || "…"})
     ]);
@@ -595,6 +596,7 @@ window.Editor = (function(){
     item("Texte structuré (.md)", function(){ ctx && ctx.onExport && ctx.onExport("md"); });
     item("Sauvegarde du projet (.json)", function(){ ctx && ctx.onExport && ctx.onExport("json"); });
     item("Imprimer / PDF", function(){ window.print(); });
+    if (ctx && ctx.cloud) item("Versions précédentes…", function(){ ctx.onExport && ctx.onExport("history"); });
     if (ctx && ctx.kind !== "template") item("Enregistrer comme gabarit…", function(){ ctx.onExport && ctx.onExport("template"); });
     positionPopover(pop, anchor);
     openPopover = {el:pop};
@@ -1227,6 +1229,18 @@ window.Editor = (function(){
     render();
   }
 
+  // Enregistre aussi pendant la frappe (après ~1 s de pause), pour les longues séances de notes :
+  // l'enregistrement ne redessine pas la page, donc il n'interrompt jamais l'écriture.
+  var typingTimer = null;
+  document.addEventListener("input", function(e){
+    if (!state) return;
+    var app = document.getElementById("app");
+    if (!app || !app.contains(e.target) || e.target.tagName === "INPUT") return;
+    if (saveStatus !== "saving") setStatus("saving");
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function(){ if (dirty) doSave(); }, 1000);
+  });
+
   document.addEventListener("keydown", function(e){
     if (!state) return;
     if (e.key === "Escape"){
@@ -1524,8 +1538,12 @@ window.Editor = (function(){
 
   /* ---------------- persistence ---------------- */
 
-  var STATUS_LABELS = {saved:"Enregistré sur cet appareil", saving:"Enregistrement…", error:"Erreur d'enregistrement — exporte une copie", idle:"…"};
-  function setStatus(s){ saveStatus = s; var el2 = document.querySelector(".status"); if (el2){ el2.className = "status "+s; var lbl = el2.querySelector("span:last-child"); if (lbl) lbl.textContent = STATUS_LABELS[s] || "…"; } }
+  var STATUS_LABELS = {
+    saved:"Enregistré sur cet appareil", saving:"Enregistrement…", error:"Erreur d'enregistrement — exporte une copie", idle:"…",
+    syncing:"Envoi en ligne…", synced:"Enregistré en ligne", offline:"Hors ligne — gardé sur l'appareil, envoi au retour du réseau"
+  };
+  var CLOUD_CLASS = {syncing:"saving", synced:"saved", offline:"offline", error:"error"};
+  function setStatus(s){ saveStatus = s; var el2 = document.querySelector("#app .status"); if (el2){ el2.className = "status "+(CLOUD_CLASS[s] || s); var lbl = el2.querySelector("span:last-child"); if (lbl) lbl.textContent = STATUS_LABELS[s] || "…"; } }
 
   function scheduleSave(light){
     if (!state) return;
@@ -1538,11 +1556,14 @@ window.Editor = (function(){
   function doSave(){
     clearTimeout(saveTimer);
     if (!state || !persist) return;
-    if (!dirty){ setStatus("saved"); return; }
+    if (!dirty){ if (saveStatus === "saving") setStatus(ctx && ctx.cloud ? (ctx.lastCloudStatus || "synced") : "saved"); return; }
     try {
+      var json = JSON.stringify(state);
+      if (json === lastSavedJson){ dirty = false; if (saveStatus === "saving") setStatus(ctx && ctx.cloud ? (ctx.lastCloudStatus || "synced") : "saved"); return; }
       persist(state);
+      lastSavedJson = json;
       dirty = false;
-      setStatus("saved");
+      setStatus(ctx && ctx.cloud ? "syncing" : "saved");
     } catch(err){
       console.error(err);
       setStatus("error");
@@ -1583,7 +1604,8 @@ window.Editor = (function(){
     migrateState();
     ctx = options || {};
     persist = ctx.save || null;
-    dirty = false; saveStatus = "saved"; armedEntity = null; dimTag = null;
+    dirty = false; saveStatus = ctx.initialStatus || "saved";
+    lastSavedJson = JSON.stringify(state); armedEntity = null; dimTag = null;
     lastFocus = {kind:null, tableId:null, rowId:null, colId:null, diagramId:null};
     document.body.classList.add("in-editor");
     render();
@@ -1591,6 +1613,10 @@ window.Editor = (function(){
   }
 
   function close(){
+    // Fait d'abord perdre le focus au champ en cours, pour que sa dernière saisie soit enregistrée
+    // pendant que le projet est encore ouvert.
+    var ae = document.activeElement, appEl = document.getElementById("app");
+    if (state && ae && appEl && appEl.contains(ae) && ae.blur) ae.blur();
     if (dirty) doSave();
     closePopover();
     state = null; persist = null; ctx = null; armedEntity = null;
@@ -1605,6 +1631,7 @@ window.Editor = (function(){
     flush: function(){ if (dirty) doSave(); },
     isDirty: function(){ return dirty; },
     currentId: function(){ return ctx ? ctx.id : null; },
+    setStatus: function(s){ if (ctx) ctx.lastCloudStatus = s; if (state && !(dirty && s === "synced")) setStatus(s); },
     getState: function(){ return state; }
   };
 })();

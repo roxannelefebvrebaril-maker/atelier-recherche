@@ -82,3 +82,23 @@ body{ margin:0 auto; }
   .scrollwrap{ overflow:visible; }
   table.datatable{ min-width:0; }
 }
+
+/* ---------- synchronisation en ligne ---------- */
+.status.offline .dot{ background:#c77a2e; }
+.status{ white-space:normal; text-align:right; }
+.lib-sync{ padding:0 6px 0 0; font-size:12.5px; }
+.lib-loading{ color:var(--ink-soft); padding:40px 0; text-align:center; }
+.login-card{
+  max-width:380px; margin:12vh auto 0; background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; box-shadow:var(--shadow); padding:26px 24px; display:flex; flex-direction:column; gap:10px;
+}
+.login-card h1{ margin:0; font-size:28px; }
+.login-card .sub{ margin:0 0 6px; }
+.login-card .field{ font-size:15px; padding:10px 12px; }
+.login-card .btn{ justify-content:center; padding:10px; font-size:14px; }
+.login-error{ margin:0; min-height:1.2em; color:var(--danger); font-size:13px; }
+.history-modal{ max-width:520px; }
+.history-list{ display:flex; flex-direction:column; gap:4px; max-height:52vh; overflow:auto; margin:10px 0 14px; font-size:13px; color:var(--ink-soft); }
+.history-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 8px; border-radius:8px; border:1px solid var(--border); }
+.history-row strong{ color:var(--ink); font-weight:600; }
+.history-actions{ display:flex; gap:4px; flex:none; }

@@ -17,53 +17,65 @@ Au premier lancement, l'app contient :
 
 ## Où sont les données ?
 
-Tout est enregistré automatiquement dans le **navigateur** (localStorage), sur l'appareil utilisé. Il n'y a ni serveur ni compte.
+Une fois la sauvegarde en ligne configurée (voir plus bas), tes projets sont enregistrés **en ligne**, dans une base de données Upstash Redis branchée à Vercel. Tu les retrouves sur tous tes appareils avec le même mot de passe.
 
-- Les données ne se synchronisent **pas** entre ordinateurs ou navigateurs.
-- Vider les données du site dans le navigateur les efface.
-- Clique régulièrement sur **Tout sauvegarder (.json)** pour garder une copie. Pour passer d'un appareil à l'autre, fais **Importer** sur l'autre appareil.
+- **Enregistrement continu** : l'app enregistre pendant la frappe (après environ 1 seconde de pause) et envoie aussitôt en ligne. Le point vert « Enregistré en ligne » confirme que c'est fait.
+- **Hors ligne** : tu peux continuer à écrire. Le texte est gardé sur l'appareil et envoyé automatiquement au retour du réseau (point orange).
+- **Deux appareils en même temps** : un projet ouvert sans être modifié se met à jour tout seul. Si le même projet a été modifié des deux côtés, rien n'est perdu : la version en ligne est affichée et celle de l'appareil devient une copie, « … — version de cet appareil ».
+- **Versions précédentes** : une copie est archivée au plus toutes les 10 minutes, et les 60 dernières sont conservées. Pour en restaurer une, ouvre **Exporter ▾ → Versions précédentes…**.
+- **Suppression** : un projet supprimé est gardé 30 jours dans une corbeille côté serveur. Tu ne la vois pas dans l'app, mais on peut le récupérer au besoin.
+- **Sauvegardes externes** : l'export **Tout sauvegarder (.json)** reste une bonne habitude, par exemple une fois par semaine.
+
+Sans configuration en ligne, par exemple en test local, l'app fonctionne en **mode local** : les données restent dans le navigateur.
 
 ## Déployer sur GitHub + Vercel
 
-C'est un site statique : pas de `npm install` ni d'étape de compilation.
-
 ### 1. Mettre le code sur GitHub
 
-**Option A, par le site GitHub (sans terminal)**
+Sur ton dépôt GitHub, clique sur **Add file → Upload files** et glisse **tout le contenu** du dossier, y compris le dossier `api`. Termine avec **Commit changes**. Vercel redéploie automatiquement.
 
-1. Sur github.com : **New repository**, nomme-le par exemple `atelier-recherche`, puis **Create repository**.
-2. Clique sur **uploading an existing file** et glisse *le contenu* du dossier : `index.html`, `vercel.json`, `README.md` et les dossiers `css/`, `js/` et `data/`.
-3. Clique sur **Commit changes**.
+### 2. Ajouter la base de données (une seule fois)
 
-**Option B, avec le terminal**
+1. Dans Vercel, ouvre ton projet, puis l'onglet **Storage**.
+2. Clique sur **Create Database** (ou **Browse Marketplace**), choisis **Upstash**, puis **Upstash for Redis**, et **Continue**.
+3. Plan **Free**. Région : la plus proche, par exemple *Washington, D.C. (iad1)*. Donne-lui un nom, puis **Create**.
+4. Quand Vercel le propose, **connecte** la base à ton projet, sur tous les environnements. Laisse le préfixe par défaut.
+   Vercel ajoute alors tout seul les variables `KV_REST_API_URL` et `KV_REST_API_TOKEN`.
 
-```bash
-cd atelier-recherche
-git init
-git add .
-git commit -m "Atelier de recherche : première version"
-git branch -M main
-git remote add origin https://github.com/<ton-compte>/atelier-recherche.git
-git push -u origin main
-```
+### 3. Choisir ton mot de passe
 
-### 2. Brancher Vercel
+1. Dans le projet Vercel, ouvre **Settings → Environment Variables**.
+2. Clique sur **Add** :
+   - Key : `APP_PASSWORD`
+   - Value : ton mot de passe, long et que tu n'utilises nulle part ailleurs.
+   - Environnements : tous.
+3. Clique sur **Save**.
 
-1. Sur vercel.com : **Add New… → Project**, puis **Import** le dépôt `atelier-recherche`.
-2. Framework Preset : **Other**. Laisse *Build Command* et *Output Directory* vides, et *Root Directory* à `./`.
-3. Clique sur **Deploy**. Chaque `git push` (ou chaque fichier modifié sur GitHub) redéploie automatiquement.
+### 4. Redéployer
 
-> Chaque adresse a son propre stockage. Les données saisies sur `xxx.vercel.app` ne sont pas visibles sur `localhost` ni sur un autre domaine, et inversement.
+Les variables ne s'appliquent qu'au prochain déploiement :
+
+1. Ouvre l'onglet **Deployments**.
+2. Sur le déploiement le plus récent, clique sur **⋯** puis **Redeploy**.
+
+### 5. Se connecter
+
+Ouvre l'adresse de l'app et entre le mot de passe. Au premier démarrage :
+
+- si le navigateur contenait déjà des projets (version locale), ils sont **envoyés en ligne** automatiquement ;
+- sinon, l'app crée le gabarit UQTR et ta thèse.
+
+Sur un autre appareil, il suffit d'ouvrir la même adresse et d'entrer le même mot de passe.
+
+> Pour changer le mot de passe, modifie `APP_PASSWORD` dans Vercel, puis fais **Redeploy**. Tous les appareils devront se reconnecter ; les données ne sont pas touchées.
 
 ## Tester en local
 
 ```bash
 cd atelier-recherche
-python3 -m http.server 8000
-# puis ouvrir http://localhost:8000
+python3 -m http.server 8000      # mode local, sans sauvegarde en ligne
+# ou, pour tester les fonctions /api :  npx vercel dev
 ```
-
-(Ouvrir `index.html` directement fonctionne aussi dans la plupart des navigateurs.)
 
 ## Structure
 
@@ -72,7 +84,11 @@ index.html          page unique
 css/editor.css      styles de l'éditeur (repris de l'outil d'origine)
 css/app.css         bibliothèque, modales, impression, ajustements mobiles
 js/seeds.js         données de départ (gabarit UQTR + thèse), chargées au 1er lancement
-js/storage.js       stockage local : projets, gabarits, import/export
+js/storage.js       copie locale : projets, gabarits, import/export
+js/cloud.js         synchronisation en ligne (envoi, réception, conflits, hors ligne, historique)
+api/login.js        connexion par mot de passe (APP_PASSWORD)
+api/data.js         lecture/écriture des projets dans Upstash Redis, historique des versions
+api/_lib/common.js  utilitaires partagés par les fonctions
 js/editor.js        l'éditeur de cartographie (tableaux, repères, liens, espaces libres)
 js/app.js           bibliothèque, routeur (#/ et #/p/<id>), exports .json/.md
 data/*.json         copies lisibles du gabarit et de la thèse, réimportables via « Importer »
@@ -80,6 +96,6 @@ data/*.json         copies lisibles du gabarit et de la thèse, réimportables v
 
 ## Pistes pour la suite
 
-- Synchronisation entre appareils et partage avec la direction de recherche (par exemple avec Supabase ou Firebase, et une connexion par courriel).
+- Comptes individuels, par exemple pour donner un accès en lecture à la direction de recherche.
 - Export Word (.docx) du formulaire éthique.
 - Historique des versions et annulation.

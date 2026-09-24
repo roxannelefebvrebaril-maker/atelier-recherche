@@ -3,6 +3,7 @@
   "use strict";
 
   var libraryEl = document.getElementById("library");
+  var localReason = null;
 
   /* ---------------- petits utilitaires ---------------- */
 
@@ -311,6 +312,7 @@
         h("p", {class:"sub", text:"Chaque projet est une cartographie modifiable : question, objectifs, concepts, méthodologie, éthique… Crée un projet à partir d'un gabarit, ou transforme un projet en gabarit pour le réutiliser."})
       ]),
       h("div", {class:"lib-toolbar"}, [
+        Cloud.isCloud() ? syncBadge() : null,
         h("button", {class:"btn primary", text:"+ Nouveau projet", onclick: function(){ newProject(); }}),
         h("button", {class:"btn", text:"Importer (.json)", onclick: importFile}),
         h("button", {class:"btn", text:"Tout sauvegarder (.json)", onclick: exportAll})
@@ -327,10 +329,19 @@
         });
       }})));
 
-    libraryEl.appendChild(h("footer", {class:"foot"}, [
-      h("span", {text:"Tes données restent dans ce navigateur, sur cet appareil (" + kb + " Ko utilisés). Elles ne sont pas synchronisées : exporte une sauvegarde régulièrement."}),
-      h("span", {text:"Atelier de recherche"})
-    ]));
+    var footLeft = Cloud.isCloud()
+      ? h("span", {text:"Tes projets sont enregistrés en ligne et disponibles sur tous tes appareils. Une copie reste aussi sur cet appareil pour travailler hors ligne."})
+      : h("span", {text: localReason === "not-configured"
+          ? "Sauvegarde en ligne pas encore configurée dans Vercel : pour l'instant, les données restent sur cet appareil (" + kb + " Ko)."
+          : "Mode local : les données restent dans ce navigateur (" + kb + " Ko). Exporte une sauvegarde régulièrement."});
+    var footRight = Cloud.isCloud()
+      ? h("button", {class:"btn small ghost", text:"Se déconnecter de cet appareil", onclick:function(){
+          confirmBox("Se déconnecter ? Il faudra entrer le mot de passe à nouveau sur cet appareil. Tes projets restent en ligne.", "Se déconnecter", function(){
+            Cloud.sync().then(function(){ Cloud.logout(); renderLogin(); });
+          });
+        }})
+      : h("span", {text:"Atelier de recherche"});
+    libraryEl.appendChild(h("footer", {class:"foot"}, [footLeft, footRight]));
   }
 
   /* ---------------- routeur ---------------- */
@@ -340,15 +351,30 @@
   function openEditor(id, meta, state){
     document.title = meta.title + " · Atelier de recherche";
     Editor.open(state, {
-      id: id, kind: meta.kind,
+      id: id, kind: meta.kind, cloud: Cloud.isCloud(),
+      initialStatus: Cloud.isCloud() ? (meta.pending ? (Cloud.status() === "offline" ? "offline" : "syncing") : "synced") : "saved",
       save: function(s){ Store.save(id, s); document.title = (s.title || "Sans titre") + " · Atelier de recherche"; },
       onBack: function(){ go("#/"); },
       onExport: function(kind){
         if (kind === "json") exportJSON(id);
         else if (kind === "md") exportMarkdown(id);
         else if (kind === "template") saveAsTemplate(id);
+        else if (kind === "history") showHistory(id);
       }
     });
+  }
+
+  // Recharge le projet ouvert (arrivé d'un autre appareil/onglet) sans perdre la position.
+  function reloadOpen(force){
+    var id = Editor.currentId(); if (!id) return false;
+    if (!force && (Editor.isDirty() || (document.activeElement && document.activeElement.isContentEditable))) return false;
+    var meta = Store.meta(id), state = Store.load(id);
+    if (!meta || !state){ toast("Ce projet a été supprimé sur un autre appareil."); go("#/"); return true; }
+    var y = window.scrollY;
+    Editor.close();
+    openEditor(id, meta, state);
+    window.scrollTo(0, y);
+    return true;
   }
 
   function route(){
@@ -370,25 +396,126 @@
     }
   }
 
+  /* ---------------- versions précédentes ---------------- */
+
+  function showHistory(id){
+    modal(function(box, close){
+      box.classList.add("history-modal");
+      box.appendChild(h("h3", {text:"Versions précédentes"}));
+      box.appendChild(h("p", {class:"lib-hint", text:"Une copie est archivée en ligne au plus toutes les 10 minutes pendant que tu travailles (60 dernières conservées). Restaurer remplace le contenu actuel ; la version actuelle est archivée avant."}));
+      var list = h("div", {class:"history-list", text:"Chargement…"});
+      box.appendChild(list);
+      box.appendChild(h("div", {class:"row"}, [h("button", {class:"btn ghost", text:"Fermer", onclick: close})]));
+      Editor.flush();
+      Cloud.history(id).then(function(versions){
+        list.textContent = "";
+        if (!versions.length){ list.appendChild(h("p", {class:"lib-hint", text:"Aucune version archivée pour l'instant. Elles apparaîtront au fil de tes modifications."})); return; }
+        versions.forEach(function(v){
+          var when = new Date(v.t * 1000).toLocaleString("fr-CA", {weekday:"short", day:"numeric", month:"long", hour:"2-digit", minute:"2-digit"});
+          list.appendChild(h("div", {class:"history-row"}, [
+            h("span", {}, [h("strong", {text: when}), h("small", {text: " · " + Math.max(1, Math.round(v.size / 1024)) + " Ko"})]),
+            h("span", {class:"history-actions"}, [
+              h("button", {class:"btn small ghost", text:"Copie", title:"Créer un nouveau projet à partir de cette version", onclick: function(){
+                Cloud.version(id, v.i).then(function(d){
+                  var st = d.state; st.title = (st.title || "Projet") + " — version du " + when;
+                  var m = Store.meta(id);
+                  Store.create(m ? m.kind : "project", st);
+                  close(); toast("Copie créée dans « Mes projets ».");
+                }).catch(function(e){ toast(e.message); });
+              }}),
+              h("button", {class:"btn small", text:"Restaurer", onclick: function(){
+                confirmBox("Restaurer la version du " + when + " ? Le contenu actuel sera remplacé (il reste disponible dans l'historique).", "Restaurer", function(){
+                  Cloud.version(id, v.i).then(function(d){
+                    Store.save(id, d.state);
+                    return Cloud.push(id, {snapshot:true});
+                  }).then(function(){ close(); reloadOpen(true); toast("Version restaurée."); })
+                    .catch(function(e){ toast(e.message); });
+                });
+              }})
+            ])
+          ]));
+        });
+      }).catch(function(e){ list.textContent = e.message; });
+    });
+  }
+
+  /* ---------------- connexion ---------------- */
+
+  function renderLogin(message){
+    Editor.close();
+    libraryEl.hidden = false;
+    libraryEl.innerHTML = "";
+    var input = h("input", {class:"field", type:"password", autocomplete:"current-password", placeholder:"Mot de passe"});
+    var err = h("p", {class:"login-error", text: message || ""});
+    var btn = h("button", {class:"btn primary", text:"Se connecter"});
+    function submit(e){
+      if (e) e.preventDefault();
+      if (!input.value) { input.focus(); return; }
+      btn.disabled = true; err.textContent = "";
+      Cloud.login(input.value).then(function(){ startCloud(); })
+        .catch(function(e){ btn.disabled = false; err.textContent = e.message; input.select(); });
+    }
+    var form = h("form", {class:"login-card"}, [
+      h("div", {class:"eyebrow", text:"Atelier de recherche"}),
+      h("h1", {text:"Connexion"}),
+      h("p", {class:"sub", text:"Entre le mot de passe de l'application pour retrouver tes projets, quel que soit l'appareil."}),
+      input, err, btn
+    ]);
+    form.addEventListener("submit", submit);
+    libraryEl.appendChild(form);
+    setTimeout(function(){ input.focus(); }, 0);
+  }
+
+  function startCloud(){
+    libraryEl.innerHTML = "";
+    libraryEl.appendChild(h("p", {class:"lib-loading", text:"Synchronisation de tes projets…"}));
+    Cloud.sync().then(function(){ route(); });
+  }
+
+  Cloud.hooks.onAuthLost = function(){ Editor.flush(); renderLogin("Ta session a expiré (le mot de passe a peut-être changé). Reconnecte-toi : tes modifications non envoyées sont gardées sur l'appareil."); };
+  Cloud.hooks.onRemoteUpdate = function(ids){
+    var open = Editor.currentId();
+    if (open && ids.indexOf(open) >= 0){ if (reloadOpen(false)) toast("Mis à jour depuis un autre appareil."); }
+    else if (!open && !libraryEl.hidden && !document.querySelector(".overlay")) renderLibrary();
+  };
+  Cloud.hooks.onConflict = function(id, copyId){
+    if (Editor.currentId() === id) reloadOpen(true);
+    else if (!libraryEl.hidden) renderLibrary();
+    toast("Ce projet avait été modifié sur un autre appareil : la version en ligne est affichée, et tes changements d'ici sont gardés dans une copie.");
+  };
+  Cloud.onStatus(function(s){
+    if (Editor.currentId()) Editor.setStatus(s);
+    var el = document.querySelector(".lib-sync");
+    if (el) el.replaceWith(syncBadge());
+  });
+
+  function syncBadge(){
+    var s = Cloud.status();
+    var label = {synced:"Tout est enregistré en ligne", syncing:"Synchronisation…", offline:"Hors ligne — modifications gardées sur l'appareil", error:"Problème de synchronisation", idle:"…"}[s] || "…";
+    return h("span", {class:"lib-sync status " + ({synced:"saved", syncing:"saving", offline:"offline", error:"error"}[s] || "")}, [h("span", {class:"dot"}), h("span", {text:label})]);
+  }
+
   // Un autre onglet a modifié le projet ouvert : on recharge si rien n'est en cours ici.
   window.addEventListener("storage", function(e){
-    var id = Editor.currentId();
     if (!e.key || e.key.indexOf(Store.PREFIX) !== 0) return;
-    if (!id){ if (!libraryEl.hidden) renderLibrary(); return; }
-    if (e.key === Store.DOC_KEY(id) && !Editor.isDirty() && !document.activeElement.isContentEditable){
-      var meta = Store.meta(id), state = Store.load(id);
-      if (meta && state){
-        var y = window.scrollY;
-        Editor.close();
-        openEditor(id, meta, state);
-        window.scrollTo(0, y);
-      }
+    var id = Editor.currentId();
+    if (!id){ if (!libraryEl.hidden && document.querySelector(".lib-top") && !document.querySelector(".overlay")) renderLibrary(); return; }
+    if (e.key === Store.DOC_KEY(id)) reloadOpen(false);
+  });
+
+  window.addEventListener("hashchange", function(){ if (document.querySelector(".login-card")) return; route(); });
+  window.addEventListener("beforeunload", function(e){
+    Editor.flush();
+    if (Cloud.isCloud() && Store.readIndex().some(function(m){ return m.pending; }) && navigator.onLine !== false){
+      Cloud.sync();
     }
   });
 
-  window.addEventListener("hashchange", route);
-  window.addEventListener("beforeunload", function(){ Editor.flush(); });
-
-  Store.seedIfEmpty();
-  route();
+  Cloud.init().then(function(res){
+    if (res.mode === "login") return renderLogin();
+    if (res.mode === "cloud") return res.offline ? route() : startCloud();
+    localReason = res.reason;
+    Store.seedIfEmpty();
+    route();
+  });
 })();

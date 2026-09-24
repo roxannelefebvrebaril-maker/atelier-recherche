@@ -6,6 +6,10 @@ window.Store = (function(){
   var INDEX_KEY = PREFIX + "index";
   var DOC_KEY = function(id){ return PREFIX + "doc:" + id; };
 
+  var listeners = [];
+  function emit(type, id, extra){ listeners.forEach(function(fn){ try { fn(type, id, extra); } catch(e){ console.error(e); } }); }
+  function onChange(fn){ listeners.push(fn); }
+
   function uid(){ return "p_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function now(){ return new Date().toISOString(); }
   function clone(o){ return JSON.parse(JSON.stringify(o)); }
@@ -33,7 +37,29 @@ window.Store = (function(){
     localStorage.setItem(DOC_KEY(id), JSON.stringify(state));
     var idx = readIndex();
     var m = idx.find(function(x){ return x.id === id; });
-    if (m){ m.title = (state.title || "").trim() || "Sans titre"; m.updatedAt = now(); writeIndex(idx); }
+    if (m){ m.title = (state.title || "").trim() || "Sans titre"; m.updatedAt = now(); m.pending = true; m.lv = (m.lv || 0) + 1; writeIndex(idx); }
+    emit("save", id);
+  }
+
+  // Used by the sync engine: write what came from the server without marking it pending.
+  function putFromServer(meta, state){
+    localStorage.setItem(DOC_KEY(meta.id), JSON.stringify(state));
+    var idx = readIndex();
+    var m = idx.find(function(x){ return x.id === meta.id; });
+    var clean = {id:meta.id, kind:meta.kind === "template" ? "template" : "project", title:meta.title || state.title || "Sans titre",
+      createdAt:meta.createdAt, updatedAt:meta.updatedAt, fromTemplate:meta.fromTemplate || null, rev:meta.rev || 0, pending:false, lv:0};
+    if (m) Object.assign(m, clean); else idx.push(clean);
+    writeIndex(idx);
+  }
+  function patchMeta(id, patch){
+    var idx = readIndex();
+    var m = idx.find(function(x){ return x.id === id; });
+    if (m){ Object.assign(m, patch); writeIndex(idx); }
+    return m;
+  }
+  function forget(id){
+    localStorage.removeItem(DOC_KEY(id));
+    writeIndex(readIndex().filter(function(m){ return m.id !== id; }));
   }
 
   function create(kind, state, extra){
@@ -41,9 +67,10 @@ window.Store = (function(){
     var s = clone(state);
     localStorage.setItem(DOC_KEY(id), JSON.stringify(s));
     var idx = readIndex();
-    var m = Object.assign({id:id, kind:kind, title:(s.title||"").trim() || "Sans titre", createdAt:now(), updatedAt:now()}, extra || {});
+    var m = Object.assign({id:id, kind:kind, title:(s.title||"").trim() || "Sans titre", createdAt:now(), updatedAt:now(), rev:0, pending:true, lv:1}, extra || {});
     idx.push(m);
     writeIndex(idx);
+    emit("save", id);
     return m;
   }
 
@@ -53,8 +80,9 @@ window.Store = (function(){
   }
 
   function remove(id){
-    localStorage.removeItem(DOC_KEY(id));
-    writeIndex(readIndex().filter(function(m){ return m.id !== id; }));
+    var m = meta(id);
+    forget(id);
+    emit("remove", id, m);
   }
 
   // Strip a project down to its skeleton: keeps every table/column/diagram and the first
@@ -124,6 +152,7 @@ window.Store = (function(){
 
   return {
     PREFIX: PREFIX, DOC_KEY: DOC_KEY,
+    onChange: onChange, putFromServer: putFromServer, patchMeta: patchMeta, forget: forget, readIndex: readIndex,
     list: list, meta: meta, load: load, save: save, create: create, rename: rename, remove: remove,
     structureOnly: structureOnly, exportAll: exportAll, exportOne: exportOne, importData: importData,
     seedIfEmpty: seedIfEmpty, usage: usage, clone: clone
