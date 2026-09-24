@@ -252,31 +252,60 @@
 
   /* ---------------- bibliothèque ---------------- */
 
+  var CARD_COLORS = ["pink","violet","blue","teal","green","amber","coral","indigo"];
+  var cardIndex = 0;
+  function cardMenu(anchor, items){
+    var old = document.querySelector(".lib-pop"); if (old) old.remove();
+    var pop = h("div", {class:"pop menu-pop lib-pop", role:"menu"});
+    items.forEach(function(it){
+      pop.appendChild(h("button", {class:"menu-item" + (it.danger ? " danger" : ""), type:"button", role:"menuitem", text: it.label, onclick:function(e){ e.stopPropagation(); pop.remove(); it.fn(); }}));
+    });
+    document.body.appendChild(pop);
+    var r = anchor.getBoundingClientRect();
+    pop.style.position = "fixed";
+    pop.style.top = Math.min(r.bottom + 6, window.innerHeight - pop.offsetHeight - 10) + "px";
+    pop.style.left = Math.max(10, Math.min(r.left, window.innerWidth - pop.offsetWidth - 10)) + "px";
+    function away(ev){ if (!pop.contains(ev.target)){ pop.remove(); document.removeEventListener("mousedown", away, true); } }
+    setTimeout(function(){ document.addEventListener("mousedown", away, true); }, 0);
+  }
+
   function card(m){
     var isTpl = m.kind === "template";
     var menu = h("div", {class:"card-actions"});
-    function act(label, fn, cls){ menu.appendChild(h("button", {class:"btn small " + (cls || "ghost"), text: label, onclick: function(e){ e.stopPropagation(); fn(); }})); }
-    if (isTpl){
-      act("Utiliser", function(){ newProject(m.id); }, "primary");
-      act("Modifier", function(){ go("#/p/" + m.id); });
-    } else {
-      act("Ouvrir", function(){ go("#/p/" + m.id); }, "primary");
-      act("En faire un gabarit", function(){ saveAsTemplate(m.id); });
-    }
+    var items = [];
+    function act(label, fn, danger){ items.push({label:label, fn:fn, danger:danger}); }
+    var primary = isTpl
+      ? h("button", {class:"btn small primary", text:"Utiliser ce gabarit", onclick:function(e){ e.stopPropagation(); newProject(m.id); }})
+      : h("button", {class:"btn small primary", text:"Ouvrir", onclick:function(e){ e.stopPropagation(); go("#/p/" + m.id); }});
+    menu.appendChild(primary);
+    if (isTpl) act("Modifier le gabarit", function(){ go("#/p/" + m.id); });
+    else act("En faire un gabarit", function(){ saveAsTemplate(m.id); });
     act("Renommer", function(){
       promptBox("Renommer", "Nouveau titre", m.title, "Renommer", function(v){ Store.rename(m.id, v); renderLibrary(); });
     });
     act("Dupliquer", function(){ duplicate(m.id); });
-    act("Exporter", function(){ exportJSON(m.id); });
+    act("Exporter (.json)", function(){ exportJSON(m.id); });
     act("Supprimer", function(){
       confirmBox("Supprimer définitivement « " + m.title + " » ? Exporte-le d'abord si tu veux en garder une copie.", "Supprimer", function(){ Store.remove(m.id); renderLibrary(); }, true);
-    }, "ghost danger-text");
+    }, true);
+    var more = h("button", {class:"btn small ghost card-more-lib", type:"button", title:"Plus d'actions", "aria-label":"Plus d'actions", text:"⋯"});
+    more.addEventListener("click", function(e){ e.stopPropagation(); cardMenu(more, items); });
+    menu.appendChild(more);
 
     var s = Store.load(m.id);
     var stats = s ? (s.tables || []).filter(function(t){ return !t.parentId; }).length + " sections" : "";
-    var c = h("article", {class:"lib-card" + (isTpl ? " is-template" : ""), tabindex:"0"}, [
+    var prog = null;
+    if (s && !isTpl){
+      try {
+        var p = Editor.progressOf(Store.clone(s)), v = p.total ? Math.round(100 * p.filled / p.total) : 0;
+        var bar = h("div", {class:"pbar"}); var fill = h("span"); fill.style.width = v + "%"; bar.appendChild(fill);
+        prog = h("div", {class:"lib-card-progress"}, [bar, h("span", {text: v + " %"})]);
+      } catch(e){}
+    }
+    var c = h("article", {class:"lib-card" + (isTpl ? " is-template" : ""), tabindex:"0", "data-sec": CARD_COLORS[(cardIndex++) % CARD_COLORS.length]}, [
       h("div", {class:"lib-card-kind", text: isTpl ? "Gabarit" : "Projet"}),
       h("h3", {text: m.title}),
+      prog,
       h("div", {class:"lib-card-meta"}, [
         h("span", {text: "Modifié le " + fmtDate(m.updatedAt)}),
         stats ? h("span", {text: stats}) : null,
@@ -301,6 +330,7 @@
 
   function renderLibrary(){
     libraryEl.innerHTML = "";
+    cardIndex = 0;
     var projects = Store.list("project");
     var templates = Store.list("template");
     var kb = Math.round(Store.usage() / 1024);

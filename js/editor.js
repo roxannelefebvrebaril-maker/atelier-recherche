@@ -102,35 +102,374 @@ window.Editor = (function(){
   }
   function tagById(id){ return state.tags.find(function(t){return t.id===id;}); }
 
-  /* ---------------- render ---------------- */
+  /* ================= NOUVELLE INTERFACE : barre latérale + une section à la fois ================= */
+
+  var activeSection = null;   // id de la section affichée, ou null = vue d'ensemble
+  var SECTION_COLORS = ["coral","amber","green","teal","blue","violet","pink","indigo"];
+  var TAGCOLOR_TO_SECTION = {blue:"blue", mauve:"violet", green:"green", yellow:"amber", orange:"coral", pink:"pink"};
+
+  var ICONS = {
+    back:'<path d="M15 18l-6-6 6-6"/>', next:'<path d="M9 18l6-6-6-6"/>',
+    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>', more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>', link:'<path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/>',
+    tag:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+    arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>', shape:'<rect x="4" y="6" width="16" height="12" rx="3"/>',
+    grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+    help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><circle cx="12" cy="17" r=".6"/>',
+    download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>', drag:'<circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/>',
+    check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+    palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.2"/><circle cx="12" cy="7.5" r="1.2"/><circle cx="16" cy="10" r="1.2"/>',
+    table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>', canvas:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M14 15l3-3"/>',
+    column:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>', close:'<path d="M6 6l12 12M18 6L6 18"/>'
+  };
+  function icon(name, extraClass){
+    var s = document.createElement("span");
+    s.className = "ico" + (extraClass ? " " + extraClass : "");
+    s.setAttribute("aria-hidden", "true");
+    s.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || "") + '</svg>';
+    return s;
+  }
+  function iconBtn(name, label, onclick, cls){
+    var b = el("button", {class:"ibtn " + (cls || ""), title:label, "aria-label":label, type:"button"});
+    b.appendChild(icon(name));
+    if (onclick) b.addEventListener("click", onclick);
+    return b;
+  }
+  function btn(iconName, label, onclick, cls){
+    var b = el("button", {class:"btn " + (cls || ""), type:"button"});
+    if (iconName) b.appendChild(icon(iconName));
+    b.appendChild(el("span", {text: label}));
+    if (onclick) b.addEventListener("click", onclick);
+    return b;
+  }
+
+  /* ---------- sections & avancement ---------- */
+
+  function topSections(){
+    normalizeOrder();
+    return state.order.map(function(id){
+      var t = state.tables.find(function(x){ return x.id===id; });
+      if (t) return {kind:"table", id:id, obj:t};
+      var d = state.diagrams.find(function(x){ return x.id===id; });
+      return d ? {kind:"diagram", id:id, obj:d} : null;
+    }).filter(Boolean);
+  }
+  function sectionColor(sec, index){
+    if (sec.obj.color && TAGCOLOR_TO_SECTION[sec.obj.color]) return TAGCOLOR_TO_SECTION[sec.obj.color];
+    // Couleur stable, tirée de l'identifiant : elle ne change pas quand on réordonne les sections.
+    var h = 0, id = String(sec.id);
+    for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+    return SECTION_COLORS[h % SECTION_COLORS.length];
+  }
+  function titleOf(obj){ return stripHtml(obj.title || "").trim() || "(sans titre)"; }
+
+  // Quelles colonnes sont « à remplir » : d'abord Rédaction/Réponses, sinon Notes/Contenu…,
+  // sinon toutes sauf la première (qui porte en général la consigne).
+  function answerColumns(t){
+    var cols = t.columns || [];
+    if (cols.length <= 1) return cols;
+    var strong = cols.filter(function(c){ return /r[ée]daction|r[ée]ponse/i.test(c.label || ""); });
+    if (strong.length) return strong;
+    var soft = cols.slice(1).filter(function(c){ return /note|r[ée]flexion|contenu|information|d[ée]tail|moyen|d[ée]finition|explication/i.test(c.label || ""); });
+    return soft.length ? soft : cols.slice(1);
+  }
+  function tableProgress(t){
+    var total = 0, filled = 0;
+    answerColumns(t).forEach(function(c){
+      (t.rows || []).forEach(function(r){
+        total++;
+        var cell = r.cells[c.id];
+        if (cell && stripHtml(cell.text).trim()) filled++;
+      });
+    });
+    state.tables.filter(function(x){ return x.parentId===t.id; }).forEach(function(ch){ var p = tableProgress(ch); total += p.total; filled += p.filled; });
+    state.diagrams.filter(function(x){ return x.parentId===t.id; }).forEach(function(d){ var p = diagramProgress(d); total += p.total; filled += p.filled; });
+    return {total:total, filled:filled};
+  }
+  function diagramProgress(d){
+    var has = (d.nodes && d.nodes.length) || (d.notes || []).some(function(n){ return stripHtml(n.text).trim(); });
+    return {total:1, filled: has ? 1 : 0};
+  }
+  function sectionProgress(sec){ return sec.kind === "table" ? tableProgress(sec.obj) : diagramProgress(sec.obj); }
+  function pct(p){ return p.total ? Math.round(100 * p.filled / p.total) : 0; }
+  function progressBar(p, cls){
+    var bar = el("div", {class:"pbar " + (cls || ""), role:"progressbar", "aria-valuemin":"0", "aria-valuemax":"100", "aria-valuenow": String(pct(p))});
+    var fill = el("span"); fill.style.width = pct(p) + "%";
+    bar.appendChild(fill);
+    return bar;
+  }
+  function progressRing(p, size){
+    var r = 15.5, c = 2 * Math.PI * r, v = pct(p);
+    var wrap = el("span", {class:"pring", title: p.filled + " / " + p.total + " cases remplies"});
+    wrap.innerHTML = '<svg viewBox="0 0 36 36" width="'+(size||22)+'" height="'+(size||22)+'"><circle cx="18" cy="18" r="'+r+'" class="pr-bg"/><circle cx="18" cy="18" r="'+r+'" class="pr-fg" stroke-dasharray="'+c+'" stroke-dashoffset="'+(c*(1-v/100))+'" transform="rotate(-90 18 18)"/>' + (v === 100 ? '<path d="M11.5 18.5l4.5 4.5 8.5-9" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>' : '') + '</svg>';
+    if (v === 100) wrap.classList.add("done");
+    return wrap;
+  }
+
+  /* ---------- mémoire de la section ouverte (par projet, sur cet appareil) ---------- */
+  function viewKey(){ return "atelier-recherche:view:" + (ctx && ctx.id); }
+  function setSection(id, opts){
+    activeSection = id;
+    try { if (id) localStorage.setItem(viewKey(), id); else localStorage.removeItem(viewKey()); } catch(e){}
+    document.body.classList.remove("nav-open");
+    render();
+    if (!(opts && opts.keepScroll)) window.scrollTo(0, 0);
+  }
+
+  /* ---------- rendu principal ---------- */
 
   function render(){
     var app = document.getElementById("app");
     app.innerHTML = "";
-    var scrim = el("div", {class:"nav-scrim", onclick:function(){ document.body.classList.remove("nav-open"); }});
-    app.appendChild(scrim);
-    var shell = el("div", {class:"page-shell"});
-    shell.appendChild(renderSideNav());
-    var main = el("div", {class:"main-col"});
-    main.appendChild(renderTop());
-    if (state.showIntro) main.appendChild(renderIntro());
-    main.appendChild(renderTagbar());
-    main.appendChild(renderToolbar());
     normalizeOrder();
-    var board = el("div", {class:"board"});
-    state.order.forEach(function(id){
-      var d = state.diagrams.find(function(x){return x.id===id;});
-      if (d) board.appendChild(renderDiagram(d));
-      else {
-        var t = state.tables.find(function(x){return x.id===id;});
-        if (t) board.appendChild(renderTable(t));
-      }
-    });
-    main.appendChild(board);
-    main.appendChild(renderFooter());
+    var secs = topSections();
+    if (activeSection && !secs.some(function(s){ return s.id===activeSection; })) activeSection = null;
+
+    var shell = el("div", {class:"ed-shell"});
+    shell.appendChild(el("div", {class:"nav-scrim", onclick:function(){ document.body.classList.remove("nav-open"); }}));
+    shell.appendChild(renderSidebar(secs));
+    var main = el("main", {class:"ed-main"});
+    main.appendChild(renderHeaderBar(secs));
+    if (armedEntity) main.appendChild(el("div", {class:"link-banner"}, [
+      icon("link"), el("span", {text:"Mode liaison : clique l'icône de lien d'une autre case (dans n'importe quelle section) pour les relier."}),
+      el("button", {class:"btn small", text:"Annuler (Échap)", onclick:function(){ armedEntity=null; render(); }})
+    ]));
+    var content = el("div", {class:"ed-content"});
+    if (activeSection) renderSectionView(content, secs);
+    else renderOverview(content, secs);
+    main.appendChild(content);
     shell.appendChild(main);
     app.appendChild(shell);
     applyDim();
+  }
+
+  function renderSidebar(secs){
+    var side = el("aside", {class:"ed-sidebar", "aria-label":"Sections du projet"});
+    var top = el("div", {class:"sb-top"});
+    top.appendChild(btn("back", "Mes projets", function(){ if (ctx && ctx.onBack) ctx.onBack(); }, "ghost sb-back"));
+    top.appendChild(iconBtn("close", "Fermer le menu", function(){ document.body.classList.remove("nav-open"); }, "sb-close"));
+    side.appendChild(top);
+
+    var total = {total:0, filled:0};
+    secs.forEach(function(s){ var p = sectionProgress(s); total.total += p.total; total.filled += p.filled; });
+    side.appendChild(el("div", {class:"sb-project"}, [
+      el("div", {class:"sb-kind", text: ctx && ctx.kind === "template" ? "Gabarit" : "Projet"}),
+      el("div", {class:"sb-title", text: stripHtml(state.title) || "Sans titre"}),
+      el("div", {class:"sb-progress"}, [progressBar(total), el("span", {text: pct(total) + " %"})])
+    ]));
+
+    var ov = el("button", {class:"sb-item sb-overview" + (!activeSection ? " active" : ""), type:"button", onclick:function(){ setSection(null); }}, [icon("grid"), el("span", {class:"sb-label", text:"Vue d'ensemble"})]);
+    side.appendChild(ov);
+    side.appendChild(el("div", {class:"sb-heading", text:"Sections"}));
+
+    var list = el("ul", {class:"sb-list"});
+    secs.forEach(function(s, i){
+      var color = sectionColor(s, i);
+      var p = sectionProgress(s);
+      var li = el("li", {class:"sb-li", "data-sec": color});
+      var handle = el("span", {class:"sb-drag", title:"Glisser pour réordonner"}); handle.appendChild(icon("drag"));
+      var item = el("button", {class:"sb-item" + (activeSection===s.id ? " active" : ""), type:"button", onclick:function(){ setSection(s.id); }}, [
+        el("span", {class:"sb-num", text: String(i + 1)}),
+        el("span", {class:"sb-label", text: titleOf(s.obj)}),
+        progressRing(p, 20)
+      ]);
+      li.appendChild(handle); li.appendChild(item);
+      makeReorderable(handle, li, s.id);
+      if (activeSection === s.id && s.kind === "table"){
+        var kids = navNodeForTable(s.obj, 0).children;
+        if (kids.length){
+          var sub = el("ul", {class:"sb-sub"});
+          (function build(nodes, depth){
+            nodes.forEach(function(n){
+              sub.appendChild(el("li", {}, [el("button", {class:"sb-subitem", type:"button", style:"padding-left:" + (10 + depth*12) + "px", text:n.title, onclick:function(){ goToBlock(n.kind, n.id); }})]));
+              if (n.children.length && depth < 2) build(n.children, depth + 1);
+            });
+          })(kids, 0);
+          li.appendChild(sub);
+        }
+      }
+      list.appendChild(li);
+    });
+    side.appendChild(list);
+
+    side.appendChild(el("div", {class:"sb-add"}, [
+      btn("plus", "Nouvelle section", function(){ addTopTable(); }, "ghost small"),
+      btn("canvas", "Espace libre", function(){ addTopDiagram(); }, "ghost small")
+    ]));
+    return side;
+  }
+
+  function addTopTable(){
+    var t = {id:uid("tbl"), title:"Nouvelle section", columns:[{id:uid("col"),label:"Consigne"},{id:uid("col"),label:"Rédaction"}], rows:[{id:uid("row"),cells:{}}]};
+    t.columns.forEach(function(c){ t.rows[0].cells[c.id] = {text:"", tags:[]}; });
+    state.tables.push(t);
+    if (activeSection){ var i = state.order.indexOf(activeSection); state.order.splice(i+1, 0, t.id); } else state.order.push(t.id);
+    scheduleSave(true); setSection(t.id);
+    setTimeout(function(){ var h = document.querySelector('[data-table-title="'+t.id+'"]'); if (h){ h.focus(); document.execCommand && document.execCommand("selectAll"); } }, 0);
+  }
+  function addTopDiagram(){
+    var d = {id:uid("dgr"), title:"Nouvel espace libre", nodes:[], arrows:[], notes:[]};
+    state.diagrams.push(d);
+    if (activeSection){ var i = state.order.indexOf(activeSection); state.order.splice(i+1, 0, d.id); } else state.order.push(d.id);
+    scheduleSave(true); setSection(d.id);
+  }
+
+  function renderHeaderBar(secs){
+    var bar = el("div", {class:"ed-header"});
+    bar.appendChild(iconBtn("menu", "Afficher les sections", function(){ document.body.classList.add("nav-open"); }, "hb-menu"));
+    var crumb = el("div", {class:"hb-crumb"});
+    if (activeSection){
+      var idx = secs.findIndex(function(s){ return s.id===activeSection; });
+      crumb.appendChild(el("span", {class:"hb-count", text:"Section " + (idx+1) + " sur " + secs.length}));
+    } else {
+      crumb.appendChild(el("span", {class:"hb-count", text:"Vue d'ensemble"}));
+    }
+    bar.appendChild(crumb);
+    var status = el("div", {class:"status " + (CLOUD_CLASS[saveStatus] || saveStatus), title:"État de l'enregistrement", role:"status"}, [
+      el("span", {class:"dot"}), el("span", {text: STATUS_LABELS[saveStatus] || "…"})
+    ]);
+    bar.appendChild(status);
+    bar.appendChild(iconBtn("help", "Aide : comment utiliser l'outil", function(){ openHelp(); }, "hb-help"));
+    var exp = btn("download", "Exporter", function(e){ openExportMenu(e.currentTarget); }, "small hb-export");
+    bar.appendChild(exp);
+    return bar;
+  }
+
+  function renderTagsRow(){
+    var wrap = el("div", {class:"tags-row"});
+    wrap.appendChild(el("span", {class:"tags-label"}, [icon("tag"), el("span", {text:"Repères"})]));
+    wrap.appendChild(renderTagbar());
+    return wrap;
+  }
+
+  function renderOverview(content, secs){
+    var isTemplate = ctx && ctx.kind === "template";
+    var hero = el("section", {class:"ov-hero"});
+    hero.appendChild(el("div", {class:"eyebrow", text: isTemplate ? "Gabarit" : "Projet de recherche"}));
+    var h1 = el("h1", {contenteditable:"true", spellcheck:"false", class:"ov-title"});
+    h1.textContent = state.title;
+    plainPaste(h1);
+    h1.addEventListener("input", function(){ state.title = h1.textContent; dirty = true; });
+    h1.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); h1.blur(); } });
+    h1.addEventListener("blur", function(){ state.title = h1.textContent.trim() || "Projet sans titre"; scheduleSave(true); var t = document.querySelector(".sb-title"); if (t) t.textContent = state.title; });
+    hero.appendChild(h1);
+    var sub = el("div", {class:"sub", contenteditable:"true", spellcheck:"false", "data-ph":"Ajoute un sous-titre : programme, session, direction… (facultatif)"});
+    sub.textContent = state.sub;
+    plainPaste(sub);
+    sub.addEventListener("input", function(){ state.sub = sub.textContent; dirty = true; });
+    sub.addEventListener("blur", function(){ scheduleSave(true); });
+    hero.appendChild(sub);
+    if (isTemplate) hero.appendChild(el("div", {class:"template-banner", text:"Tu modifies un gabarit : les nouveaux projets créés à partir de lui reprendront cette structure. Les projets existants ne changent pas."}));
+
+    var total = {total:0, filled:0}, done = 0;
+    var ps = secs.map(function(s){ var p = sectionProgress(s); total.total += p.total; total.filled += p.filled; if (p.total && p.filled === p.total) done++; return p; });
+    var nodeCount = state.diagrams.reduce(function(a,d){ return a + d.nodes.length; }, 0);
+    hero.appendChild(el("div", {class:"ov-stats"}, [
+      stat(pct(total) + " %", "du projet rempli", progressBar(total, "big")),
+      stat(done + " / " + secs.length, "sections complètes"),
+      stat(String(total.filled), "cases rédigées"),
+      stat(String(state.links.length), "liens entre idées")
+    ]));
+    content.appendChild(hero);
+
+    if (state.showIntro) content.appendChild(renderIntro());
+
+    var last = null; try { last = localStorage.getItem(viewKey() + ":last"); } catch(e){}
+    var lastSec = last && secs.find(function(s){ return s.id===last; });
+    if (lastSec) content.appendChild(el("button", {class:"ov-resume", type:"button", onclick:function(){ setSection(lastSec.id); }}, [
+      el("span", {class:"ov-resume-k", text:"Reprendre là où tu étais"}), el("strong", {text: titleOf(lastSec.obj)}), icon("next")
+    ]));
+
+    content.appendChild(renderTagsRow());
+
+    var grid = el("div", {class:"ov-grid"});
+    secs.forEach(function(s, i){
+      var p = ps[i], color = sectionColor(s, i);
+      var card = el("button", {class:"ov-card", type:"button", "data-sec": color, onclick:function(){ setSection(s.id); }}, [
+        el("div", {class:"ov-card-top"}, [el("span", {class:"ov-num", text: String(i+1).padStart(2, "0")}), progressRing(p, 30)]),
+        el("div", {class:"ov-card-title", text: titleOf(s.obj)}),
+        el("div", {class:"ov-card-meta", text: s.kind === "diagram" ? (s.obj.nodes.length + " élément(s)") : (p.total ? p.filled + " / " + p.total + " cases remplies" : "Aucune case à remplir")}),
+        progressBar(p)
+      ]);
+      grid.appendChild(card);
+    });
+    var addCard = el("div", {class:"ov-card ov-add"}, [
+      btn("plus", "Nouvelle section", function(){ addTopTable(); }, "ghost"),
+      btn("canvas", "Nouvel espace libre", function(){ addTopDiagram(); }, "ghost")
+    ]);
+    grid.appendChild(addCard);
+    content.appendChild(grid);
+    content.appendChild(el("p", {class:"ov-foot", text: state.tables.length + " tableaux · " + nodeCount + " éléments de schéma · " + state.tags.length + " repères"}));
+  }
+  function stat(value, label, extra){
+    return el("div", {class:"ov-stat"}, [el("div", {class:"ov-stat-v", text:value}), el("div", {class:"ov-stat-l", text:label}), extra || null]);
+  }
+
+  function renderSectionView(content, secs){
+    var idx = secs.findIndex(function(s){ return s.id===activeSection; });
+    var s = secs[idx];
+    var color = sectionColor(s, idx);
+    try { localStorage.setItem(viewKey() + ":last", s.id); } catch(e){}
+    var p = sectionProgress(s);
+    var head = el("div", {class:"sec-head", "data-sec": color}, [
+      el("div", {class:"sec-num", text: String(idx+1).padStart(2, "0")}),
+      el("div", {class:"sec-meta"}, [
+        el("div", {class:"sec-kicker", text: s.kind === "diagram" ? "Espace libre" : "Section"}),
+        el("div", {class:"sec-progress"}, [progressBar(p), el("span", {text: p.total ? p.filled + " / " + p.total + " remplies" : ""})])
+      ])
+    ]);
+    content.appendChild(head);
+    content.appendChild(renderTagsRow());
+    var board = el("div", {class:"board", "data-sec": color});
+    board.appendChild(s.kind === "table" ? renderTable(s.obj, {top:true}) : renderDiagram(s.obj, {top:true}));
+    content.appendChild(board);
+
+    var pager = el("nav", {class:"sec-pager", "aria-label":"Sections précédente et suivante"});
+    var prev = secs[idx-1], next = secs[idx+1];
+    pager.appendChild(prev ? el("button", {class:"pg-btn", type:"button", onclick:function(){ setSection(prev.id); }}, [icon("back"), el("span", {}, [el("small", {text:"Précédente"}), el("strong", {text:titleOf(prev.obj)})])]) : el("span"));
+    pager.appendChild(next ? el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setSection(next.id); }}, [el("span", {}, [el("small", {text:"Suivante"}), el("strong", {text:titleOf(next.obj)})]), icon("next")]) : el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setSection(null); }}, [el("span", {}, [el("small", {text:"Terminé"}), el("strong", {text:"Retour à la vue d'ensemble"})]), icon("grid")]));
+    content.appendChild(pager);
+  }
+
+  /* ---------- menus contextuels ---------- */
+
+  function openMenu(anchor, title, items){
+    closePopover();
+    var pop = el("div", {class:"pop menu-pop", role:"menu"});
+    if (title) pop.appendChild(el("h4", {text:title}));
+    items.forEach(function(it){
+      if (!it) return;
+      if (it.sep){ pop.appendChild(el("div", {class:"menu-sep"})); return; }
+      var b = el("button", {class:"menu-item" + (it.danger ? " danger" : ""), type:"button", role:"menuitem", onclick:function(){ closePopover(); it.run(); }});
+      if (it.icon) b.appendChild(icon(it.icon));
+      b.appendChild(el("span", {text: it.label}));
+      pop.appendChild(b);
+    });
+    positionPopover(pop, anchor);
+    openPopover = {el:pop};
+    setTimeout(function(){ document.addEventListener("mousedown", outsideCloser, true); },0);
+  }
+
+  function openHelp(){
+    var overlay = el("div", {class:"overlay"});
+    var m = el("div", {class:"modal help-modal", role:"dialog", "aria-modal":"true"});
+    m.appendChild(el("h3", {text:"Comment utiliser l'outil"}));
+    var tips = [
+      ["grid", "Navigue par sections", "Le menu de gauche liste les sections, avec leur avancement. Clique pour en ouvrir une ; « Suivante » et « Précédente » en bas de page te font avancer dans l'ordre."],
+      ["table", "Écris directement dans les cases", "Tout est modifiable : titres, colonnes, cases. La première colonne donne souvent la consigne ; écris dans « Rédaction » ou « Réponses ». Tout s'enregistre pendant que tu tapes."],
+      ["more", "Ajoute ou supprime", "Le bouton ⋯ d'un tableau permet d'ajouter une colonne, un sous-tableau ou un espace libre, de changer la couleur ou de supprimer."],
+      ["tag", "Repères de couleur", "Crée des repères (ex. « à vérifier ») et applique-les à une case avec l'icône d'étiquette. Clique un repère pour surligner toutes les cases qui l'ont."],
+      ["link", "Relie des idées", "Clique l'icône de lien d'une case, puis celle d'une autre case, même dans une autre section. Le nombre de liens s'affiche sur l'icône ; la flèche permet d'y naviguer."],
+      ["drag", "Réorganise", "Glisse la poignée ⠿ d'une ligne, d'une colonne ou d'un sous-tableau pour le déplacer, même vers un autre tableau. Dans le menu de gauche, glisse une section pour changer l'ordre."]
+    ];
+    var list = el("div", {class:"help-list"});
+    tips.forEach(function(t){ list.appendChild(el("div", {class:"help-item"}, [icon(t[0]), el("div", {}, [el("strong", {text:t[1]}), el("p", {text:t[2]})])])); });
+    m.appendChild(list);
+    function closeIt(){ if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+    m.appendChild(el("div", {class:"row"}, [el("button", {class:"btn primary", text:"Compris", onclick:closeIt})]));
+    overlay.appendChild(m);
+    overlay.addEventListener("mousedown", function(e){ if (e.target===overlay) closeIt(); });
+    document.body.appendChild(overlay);
   }
 
   /* ---------------- full-width reorderable board ---------------- */
@@ -615,7 +954,6 @@ window.Editor = (function(){
 
   function renderTagbar(){
     var bar = el("div", {class:"tagbar"});
-    bar.appendChild(el("span", {class:"tagbar-label", text:"Repères :"}));
     state.tags.forEach(function(tag){
       var chip = el("span", {class:"tagchip" + (dimTag===tag.id?" active":"")});
       chip.style.background = "var(--tag-"+tag.color+"-bg)";
@@ -660,7 +998,7 @@ window.Editor = (function(){
       });
       sws.appendChild(s);
     });
-    var input = el("input", {placeholder:"+ repère…"});
+    var input = el("input", {placeholder:"Nouveau repère…", "aria-label":"Nom du nouveau repère"});
     function commit(){
       var v = input.value.trim();
       if (!v) return;
@@ -670,6 +1008,10 @@ window.Editor = (function(){
     }
     input.addEventListener("keydown", function(e){ if (e.key==="Enter"){ e.preventDefault(); commit(); } });
     wrap.appendChild(sws); wrap.appendChild(input);
+    var opener = el("button", {class:"tag-open", type:"button", title:"Créer un nouveau repère", text:"+ Repère"});
+    opener.addEventListener("click", function(){ wrap.classList.add("open"); setTimeout(function(){ input.focus(); }, 0); });
+    input.addEventListener("blur", function(){ setTimeout(function(){ if (!input.value.trim() && !wrap.contains(document.activeElement)) wrap.classList.remove("open"); }, 150); });
+    wrap.insertBefore(opener, wrap.firstChild);
     return wrap;
   }
 
@@ -704,22 +1046,17 @@ window.Editor = (function(){
     opts = opts || {};
     var nested = !!opts.nested;
     var head = el("div", {class:"table-card-head"});
-    var handle = el("button", {class:"drag-handle", title: nested ? "Déplacer ce sous-tableau (dans ce tableau, vers un autre, ou hors des tableaux)" : "Déplacer ce tableau", text:"⠿"});
-    head.appendChild(handle);
+    var handle = el("button", {class:"drag-handle", type:"button", title: "Glisser pour déplacer ce sous-tableau (dans ce tableau, vers un autre, ou pour en faire une section)", text:"⠿"});
+    if (nested) head.appendChild(handle);
     var h2 = el("h2", {contenteditable:"true", spellcheck:"false", "data-table-title":t.id, text:t.title});
     plainPaste(h2);
     h2.addEventListener("input", function(){ t.title = h2.textContent; dirty = true; });
+    h2.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); h2.blur(); } });
     h2.addEventListener("focus", function(){ lastFocus = {kind:"table", tableId:t.id, rowId:null, colId:null, diagramId:null}; });
-    h2.addEventListener("blur", function(){ scheduleSave(true); });
+    h2.addEventListener("blur", function(){ scheduleSave(true); if (!nested){ var lab = document.querySelector(".sb-item.active .sb-label"); if (lab) lab.textContent = stripHtml(t.title) || "(sans titre)"; } });
     head.appendChild(h2);
     var actions = el("div", {class:"table-card-actions"});
-    var colorBtn = el("button", {class:"table-color-btn", title:"Changer la couleur du tableau"});
-    var colorDot = el("span", {class:"table-color-dot"});
-    if (t.color) colorDot.style.background = "var(--tag-"+t.color+")";
-    colorBtn.appendChild(colorDot);
-    colorBtn.addEventListener("click", function(){ openTableColorPopover(colorBtn, t); });
-    actions.appendChild(colorBtn);
-    actions.appendChild(el("button", {class:"btn small ghost", title:"Ajouter une colonne (juste après celle où tu es, si tu y étais)", text:"+ Colonne", onclick:function(){
+    function addColumn(){
       var col = {id:uid("col"), label:"Nouvelle colonne"};
       var insertAt = t.columns.length;
       if (lastFocus.kind==="table" && lastFocus.tableId===t.id && lastFocus.colId){
@@ -728,29 +1065,39 @@ window.Editor = (function(){
       }
       t.columns.splice(insertAt, 0, col);
       t.rows.forEach(function(r){ r.cells[col.id] = {text:"", tags:[]}; });
+      if (!t.rows.length){ var r0 = {id:uid("row"), cells:{}}; t.columns.forEach(function(c){ r0.cells[c.id] = {text:"", tags:[]}; }); t.rows.push(r0); }
       scheduleSave(true); render();
-    }}));
-    actions.appendChild(el("button", {class:"btn small ghost", title:"Ajouter un sous-tableau imbriqué dans celui-ci (juste après celui où tu es, si tu y étais)", text:"+ Sous-tableau", onclick:function(){
+    }
+    function addSubTable(){
       var child = {id:uid("tbl"), parentId:t.id, title:"Nouveau sous-tableau", columns:[{id:uid("col"),label:"Colonne 1"},{id:uid("col"),label:"Colonne 2"}], rows:[{id:uid("row"),cells:{}}]};
-      var colIds = child.columns.map(function(c){return c.id;});
-      child.rows[0].cells = {}; colIds.forEach(function(cid){ child.rows[0].cells[cid] = {text:"", tags:[]}; });
+      child.columns.forEach(function(c){ child.rows[0].cells[c.id] = {text:"", tags:[]}; });
       insertNestedChildAfterFocus(state.tables, child, t.id, "table");
       scheduleSave(true); render();
-      setTimeout(function(){ var h = document.querySelector('[data-table-title="'+child.id+'"]'); if (h) h.focus(); }, 0);
-    }}));
-    actions.appendChild(el("button", {class:"btn small ghost", title:"Ajouter un espace libre imbriqué dans ce tableau (juste après celui où tu es, si tu y étais)", text:"+ Espace libre", onclick:function(){
+      setTimeout(function(){ var h = document.querySelector('[data-table-title="'+child.id+'"]'); if (h){ h.focus(); h.scrollIntoView({block:"center", behavior:"smooth"}); } }, 0);
+    }
+    function addSubDiagram(){
       var d = {id:uid("dgr"), parentId:t.id, title:"Nouvel espace libre", nodes:[], arrows:[], notes:[]};
       insertNestedChildAfterFocus(state.diagrams, d, t.id, "diagram");
       scheduleSave(true); render();
-    }}));
-    actions.appendChild(el("button", {class:"btn small danger", title:"Supprimer ce tableau", text:"✕", onclick:function(){
-      var descCount = countDescendants(t.id);
-      var msg = "Supprimer le tableau « " + t.title + " »" + (descCount ? " ainsi que ses " + descCount + " élément(s) imbriqué(s) (sous-tableaux / espaces libres)" : "") + " et tout son contenu ?";
-      askConfirm(msg, function(){
-        deleteTableCascade(t.id);
-        scheduleSave(true); render();
-      });
-    }}));
+    }
+    var moreBtn = iconBtn("more", "Options du tableau", null, "card-more");
+    moreBtn.addEventListener("click", function(){
+      openMenu(moreBtn, null, [
+        {icon:"column", label:"Ajouter une colonne", run:addColumn},
+        {icon:"table", label:"Ajouter un sous-tableau", run:addSubTable},
+        {icon:"canvas", label:"Ajouter un espace libre", run:addSubDiagram},
+        {sep:true},
+        {icon:"palette", label:"Changer la couleur", run:function(){ openTableColorPopover(moreBtn, t); }},
+        {sep:true},
+        {icon:"trash", label: nested ? "Supprimer ce sous-tableau" : "Supprimer cette section", danger:true, run:function(){
+          var descCount = countDescendants(t.id);
+          var msg = "Supprimer « " + t.title + " »" + (descCount ? " ainsi que ses " + descCount + " élément(s) imbriqué(s)" : "") + " et tout son contenu ?";
+          askConfirm(msg, function(){ deleteTableCascade(t.id); scheduleSave(true); render(); });
+        }}
+      ]);
+    });
+    if (!t.columns.length) actions.appendChild(btn("table", "Sous-tableau", addSubTable, "small ghost"));
+    actions.appendChild(moreBtn);
     head.appendChild(actions);
 
     var table = el("table", {class:"datatable"});
@@ -797,7 +1144,7 @@ window.Editor = (function(){
       t.columns.forEach(function(col, ci){
         var cell = row.cells[col.id] || {text:"",tags:[]};
         row.cells[col.id] = cell;
-        var td = el("td");
+        var td = el("td", {"data-label": stripHtml(col.label || "")});
         var wrap = el("div", {class:"cellwrap entity-wrap"});
         var eid = entityKeyForCell(t.id,row.id,col.id);
         wrap.setAttribute("data-entity", eid);
@@ -830,7 +1177,7 @@ window.Editor = (function(){
     table.appendChild(tbody);
 
     var addRowBtn = el("div", {class:"table-add-row"}, [
-      el("button", {class:"btn small ghost addrow", title:"Ajouter une ligne (juste après celle où tu es, si tu y étais)", text:"+ Ajouter une ligne", onclick:function(){
+      el("button", {class:"btn small ghost addrow", type:"button", title:"Ajouter une ligne (juste après celle où tu es, si tu y étais)", text:"+ Ligne", onclick:function(){
         var r = {id:uid("row"), cells:{}};
         t.columns.forEach(function(c){ r.cells[c.id] = {text:"", tags:[]}; });
         var insertAt = t.rows.length;
@@ -858,9 +1205,8 @@ window.Editor = (function(){
       childDiagrams.forEach(function(child){ childrenWrap.appendChild(renderDiagram(child, {nested:true})); });
       cardKids.push(childrenWrap);
     }
-    var card = el("div", {class:"table-card" + (nested ? " nested" : ""), "data-table-id": t.id, "data-color": t.color}, cardKids);
+    var card = el("div", {class:"table-card" + (nested ? " nested" : " is-top") + (t.columns.length ? "" : " container"), "data-table-id": t.id, "data-color": t.color}, cardKids);
     if (nested) makeBlockDraggable(handle, card, t, "table");
-    else makeReorderable(handle, card, t.id);
     return card;
   }
 
@@ -879,58 +1225,56 @@ window.Editor = (function(){
 
   function renderIcons(entityId, cellOrNode, isNode){
     var box = el("div", {class:"cell-icons"});
-    var linkBtn = el("button", {class:"icon-btn" + (armedEntity===entityId?" armed":""), title:"Relier cette case à une autre", text:"🔗"});
-    linkBtn.addEventListener("click", function(e){
-      e.stopPropagation();
-      handleLinkClick(entityId);
-    });
     var n = linksFor(entityId).length;
+    var linkBtn = iconBtn("link", armedEntity===entityId ? "Annuler la liaison" : (armedEntity ? "Relier à cette case" : "Relier cette case à une autre"), function(e){ e.stopPropagation(); handleLinkClick(entityId); }, "icon-btn" + (armedEntity===entityId ? " armed" : "") + (armedEntity && armedEntity!==entityId ? " target" : ""));
     if (n>0){ linkBtn.classList.add("has-links"); linkBtn.setAttribute("data-count", n); }
     box.appendChild(linkBtn);
-    var tagBtn = el("button", {class:"icon-btn", title:"Ajouter des repères", text:"◐"});
+    var tagBtn = iconBtn("tag", "Ajouter des repères", null, "icon-btn");
     tagBtn.addEventListener("click", function(e){ e.stopPropagation(); openTagPopover(tagBtn, cellOrNode); });
     box.appendChild(tagBtn);
-    var showLinksBtn = null;
     if (n>0){
-      showLinksBtn = el("button", {class:"icon-btn", title:"Voir les liens", text:"→"});
+      var showLinksBtn = iconBtn("arrow", "Voir les " + n + " lien(s) et y aller", null, "icon-btn");
       showLinksBtn.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(showLinksBtn, entityId); });
       box.appendChild(showLinksBtn);
     }
     if (isNode){
-      var shapeBtn = el("button", {class:"icon-btn", title:"Forme et contour", text:"▭"});
+      var shapeBtn = iconBtn("shape", "Forme et contour", null, "icon-btn");
       shapeBtn.addEventListener("click", function(e){ e.stopPropagation(); openNodeStylePopover(shapeBtn, cellOrNode); });
       box.appendChild(shapeBtn);
     }
+    if (n>0 || (cellOrNode.tags||[]).length) box.classList.add("has-state");
     return box;
   }
 
   function renderDiagram(diagram, opts){
     opts = opts || {};
     var nested = !!opts.nested;
-    var handle = el("button", {class:"drag-handle", title: nested ? "Déplacer cet espace libre (dans ce tableau, vers un autre, ou hors des tableaux)" : "Déplacer cet espace libre", text:"⠿"});
-    var headKids = [handle];
+    var handle = el("button", {class:"drag-handle", type:"button", title:"Glisser pour déplacer cet espace libre", text:"⠿"});
+    var headKids = nested ? [handle] : [];
     var h2 = el("h2", {contenteditable:"true", spellcheck:"false", text: diagram.title});
     plainPaste(h2);
     h2.addEventListener("input", function(){ diagram.title = h2.textContent; dirty = true; });
+    h2.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); h2.blur(); } });
     h2.addEventListener("focus", function(){ lastFocus = {kind:"diagram", tableId:null, rowId:null, colId:null, diagramId:diagram.id}; });
     h2.addEventListener("blur", function(){ scheduleSave(true); });
     headKids.push(h2);
-    headKids.push(el("button", {class:"btn small ghost", text:"+ Élément", onclick:function(){
+    headKids.push(btn("plus", "Élément", function(){
       var node = {id:uid("n").replace("_",""), x: 30 + Math.random()*260, y: 30+Math.random()*200, text:"Nouvel élément", notes:[{id:uid("note"), text:""}], tags:[], shape:"rect", border:"solid"};
       diagram.nodes.push(node);
       scheduleSave(true); render();
-    }}));
-    headKids.push(el("button", {class:"btn small ghost", text:"+ Flèche", title:"Ajouter une flèche indépendante", onclick:function(){
+    }, "small ghost"));
+    headKids.push(btn("arrow", "Flèche", function(){
       diagram.arrows = diagram.arrows || [];
       diagram.arrows.push({id:uid("arw"), x1:40, y1:40, x2:220, y2:40, dir:"right", style:"solid"});
       scheduleSave(true); render();
-    }}));
-    headKids.push(el("button", {class:"btn small danger", title:"Supprimer cet espace libre", text:"✕", onclick:function(){
-      askConfirm("Supprimer l'espace libre « " + diagram.title + " » et tout son contenu ?", function(){
-        deleteDiagram(diagram.id);
-        scheduleSave(true); render();
-      });
-    }}));
+    }, "small ghost"));
+    var dMore = iconBtn("more", "Options de l'espace libre", null, "card-more");
+    dMore.addEventListener("click", function(){
+      openMenu(dMore, null, [{icon:"trash", label:"Supprimer cet espace libre", danger:true, run:function(){
+        askConfirm("Supprimer l'espace libre « " + diagram.title + " » et tout son contenu ?", function(){ deleteDiagram(diagram.id); scheduleSave(true); render(); });
+      }}]);
+    });
+    headKids.push(dMore);
     var head = el("div", {class:"diagram-head"}, headKids);
     diagram.notes = diagram.notes || [];
     if (diagram.notes.length === 0) diagram.notes.push({id:uid("note"), text:""});
@@ -1447,7 +1791,14 @@ window.Editor = (function(){
     nav.appendChild(list);
     return nav;
   }
+  function ensureSectionFor(kind, id){
+    var top = topLevelAncestorId(kind, id);
+    if (top && activeSection && activeSection !== top){ setSection(top, {keepScroll:true}); return true; }
+    if (top && !activeSection){ setSection(top, {keepScroll:true}); return true; }
+    return false;
+  }
   function goToBlock(kind, id){
+    if (ensureSectionFor(kind, id)) return setTimeout(function(){ goToBlock(kind, id); }, 30);
     var sel = kind==="diagram" ? '[data-diagram-id="'+cssEscape(id)+'"]' : '[data-table-id="'+cssEscape(id)+'"]';
     var target = document.querySelector(sel);
     if (!target) return;
@@ -1458,6 +1809,9 @@ window.Editor = (function(){
   }
 
   function goTo(entityId){
+    var m = /^t:([^:]+):/.exec(entityId);
+    var owner = m ? ["table", m[1]] : (findNodeDiagram(entityId) ? ["diagram", findNodeDiagram(entityId).id] : null);
+    if (owner && ensureSectionFor(owner[0], owner[1])) return setTimeout(function(){ goTo(entityId); }, 30);
     var target = document.querySelector('[data-entity="'+cssEscape(entityId)+'"]');
     if (!target) return;
     target.scrollIntoView({behavior:"smooth", block:"center"});
@@ -1608,6 +1962,9 @@ window.Editor = (function(){
     lastSavedJson = JSON.stringify(state); armedEntity = null; dimTag = null;
     lastFocus = {kind:null, tableId:null, rowId:null, colId:null, diagramId:null};
     document.body.classList.add("in-editor");
+    activeSection = null;
+    if (ctx.keepSection) activeSection = ctx.keepSection;
+    else { try { activeSection = localStorage.getItem(viewKey()) || null; } catch(e){} }
     render();
     window.scrollTo(0,0);
   }
@@ -1632,6 +1989,12 @@ window.Editor = (function(){
     isDirty: function(){ return dirty; },
     currentId: function(){ return ctx ? ctx.id : null; },
     setStatus: function(s){ if (ctx) ctx.lastCloudStatus = s; if (state && !(dirty && s === "synced")) setStatus(s); },
-    getState: function(){ return state; }
+    getState: function(){ return state; },
+    currentSection: function(){ return activeSection; },
+    progressOf: function(st){
+      var saved = state; state = st;
+      try { migrateState(); var tot = {total:0, filled:0}; topSections().forEach(function(x){ var p = sectionProgress(x); tot.total += p.total; tot.filled += p.filled; }); return tot; }
+      finally { state = saved; }
+    }
   };
 })();

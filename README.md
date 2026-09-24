@@ -83,6 +83,7 @@ python3 -m http.server 8000      # mode local, sans sauvegarde en ligne
 index.html          page unique
 css/editor.css      styles de l'éditeur (repris de l'outil d'origine)
 css/app.css         bibliothèque, modales, impression, ajustements mobiles
+css/theme.css       thème visuel : barre latérale, sections, couleurs, mobile
 js/seeds.js         données de départ (gabarit UQTR + thèse), chargées au 1er lancement
 js/storage.js       copie locale : projets, gabarits, import/export
 js/cloud.js         synchronisation en ligne (envoi, réception, conflits, hors ligne, historique)
