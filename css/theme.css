@@ -256,6 +256,25 @@ h1,h2,h3{ font-family:'Source Serif 4',Georgia,serif; }
 .scrollwrap{ padding:4px 18px 8px; }
 table.datatable th{ font-size:11px; letter-spacing:.7px; padding:12px 10px 8px; border-bottom:1px solid var(--border); color:var(--ink-faint); }
 table.datatable td{ border-bottom:1px solid var(--border); }
+table.datatable.row-lines-strong tr:not(:last-child) > td{ border-bottom:2px solid var(--sec, var(--accent-ink)); }
+table.datatable.row-lines-strong td{ padding-top:4px; padding-bottom:4px; }
+.row-band{ padding:0 !important; }
+.row-band-header{ background:var(--sec-bg, var(--surface-2)); border-top:2px solid var(--sec, var(--accent)); }
+.row-band-header .celltext{ font-weight:700; }
+.row-band-note{ background:var(--surface-2); color:var(--ink-soft); }
+.row-band-note .celltext{ font-style:italic; }
+.row-band .cellwrap{ min-height:34px; padding-bottom:30px; }
+.section-overview{ margin:0 0 18px; border:1px solid var(--border); border-radius:14px; background:var(--surface); box-shadow:var(--shadow); overflow:hidden; }
+.section-overview-toggle{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px; border:0; background:var(--surface); color:var(--ink); font:inherit; text-align:left; cursor:pointer; }
+.section-overview-toggle span{ margin-left:auto; color:var(--ink-soft); font-size:12px; }
+.section-overview-toggle:focus-visible, .overview-link:focus-visible{ outline:none; box-shadow:inset 0 0 0 3px var(--accent-soft); }
+.section-overview-table{ width:100%; border-collapse:collapse; }
+.section-overview-table th, .section-overview-table td{ padding:10px 12px; border-top:1px solid var(--border); text-align:left; vertical-align:middle; }
+.section-overview-table thead th{ color:var(--ink-faint); font-size:11px; letter-spacing:.6px; text-transform:uppercase; }
+.overview-link{ border:0; background:none; color:var(--accent-ink); font:inherit; font-weight:600; text-align:left; cursor:pointer; padding:0; }
+.overview-summary{ min-width:150px; }
+.overview-summary .pbar{ margin-top:5px; }
+.overview-total th, .overview-total td{ font-weight:700; background:var(--surface-2); }
 .cellwrap{ padding:10px 10px 30px 10px; border-radius:10px; transition:background .15s; }
 .cellwrap:hover{ background:#faf9fd; }
 .cellwrap:focus-within{ background:var(--surface-2); }
@@ -385,6 +404,7 @@ table.datatable td{ border-bottom:1px solid var(--border); }
   .ed-sidebar, .ed-header, .sec-pager, .tags-row, .link-banner, .card-more{ display:none !important; }
   .ed-shell{ display:block; }
   .ed-content{ max-width:none; padding:0; }
+  table.datatable.row-lines-strong tr:not(:last-child) > td{ border-bottom:2px solid #6b3150 !important; }
 }
 
 /* les cartes s'empilent verticalement et ne débordent jamais de l'écran */
@@ -415,6 +435,7 @@ table.datatable td{ border-bottom:1px solid var(--border); }
   .ed-content table.datatable thead{ display:none; }
   .ed-content table.datatable tbody, .ed-content table.datatable tr{ display:block; }
   .ed-content table.datatable tr{ position:relative; border-bottom:1px solid var(--border); padding:8px 0; }
+  .ed-content table.datatable.row-lines-strong tr{ border-bottom:2px solid var(--sec, var(--accent-ink)); padding-top:12px; padding-bottom:12px; }
   .ed-content table.datatable tr:last-child{ border-bottom:0; }
   .ed-content table.datatable td{ display:block; border:0; }
   .ed-content table.datatable td.rowdrag-td{ position:absolute; right:0; top:8px; width:auto; padding:0 !important; }
@@ -424,6 +445,12 @@ table.datatable td{ border-bottom:1px solid var(--border); }
   }
   .ed-content table.datatable td[data-label=""]::before{ display:none; }
   .ed-content .cellwrap{ min-width:0; padding:4px 10px 30px; }
+  .ed-content table.datatable tr.row-band{ padding:0; }
+  .ed-content table.datatable tr.row-band td{ padding:0; }
+  .section-overview{ margin-left:-2px; margin-right:-2px; }
+  .section-overview-table{ display:block; overflow-x:auto; }
+  .section-overview-table th, .section-overview-table td{ min-width:92px; }
+  .section-overview-table th:first-child{ min-width:150px; }
 }
 .card-actions{ align-items:center; justify-content:space-between; }
 .card-more-lib{ font-size:18px; line-height:1; padding:2px 10px !important; letter-spacing:1px; }

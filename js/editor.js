@@ -168,7 +168,7 @@ window.Editor = (function(){
   function answerColumns(t){
     var cols = t.columns || [];
     if (cols.length <= 1) return cols;
-    var strong = cols.filter(function(c){ return /r[ée]daction|r[ée]ponse/i.test(c.label || ""); });
+    var strong = cols.filter(function(c){ return /r[ée]daction|r[ée]ponse|r[ée]sum[ée]/i.test(c.label || ""); });
     if (strong.length) return strong;
     var soft = cols.slice(1).filter(function(c){ return /note|r[ée]flexion|contenu|information|d[ée]tail|moyen|d[ée]finition|explication/i.test(c.label || ""); });
     return soft.length ? soft : cols.slice(1);
@@ -177,6 +177,7 @@ window.Editor = (function(){
     var total = 0, filled = 0;
     answerColumns(t).forEach(function(c){
       (t.rows || []).forEach(function(r){
+        if (r.kind) return;
         total++;
         var cell = r.cells[c.id];
         if (cell && stripHtml(cell.text).trim()) filled++;
@@ -294,7 +295,8 @@ window.Editor = (function(){
 
     side.appendChild(el("div", {class:"sb-add"}, [
       btn("plus", "Nouvelle section", function(){ addTopTable(); }, "ghost small"),
-      btn("canvas", "Espace libre", function(){ addTopDiagram(); }, "ghost small")
+      btn("canvas", "Espace libre", function(){ addTopDiagram(); }, "ghost small"),
+      btn("download", "Importer une section", importSection, "ghost small")
     ]));
     return side;
   }
@@ -312,6 +314,90 @@ window.Editor = (function(){
     state.diagrams.push(d);
     if (activeSection){ var i = state.order.indexOf(activeSection); state.order.splice(i+1, 0, d.id); } else state.order.push(d.id);
     scheduleSave(true); setSection(d.id);
+  }
+
+  function importSection(){
+    var input = el("input", {type:"file", accept:".json,application/json"});
+    input.addEventListener("change", function(){
+      var file = input.files && input.files[0]; if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        var data;
+        try { data = JSON.parse(reader.result); }
+        catch(e){ showToast("Import impossible : le fichier n'est pas un JSON valide."); return; }
+        if (!data || data.format !== "atelier-recherche/section"){
+          showToast("Import impossible : ce fichier n'est pas une section Atelier de recherche."); return;
+        }
+        var title = stripHtml(data.section && data.section.title || "Section importée").trim() || "Section importée";
+        var duplicateKey = title.normalize("NFC").toLowerCase();
+        var duplicate = state.tables.some(function(t){ return !t.parentId && titleOf(t).normalize("NFC").toLowerCase() === duplicateKey; });
+        var proceed = function(){ mergeImportedSection(data, title); };
+        if (duplicate) askConfirm("Une section « " + title + " » existe déjà. L'importer quand même ?", proceed, "Importer");
+        else proceed();
+      };
+      reader.readAsText(file);
+    });
+    input.click();
+  }
+
+  function mergeImportedSection(data, title){
+    var sourceSection = data.section || {id:"section", title:title, columns:[], rows:[]};
+    var idMap = {};
+    function remap(kind, oldId){
+      if (!oldId) return oldId;
+      if (!idMap[oldId]) idMap[oldId] = uid(kind);
+      return idMap[oldId];
+    }
+    var importedTags = data.tags || [];
+    var tagMap = {};
+    importedTags.forEach(function(tag){
+      var key = String(tag.label || "").trim().normalize("NFC").toLowerCase();
+      var existing = state.tags.find(function(t){ return String(t.label || "").trim().normalize("NFC").toLowerCase() === key; });
+      tagMap[tag.id] = existing ? existing.id : uid("tag");
+      if (!existing) state.tags.push({id:tagMap[tag.id], label:tag.label || "Repère", color:tag.color || "blue"});
+    });
+    function copyRow(row){
+      var copy = {id:remap("row", row.id), cells:{}};
+      if (row.kind) copy.kind = row.kind;
+      Object.keys(row.cells || {}).forEach(function(colId){
+        var cell = row.cells[colId] || {};
+        copy.cells[colId] = {text:cell.text || "", tags:(cell.tags || []).map(function(tagId){ return tagMap[tagId] || tagId; })};
+      });
+      return copy;
+    }
+    function copyTable(table, isRoot){
+      var copy = {id:remap("tbl", table.id), title:table.title || "Tableau", columns:JSON.parse(JSON.stringify(table.columns || [])), rows:(table.rows || []).map(copyRow)};
+      if (!isRoot && table.parentId) copy.parentId = remap("tbl", table.parentId);
+      if (table.color) copy.color = table.color;
+      if (table.rowLines) copy.rowLines = table.rowLines;
+      if (table.view) copy.view = table.view;
+      return copy;
+    }
+    var root = copyTable({id:sourceSection.id, title:title, columns:sourceSection.columns || [], rows:sourceSection.rows || []}, true);
+    var importedTables = [root].concat((data.tables || []).map(function(t){ return copyTable(t, false); }));
+    importedTables.forEach(function(t){ state.tables.push(t); });
+    (data.diagrams || []).forEach(function(diagram){
+      var copy = JSON.parse(JSON.stringify(diagram));
+      copy.id = remap("dgr", diagram.id);
+      if (diagram.parentId) copy.parentId = remap("tbl", diagram.parentId);
+      (copy.nodes || []).forEach(function(node){ node.id = remap("node", node.id); node.tags = (node.tags || []).map(function(tagId){ return tagMap[tagId] || tagId; }); });
+      (copy.notes || []).forEach(function(note){ note.id = remap("note", note.id); });
+      state.diagrams.push(copy);
+    });
+    (data.links || []).forEach(function(link){
+      var copy = JSON.parse(JSON.stringify(link));
+      ["a","b"].forEach(function(side){
+        var m = /^t:([^:]+):([^:]+):([^:]+)$/.exec(copy[side] || "");
+        if (m) copy[side] = entityKeyForCell(remap("tbl", m[1]), remap("row", m[2]), m[3]);
+        else if (idMap[copy[side]]) copy[side] = idMap[copy[side]];
+      });
+      state.links.push(copy);
+    });
+    state.order.push(root.id);
+    var refs = importedTables.reduce(function(total, table){ return total + (table.rows || []).filter(function(row){ return !row.kind; }).length; }, 0);
+    scheduleSave(true);
+    setSection(root.id);
+    showToast("Section importée : " + refs + " références dans " + (data.tables || []).length + " chapitres");
   }
 
   function renderHeaderBar(secs){
@@ -395,7 +481,8 @@ window.Editor = (function(){
     });
     var addCard = el("div", {class:"ov-card ov-add"}, [
       btn("plus", "Nouvelle section", function(){ addTopTable(); }, "ghost"),
-      btn("canvas", "Nouvel espace libre", function(){ addTopDiagram(); }, "ghost")
+      btn("canvas", "Nouvel espace libre", function(){ addTopDiagram(); }, "ghost"),
+      btn("download", "Importer une section", importSection, "ghost")
     ]);
     grid.appendChild(addCard);
     content.appendChild(grid);
@@ -420,6 +507,10 @@ window.Editor = (function(){
     ]);
     content.appendChild(head);
     content.appendChild(renderTagsRow());
+    if (s.kind === "table"){
+      var overview = renderSectionOverview(s.obj);
+      if (overview) content.appendChild(overview);
+    }
     var board = el("div", {class:"board", "data-sec": color});
     board.appendChild(s.kind === "table" ? renderTable(s.obj, {top:true}) : renderDiagram(s.obj, {top:true}));
     content.appendChild(board);
@@ -470,6 +561,46 @@ window.Editor = (function(){
     overlay.appendChild(m);
     overlay.addEventListener("mousedown", function(e){ if (e.target===overlay) closeIt(); });
     document.body.appendChild(overlay);
+  }
+
+  function renderSectionOverview(parent){
+    var children = state.tables.filter(function(t){ return t.parentId === parent.id; });
+    if (children.length < 2) return null;
+    var key = "atelier-recherche:overview:" + (ctx && ctx.id) + ":" + parent.id;
+    var collapsed = false;
+    try { collapsed = localStorage.getItem(key) === "hidden"; } catch(e){}
+    var wrap = el("section", {class:"section-overview"});
+    var toggle = el("button", {class:"section-overview-toggle", type:"button", "aria-expanded":String(!collapsed)}, [
+      el("strong", {text:"Vue d'ensemble"}), el("span", {text:collapsed ? "Afficher la vue d'ensemble" : "Masquer la vue d'ensemble"})
+    ]);
+    toggle.addEventListener("click", function(){
+      try { localStorage.setItem(key, collapsed ? "shown" : "hidden"); } catch(e){}
+      render();
+    });
+    wrap.appendChild(toggle);
+    if (collapsed) return wrap;
+    var table = el("table", {class:"section-overview-table"});
+    table.appendChild(el("thead", {}, [el("tr", {}, [
+      el("th", {text:"Chapitre"}), el("th", {text:"Références"}), el("th", {text:"Repères"}), el("th", {text:"Résumés"})
+    ])]));
+    var body = el("tbody"), totals = {refs:0, summaries:0};
+    children.forEach(function(child){
+      var refs = (child.rows || []).filter(function(r){ return !r.kind; });
+      var summaryCol = (child.columns || []).find(function(c){ return /r[ée]sum[ée]/i.test(c.label || ""); });
+      var summaries = summaryCol ? refs.filter(function(r){ return r.cells[summaryCol.id] && stripHtml(r.cells[summaryCol.id].text).trim(); }).length : 0;
+      var counts = {};
+      refs.forEach(function(r){ Object.keys(r.cells || {}).forEach(function(cid){ (r.cells[cid].tags || []).forEach(function(tagId){ counts[tagId] = (counts[tagId] || 0) + 1; }); }); });
+      totals.refs += refs.length; totals.summaries += summaries;
+      var tagText = state.tags.map(function(tag){ return counts[tag.id] ? tag.label + " " + counts[tag.id] : ""; }).filter(Boolean).join(" · ");
+      body.appendChild(el("tr", {"data-overview-table":child.id}, [
+        el("th", {scope:"row"}, [el("button", {class:"overview-link", type:"button", text:titleOf(child), onclick:function(){ goToBlock("table", child.id); }})]),
+        el("td", {text:String(refs.length)}), el("td", {text:tagText || "—"}),
+        el("td", {class:"overview-summary"}, [el("span", {text:summaries + " / " + refs.length}), progressBar({total:refs.length, filled:summaries})])
+      ]));
+    });
+    body.appendChild(el("tr", {class:"overview-total"}, [el("th", {scope:"row", text:"Total"}), el("td", {text:String(totals.refs)}), el("td", {text:""}), el("td", {text:totals.summaries + " / " + totals.refs})]));
+    table.appendChild(body); wrap.appendChild(table);
+    return wrap;
   }
 
   /* ---------------- full-width reorderable board ---------------- */
@@ -1087,6 +1218,8 @@ window.Editor = (function(){
         {icon:"table", label:"Ajouter un sous-tableau", run:addSubTable},
         {icon:"canvas", label:"Ajouter un espace libre", run:addSubDiagram},
         {sep:true},
+        {icon:t.rowLines === "strong" ? "check" : null, label:"Lignes de séparation marquées", run:function(){ t.rowLines = t.rowLines === "strong" ? "" : "strong"; scheduleSave(true); render(); }},
+        {sep:true},
         {icon:"palette", label:"Changer la couleur", run:function(){ openTableColorPopover(moreBtn, t); }},
         {sep:true},
         {icon:"trash", label: nested ? "Supprimer ce sous-tableau" : "Supprimer cette section", danger:true, run:function(){
@@ -1100,7 +1233,7 @@ window.Editor = (function(){
     actions.appendChild(moreBtn);
     head.appendChild(actions);
 
-    var table = el("table", {class:"datatable"});
+    var table = el("table", {class:"datatable" + (t.rowLines === "strong" ? " row-lines-strong" : "")});
     var thead = el("thead");
     var trh = el("tr");
     trh.appendChild(el("th", {class:"rowdrag-th"}));
@@ -1139,9 +1272,32 @@ window.Editor = (function(){
       var rowdragTd = el("td", {class:"rowdrag-td"});
       var rowHandle = el("button", {class:"row-drag-handle", title:"Déplacer cette ligne (dans ce tableau ou vers un autre)", text:"⠿"});
       rowdragTd.appendChild(rowHandle);
-      tr.appendChild(rowdragTd);
+      if (!row.kind) tr.appendChild(rowdragTd);
       makeRowDraggable(rowHandle, tr, t, row);
-      t.columns.forEach(function(col, ci){
+      if (row.kind){
+        var sourceCol = t.columns.find(function(c){ return /^sources?$/i.test(c.label || ""); }) || t.columns[0];
+        var sourceCell = sourceCol ? (row.cells[sourceCol.id] || {text:"",tags:[]}) : {text:"",tags:[]};
+        if (sourceCol) row.cells[sourceCol.id] = sourceCell;
+        var bandTd = el("td", {colspan:String(Math.max(1, t.columns.length)), class:"row-band row-band-" + row.kind});
+        var bandWrap = el("div", {class:"cellwrap entity-wrap"});
+        bandWrap.appendChild(rowHandle);
+        var bandEid = sourceCol ? entityKeyForCell(t.id,row.id,sourceCol.id) : null;
+        if (bandEid) bandWrap.setAttribute("data-entity", bandEid);
+        var bandText = el("div", {class:"celltext rich", contenteditable:"true", spellcheck:"false", "data-ph":"…"});
+        bandText.innerHTML = sourceCell.text || "";
+        attachRichText(bandText, sourceCell, "text");
+        plainPaste(bandText);
+        bandText.addEventListener("focus", function(){ lastFocus = {kind:"table", tableId:t.id, rowId:row.id, colId:sourceCol && sourceCol.id, diagramId:null}; });
+        bandWrap.appendChild(bandText);
+        bandWrap.appendChild(renderCellTags(sourceCell));
+        if (bandEid) bandWrap.appendChild(renderIcons(bandEid, sourceCell));
+        if (t.rows.length>1) bandWrap.appendChild(el("button", {class:"rowrm", title:"Supprimer la ligne", text:"✕ ligne", onclick:function(){
+          askConfirm("Supprimer cette ligne dans « " + t.title + " » ?", function(){
+            t.rows = t.rows.filter(function(r){return r.id!==row.id;}); scheduleSave(true); render();
+          });
+        }}));
+        bandTd.appendChild(bandWrap); tr.appendChild(bandTd);
+      } else t.columns.forEach(function(col, ci){
         var cell = row.cells[col.id] || {text:"",tags:[]};
         row.cells[col.id] = cell;
         var td = el("td", {"data-label": stripHtml(col.label || "")});
@@ -1826,13 +1982,13 @@ window.Editor = (function(){
 
   /* ---------------- confirm & toast (no native dialogs) ---------------- */
 
-  function askConfirm(message, onYes){
+  function askConfirm(message, onYes, yesLabel){
     var overlay = el("div", {class:"overlay"});
     var modal = el("div", {class:"modal"});
     modal.appendChild(el("p", {text:message}));
     var row = el("div", {class:"row"});
     row.appendChild(el("button", {class:"btn ghost", text:"Annuler", onclick:function(){ document.body.removeChild(overlay); }}));
-    row.appendChild(el("button", {class:"btn danger", text:"Supprimer", onclick:function(){ document.body.removeChild(overlay); onYes(); }}));
+    row.appendChild(el("button", {class:"btn danger", text:yesLabel || "Supprimer", onclick:function(){ document.body.removeChild(overlay); onYes(); }}));
     modal.appendChild(row);
     overlay.appendChild(modal);
     overlay.addEventListener("mousedown", function(e){ if (e.target===overlay) document.body.removeChild(overlay); });
@@ -1882,11 +2038,39 @@ window.Editor = (function(){
     // resyncs to that published copy — if that happened while typing was still in progress,
     // whatever was typed after the save was captured could be wiped out when the page resynced.
     // Saving only on blur (leaving the cell) means a save never lands mid-keystroke.
-    elmt.addEventListener("input", function(){ obj[prop] = elmt.innerHTML; dirty = true; });
+    elmt.addEventListener("input", function(){ obj[prop] = elmt.innerHTML; dirty = true; updateProgressIndicators(); });
     elmt.addEventListener("blur", function(){
       if (stripHtml(elmt.innerHTML).trim()==="") elmt.innerHTML = "";
       obj[prop] = elmt.innerHTML;
       scheduleSave(true);
+    });
+  }
+
+  function updateProgressIndicators(){
+    if (!state || !activeSection) return;
+    var sec = topSections().find(function(s){ return s.id === activeSection; });
+    if (!sec) return;
+    var p = sectionProgress(sec);
+    var progress = document.querySelector(".sec-progress");
+    if (progress){
+      var fill = progress.querySelector(".pbar > span");
+      var bar = progress.querySelector(".pbar");
+      if (fill) fill.style.width = pct(p) + "%";
+      if (bar) bar.setAttribute("aria-valuenow", String(pct(p)));
+      var label = progress.children[1];
+      if (label) label.textContent = p.total ? p.filled + " / " + p.total + " remplies" : "";
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("tr[data-overview-table]"), function(row){
+      var table = state.tables.find(function(t){ return t.id === row.getAttribute("data-overview-table"); });
+      if (!table) return;
+      var refs = (table.rows || []).filter(function(r){ return !r.kind; });
+      var summaryCol = (table.columns || []).find(function(c){ return /r[ée]sum[ée]/i.test(c.label || ""); });
+      var filled = summaryCol ? refs.filter(function(r){ return r.cells[summaryCol.id] && stripHtml(r.cells[summaryCol.id].text).trim(); }).length : 0;
+      var summary = row.querySelector(".overview-summary");
+      if (summary){
+        var text = summary.querySelector("span"); if (text) text.textContent = filled + " / " + refs.length;
+        var fill = summary.querySelector(".pbar > span"); if (fill) fill.style.width = (refs.length ? Math.round(100 * filled / refs.length) : 0) + "%";
+      }
     });
   }
 

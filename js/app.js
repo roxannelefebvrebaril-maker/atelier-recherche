@@ -215,13 +215,26 @@
     function table(t, depth){
       out.push("#".repeat(Math.min(depth + 2, 6)) + " " + (t.title || "Tableau"), "");
       var cols = t.columns || [];
-      var rows = (t.rows || []).filter(function(r){ return cols.some(function(c){ return r.cells[c.id] && htmlToText(r.cells[c.id].text); }); });
-      if (cols.length && rows.length){
+      var rows = t.rows || [], regularOpen = false;
+      function openTable(){
+        if (!cols.length || regularOpen) return;
         out.push("| " + cols.map(function(c){ return c.label || " "; }).join(" | ") + " |");
         out.push("|" + cols.map(function(){ return "---"; }).join("|") + "|");
-        rows.forEach(function(r){ out.push("| " + cols.map(function(c){ return cellMd(r.cells[c.id]); }).join(" | ") + " |"); });
-        out.push("");
+        regularOpen = true;
       }
+      rows.forEach(function(r){
+        if (r.kind){
+          if (regularOpen){ out.push(""); regularOpen = false; }
+          var source = cols.find(function(c){ return /^sources?$/i.test(c.label || ""); }) || cols[0];
+          var text = source && r.cells[source.id] ? htmlToText(r.cells[source.id].text) : "";
+          if (text) out.push(r.kind === "header" ? "#### " + text : "*" + text + "*", "");
+          return;
+        }
+        if (!cols.some(function(c){ return r.cells[c.id] && htmlToText(r.cells[c.id].text); })) return;
+        openTable();
+        out.push("| " + cols.map(function(c){ return cellMd(r.cells[c.id]); }).join(" | ") + " |");
+      });
+      if (regularOpen) out.push("");
       state.tables.filter(function(x){ return x.parentId === t.id; }).forEach(function(c){ table(c, depth + 1); });
       state.diagrams.filter(function(x){ return x.parentId === t.id; }).forEach(function(c){ diagram(c, depth + 1); });
     }

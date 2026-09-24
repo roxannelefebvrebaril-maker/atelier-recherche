@@ -1,0 +1,6465 @@
+{
+ "format": "atelier-recherche/section",
+ "version": 1,
+ "source": "Plan_de_lecture_par_chapitre.docx — Répartition des lectures selon les thématiques de la table des matières de l'Examen prospectif",
+ "tags": [
+  {
+   "id": "tag-coeur",
+   "label": "cœur",
+   "color": "pink"
+  },
+  {
+   "id": "tag-appui",
+   "label": "appui",
+   "color": "blue"
+  },
+  {
+   "id": "tag-synthese",
+   "label": "synthèse",
+   "color": "mauve"
+  }
+ ],
+ "section": {
+  "id": "sec14",
+  "title": "Références par chapitre",
+  "columns": [],
+  "rows": []
+ },
+ "tables": [
+  {
+   "id": "sec14_ch1",
+   "parentId": "sec14",
+   "title": "Chapitre 1 — Introduction générale",
+   "color": "pink",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c1_intro1",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "Des pratiques vidéoludiques aux skins : construire un objet de communication.",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_h2",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>1.1 Les jeux vidéo dans les cultures contemporaines de l'enfance (+ 1.1.1–1.1.3)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r001",
+     "cells": {
+      "src": {
+       "text": "Bonenfant, M., Delorme, S., Dumont, A., &amp; Duchaineau, C. (2024). Les jeux vidéo pour enfants : Bien les comprendre pour mieux les choisir. PUQ.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r002",
+     "cells": {
+      "src": {
+       "text": "Boutet, M. (2012). Jouer aux jeux vidéo avec style : Pour une ethnographie des sociabilités vidéoludiques. Réseaux, 3(173-174), 207-234.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r003",
+     "cells": {
+      "src": {
+       "text": "Postel-Vinay, O. (2023). Les enfants et les écrans. Dossiers Cairn.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Mise en contexte",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r004",
+     "cells": {
+      "src": {
+       "text": "Huizinga, J. (1973 [1938]). Homo ludens.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Jeu comme forme culturelle",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r005",
+     "cells": {
+      "src": {
+       "text": "Bassiouni, D. H., &amp; Hackley, C. (2016). Video games and young children's evolving sense of identity: a qualitative study. Young Consumers, 17(2), 127-142.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Transition vers l'identité",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r006",
+     "cells": {
+      "src": {
+       "text": "Tordo, F. (2021). Soi-même comme un avatar. Imaginaire &amp; Inconscient, 1(47), 77-88.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Transition avatar → skin",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r007",
+     "cells": {
+      "src": {
+       "text": "Nachez, M., &amp; Schmoll, P. (2022). Avatars, personnages, identités multiples. Hybrid, (9).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Transition avatar → skin",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r008",
+     "cells": {
+      "src": {
+       "text": "Deseilligny, O., &amp; Beau, F. (2009). Une figure du double numérique : l'avatar. Hermès, La Revue, 2009/1(53), 41-48.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Théorise l'avatar comme double numérique, trouvé via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r009",
+     "cells": {
+      "src": {
+       "text": "Le Fourn, J.-Y. (2001). Les enfants jouent-ils encore ? Game-boy et jeux vidéo. Enfances &amp; Psy, 15(3), 46-49.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r010",
+     "cells": {
+      "src": {
+       "text": "Andrade, D., &amp; Ferreira, A. (2021). \"Fortnite\" and New Kids' Sociabilities. Social Sciences, 4(1).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Fortnite fait partie du corpus",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r011",
+     "cells": {
+      "src": {
+       "text": "Le Corre, V. (2012). Au croisement de l'imaginaire et du symbolique, le jeu vidéo. Enfances &amp; Psy, 56(3), 118-126.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r012",
+     "cells": {
+      "src": {
+       "text": "Allison, A. (2008). La culture populaire japonaise et l'imaginaire global. Critique internationale, 38(1), 19-35.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r013",
+     "cells": {
+      "src": {
+       "text": "Boubée, N., Safont-Mottay, C., &amp; Martin, F. (2019). La numérisation de la vie des jeunes. L'Harmattan.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r014",
+     "cells": {
+      "src": {
+       "text": "Bonenfant, M. (2010). Le jeu comme producteur culturel : distinction entre la notion et la fonction de jeu. Ethnologies, 32(1), 51-69.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_h17",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>1.2 Construire un problème de recherche (1.2.1 ce que la recherche sait / 1.2.2 ce qu'elle ne sait pas / 1.2.3–1.2.4)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_h18",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>Ce que la recherche sait (effets, usages, identité, avatars, représentations)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r015",
+     "cells": {
+      "src": {
+       "text": "Lissak, G. (2018). Adverse physiological and psychological effects of screen time on children and adolescents. Environmental Research, 164, 149-157.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r016",
+     "cells": {
+      "src": {
+       "text": "Oswald, T. K., Rumbold, A. R., Kedzior, S. G., &amp; Moore, V. M. (2020). Psychological impacts of “screen time” and “green time”... PLOS ONE, 15(9), e0237725.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r017",
+     "cells": {
+      "src": {
+       "text": "Santos, R. M. S. et al. (2023). The associations between screen time and mental health in adolescents. BMC Psychology, 11(1), 127.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r018",
+     "cells": {
+      "src": {
+       "text": "Kuss, D. J., &amp; Griffiths, M. D. (2012). Online gaming addiction in children and adolescents. Journal of Behavioral Addictions, 1(1), 3-22.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r019",
+     "cells": {
+      "src": {
+       "text": "Aziz, N. et al. (2021). Digital Addiction: Systematic Review of Computer Game Addiction Impact on Adolescent Physical Health. Electronics, 10(9), 996.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r020",
+     "cells": {
+      "src": {
+       "text": "Esposito, M. R. et al. (2020). An Investigation into Video Game Addiction in Pre-Adolescents and Adolescents. Medicina, 56(5), 221.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r021",
+     "cells": {
+      "src": {
+       "text": "Burke, A. (2013). Children's construction of identity in virtual play worlds. Language and Literacy, 15(1), 58-73.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r022",
+     "cells": {
+      "src": {
+       "text": "Wiederhold, B. K. (2021). Kids will find a way: The benefits of social video games. Cyberpsychology, Behavior, and Social Networking, 24(4), 213-214.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r023",
+     "cells": {
+      "src": {
+       "text": "Quwaider, M., Alabed, A., &amp; Duwairi, R. (2019). The impact of video games on the players behaviors: A survey. Procedia Computer Science, 151, 575-582.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_h28",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>Ce que la recherche ne sait pas encore / pourquoi les skins constituent un angle mort</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r024",
+     "cells": {
+      "src": {
+       "text": "Mauco, O. (2020). Le marché des identités virtuelles dans le jeu vidéo. La revue lacanienne, 21(1), 139-151.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Rares travaux ciblant les skins",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r025",
+     "cells": {
+      "src": {
+       "text": "Järvinen, L. (2023). Understanding luxury fashion and video game collaborations: Luxury skins in online games.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r026",
+     "cells": {
+      "src": {
+       "text": "Li, L., Freeman, G., &amp; Wohn, D. Y. (2020). Power in skin: the interplay of self-presentation, tactical play, and spending in Fortnite. Proceedings of CHI PLAY, 71-80.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r027",
+     "cells": {
+      "src": {
+       "text": "Reza, A., Chu, S., Nedd, A., &amp; Gardner, D. (2022). Having skin in the game. Convergence, 28(6), 1621-1642.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r028",
+     "cells": {
+      "src": {
+       "text": "Mills, S., Ash, J., &amp; Gordon, R. (2023). Children and Young People's Experiences and Understandings of Gambling-Style Systems in Digital Games: Loot Boxes, Popular Culture, and Changing Childhoods. Annals of the American Association of Geographers, 114(1), 200-217. https://doi.org/10.1080/24694452.2023.2248293",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Comble directement le vide identifié : très peu d'études sur skins/loot boxes ET enfants",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r029",
+     "cells": {
+      "src": {
+       "text": "Fu, Y., Schwamm, S., Baughan, A., Powell, N., Kronberg, Z., Owens, A., Izenman, E., Alsabeh, D., Hunt, E., Rich, M., Bickham, D., Radesky, J., &amp; Hiniker, A. (2025). Understanding Children's Avatar Making in Social Online Games. Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems. https://doi.org/10.1145/3706598.3713262",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "48 enfants de 8-13 ans, personnalisation d'avatar : population et objet quasi identiques à la thèse",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_h35",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>1.4 Positionnement scientifique (1.4.1–1.4.5)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r030",
+     "cells": {
+      "src": {
+       "text": "Pretorius, L. (2024). Demystifying research paradigms. The Qualitative Report, 29(10), 2698-2715.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r031",
+     "cells": {
+      "src": {
+       "text": "Omodan, B. I. (2024). Research paradigms and their methodological alignment in social sciences. Routledge.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r032",
+     "cells": {
+      "src": {
+       "text": "Burns, M., Bally, J., Burles, M., Holtslander, L., &amp; Peacock, S. (2022). Constructivist grounded theory or interpretive phenomenology? IJQM, 21.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r033",
+     "cells": {
+      "src": {
+       "text": "William, F. K. A. (2024). Interpretivism or constructivism: Navigating research paradigms. IJRP, 143(1), 134-138.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r034",
+     "cells": {
+      "src": {
+       "text": "Sol, K., &amp; Heng, K. (2022). Understanding epistemology and its key approaches in research. CJER, 2(2), 80-99.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c1_r035",
+     "cells": {
+      "src": {
+       "text": "Kara, H. (2020). Creative research methods: A practical guide. Policy Press.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Annonce 1.4.5 et le chap. 4",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  },
+  {
+   "id": "sec14_ch2",
+   "parentId": "sec14",
+   "title": "Chapitre 2 — Comprendre les pratiques vidéoludiques comme pratiques communicationnelles",
+   "color": "blue",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c2_h1",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.1 Les pratiques vidéoludiques comme objet de recherche</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r001",
+     "cells": {
+      "src": {
+       "text": "Postel-Vinay, O. (2023). Les enfants et les écrans. Dossiers Cairn.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r002",
+     "cells": {
+      "src": {
+       "text": "Bonenfant, M. et al. (2024). Les jeux vidéo pour enfants. PUQ.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r003",
+     "cells": {
+      "src": {
+       "text": "Boutet, M. (2012). Jouer aux jeux vidéo avec style. Réseaux, 3(173-174), 207-234.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r004",
+     "cells": {
+      "src": {
+       "text": "Cerezo-Pizarro, M., Revuelta-Domínguez, F. I., Guerra-Antequera, J., &amp; Melo-Sánchez, J. (2023). The cultural impact of video games: A systematic review. Education Sciences, 13(11), 1116.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r005",
+     "cells": {
+      "src": {
+       "text": "La Rocca, F. (2016). L'imaginaire numérique et les formes communicatives. Cultures of Communication–Cultures de la communication, 1(1), 83-94.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r006",
+     "cells": {
+      "src": {
+       "text": "Citton, Y. (2016). Naviguer ou filtrer. Vilém Flusser et l'alternative vampirique de l'imaginaire numérique. Hybrid, (3).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r007",
+     "cells": {
+      "src": {
+       "text": "Chevaldonné, Y. (2012). Intertextualités : jeu vidéo, littérature, cinéma, bande dessinée. Hermès, La Revue, 62(1), 115-121.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r008",
+     "cells": {
+      "src": {
+       "text": "Del Monte, I. (2017). Alice au pays de Matrix. Rêve et virtualité dans le roman contemporain pour adolescents. Publije, (1).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r009",
+     "cells": {
+      "src": {
+       "text": "Stern, E. (2003). Une touche moyenâgeuse : le néomédiévisme, la magie et la technologie informatique. Dans Les défis du cybermonde (p. 153). Presses Université Laval.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r010",
+     "cells": {
+      "src": {
+       "text": "Craipeau, S. (2011). La société en jeu(x). Le laboratoire social des jeux en ligne. PUF.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r011",
+     "cells": {
+      "src": {
+       "text": "Barnabé, F. (2011). Compte rendu de S. Craipeau, La société en jeu(x). Lectures.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r012",
+     "cells": {
+      "src": {
+       "text": "Cotta, A. (2014). La société du jeu. Fayard.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r013",
+     "cells": {
+      "src": {
+       "text": "Vanoye, F. (1983). Fonctions du langage et pédagogie de la communication. Pratiques, 40(1), 37-50.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r014",
+     "cells": {
+      "src": {
+       "text": "Mounin, G. (1967). Les fonctions du langage. Word, 23(1-3), 396-413.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r015",
+     "cells": {
+      "src": {
+       "text": "Jakobson, R. (1965). À la recherche de l'essence du langage. Diogène, 51, 22-38.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r016",
+     "cells": {
+      "src": {
+       "text": "Hébert, L., &amp; Tabler, J. (2019). The functions of language. Dans An Introduction to Applied Semiotics (p. 232-240). Routledge.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r017",
+     "cells": {
+      "src": {
+       "text": "Jakobson, R. (1976). Metalanguage as a linguistic problem. Akadémiai Nyomda.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r018",
+     "cells": {
+      "src": {
+       "text": "Jakobson, R. (1971). Selected Writings II: Word and Language. Mouton.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r019",
+     "cells": {
+      "src": {
+       "text": "Boutaud, J.-J. (2004). Sémiotique et communication : un malentendu qui a bien tourné. Hermès, La Revue, 38(1), 96-102.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h21",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.2 Les grandes approches de la recherche sur les jeux vidéo</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h22",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.2.1 Approche centrée sur les effets (temps d'écran, dépendance, psychologie, santé publique)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r020",
+     "cells": {
+      "src": {
+       "text": "Santos, R. M. S. et al. (2023). BMC Psychology, 11(1), 127.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r021",
+     "cells": {
+      "src": {
+       "text": "Oswald, T. K. et al. (2020). PLOS ONE, 15(9), e0237725.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r022",
+     "cells": {
+      "src": {
+       "text": "Mimoun, E. A. et al. (2024). EPPOC... Neuropsychiatrie de l'enfance et de l'adolescence, 72, 272-281.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r023",
+     "cells": {
+      "src": {
+       "text": "Kuss, D. J., &amp; Griffiths, M. D. (2012). Journal of Behavioral Addictions, 1(1), 3-22.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r024",
+     "cells": {
+      "src": {
+       "text": "Aziz, N. et al. (2021). Electronics, 10(9), 996.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r025",
+     "cells": {
+      "src": {
+       "text": "Esposito, M. R. et al. (2020). Medicina, 56(5), 221.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r026",
+     "cells": {
+      "src": {
+       "text": "Lerida-Ayala, V. et al. (2022). Internet and video games: Causes of behavioral disorders in children and teenagers. Children, 10(1), 86.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r027",
+     "cells": {
+      "src": {
+       "text": "Touitou, Y. (2024). Surconsommation des écrans par l'enfant et l'adolescent. Bulletin de l'Académie nationale de médecine, 208, 901-910.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r028",
+     "cells": {
+      "src": {
+       "text": "Caron, M., &amp; INSPQ (2023). Pratique du jeu vidéo de compétition et santé des adolescents et jeunes adultes.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r029",
+     "cells": {
+      "src": {
+       "text": "Courbet, D., &amp; Fourquet-Courbet, M. P. (2024). Usages des médias numériques, santé mentale et bien-être. RFSIC, (28).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r030",
+     "cells": {
+      "src": {
+       "text": "Noon, E. J., Carbone, L., Swinnen, B., &amp; Vandenbosch, L. (2024). Adolescents' videogame play, need satisfaction, and self-esteem. Current Psychology, 43(24), 21192-21207.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r031",
+     "cells": {
+      "src": {
+       "text": "Lissak, G. (2018). Environmental Research, 164, 149-157.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r032",
+     "cells": {
+      "src": {
+       "text": "Roussel-Ouellet, J. (2024). Les déterminants psychosociaux du temps d'écran... (Mémoire de maîtrise, UQAR).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h36",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.2.2 Approche centrée sur les usages (sociologie des usages, appropriation)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r033",
+     "cells": {
+      "src": {
+       "text": "Jouët, J. (2000). Retour critique sur la sociologie des usages. Réseaux, 18(100), 487-521.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r034",
+     "cells": {
+      "src": {
+       "text": "Proulx, S. (2005). Penser les usages des TIC aujourd'hui. Dans Enjeux et usages des TIC (vol. 1, p. 7-20).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r035",
+     "cells": {
+      "src": {
+       "text": "Proulx, S. (2015). La sociologie des usages, et après ? RFSIC, (6).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r036",
+     "cells": {
+      "src": {
+       "text": "Bouakka, O., &amp; Chakouk, S. (2024). Appropriation du numérique. Revue-IRS, 2(4), 2099-2116.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r037",
+     "cells": {
+      "src": {
+       "text": "Vidal, G. (2012). La sociologie des usages : Continuités et transformations. Hermès Science.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r038",
+     "cells": {
+      "src": {
+       "text": "Granjon, F., &amp; Denouël, J. (2011). Penser les usages sociaux des technologies numériques. Dans Communiquer à l'ère numérique (p. 7-43).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h43",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.2.3 Approche centrée sur les cultures vidéoludiques (Game Studies, sociabilités, communautés)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r039",
+     "cells": {
+      "src": {
+       "text": "Zabban, V. (2012). Retour sur les game studies. Réseaux, 173-174(3), 137-176.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r040",
+     "cells": {
+      "src": {
+       "text": "Cerezo-Pizarro, M. et al. (2023). Education Sciences, 13(11), 1116.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r041",
+     "cells": {
+      "src": {
+       "text": "Berry, V., &amp; Borzakian, M. (2015). Introduction. Les Mondes du jeu. RESET, (4).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r042",
+     "cells": {
+      "src": {
+       "text": "Genvo, S. (2009). Le rôle de l'avatar dans la jouabilité d'une structure de jeu vidéo. Adolescence, 2009/3 (T. 27, n° 3), p. 645.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Ludologue français, articule avatar et jouabilité ; trouvé via Cairn.info / HAL",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r043",
+     "cells": {
+      "src": {
+       "text": "Caroux, L., Isbister, K., Le Bigot, L., &amp; Vibert, N. (2015). Player–video game interaction: A systematic review of current concepts. Computers in Human Behavior, 48, 366-381.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r044",
+     "cells": {
+      "src": {
+       "text": "Therrien, C. (2011). Illusion, idéalisation, gratification : l'immersion dans les univers de fiction à l'ère du jeu vidéo (Thèse de doctorat, UQAM).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r045",
+     "cells": {
+      "src": {
+       "text": "Genvo, S. (2009). Le jeu à son ère numérique : comprendre et analyser les jeux vidéo. L'Harmattan.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r046",
+     "cells": {
+      "src": {
+       "text": "Chauvier, S. (2007). Qu'est-ce qu'un jeu ? Vrin.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r047",
+     "cells": {
+      "src": {
+       "text": "Stenros, J. (2017). The game definition game: A review. Games and Culture, 12(6), 499-520.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r048",
+     "cells": {
+      "src": {
+       "text": "Suits, B. (1967). What is a Game? Philosophy of Science, 34(2), 148-156.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r049",
+     "cells": {
+      "src": {
+       "text": "Adams, E., &amp; Dormans, J. (2012). Game mechanics: Advanced game design. New Riders.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r050",
+     "cells": {
+      "src": {
+       "text": "Di Filippo, L. (2014). Contextualiser les théories du jeu de Johan Huizinga et Roger Caillois. Questions de communication, 25(1), 281-308.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r051",
+     "cells": {
+      "src": {
+       "text": "Caillois, R. (1958). Théorie des jeux. Revue de Métaphysique et de Morale, 63(1), 83-102.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r052",
+     "cells": {
+      "src": {
+       "text": "Berry, V. (2021). Que sait-on des jeux de société « modernes » ? Sciences du jeu, (14).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h58",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.2.4 Approche communicationnelle — se positionner ici</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r053",
+     "cells": {
+      "src": {
+       "text": "Boutet, M. (2012). Réseaux, 3(173-174), 207-234.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Socialisation horizontale",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_n60",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "<i>Rappel : mobiliser la synthèse des quatre approches ci-dessus pour justifier le choix communicationnel.</i>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h61",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.3 Comprendre les pratiques vidéoludiques (dispositif, sociotechnique, appropriation, temporalités)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r054",
+     "cells": {
+      "src": {
+       "text": "Foucault, M., &amp; Mailänder, E. (1975). Surveiller et punir.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r055",
+     "cells": {
+      "src": {
+       "text": "Agamben, G. (2006). Théorie des dispositifs. Po&amp;sie, 115(1), 25-33.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r056",
+     "cells": {
+      "src": {
+       "text": "Gavillet, I. (2010). Michel Foucault et le dispositif. Dans Les dispositifs d'information et de communication (p. 17-38).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r057",
+     "cells": {
+      "src": {
+       "text": "Zabban, V. (2012). Réseaux, 173-174(3), 137-176.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Système sociotechnique",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r058",
+     "cells": {
+      "src": {
+       "text": "Domenget, J.-C., &amp; Latzko-Toth, G. (2015). Pour une approche temporaliste des usages et des dispositifs de communication numériques. IAMCR.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "2.3.4 temporalités du jeu",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r059",
+     "cells": {
+      "src": {
+       "text": "Berry, V., &amp; Borzakian, M. (2015). RESET, (4).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r060",
+     "cells": {
+      "src": {
+       "text": "Amato, É. A. (2012). Communication ludique. Hermès, La Revue, 2012/1(62), 21-26.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Théorise le jeu vidéo comme dispositif communicationnel ; trouvé via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r061",
+     "cells": {
+      "src": {
+       "text": "Gøtzsche-Astrup, J., &amp; Villadsen, K. (2025). The dispositif is alive! Recovering social agents in Foucauldian analysis. The British Journal of Sociology, 76(2), 442-456. https://doi.org/10.1111/1468-4446.13174",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Réactualise la théorie foucaldienne du dispositif en y réintégrant les acteurs sociaux, cohérent avec la focale sur l'agentivité enfantine",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r062",
+     "cells": {
+      "src": {
+       "text": "Candel, É. (2009). « Un jeu rejoué » : propositions méthodologiques pour l'étude des dispositifs d'interaction sur Internet. Journées d'études TIC-Information et stratégies.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r063",
+     "cells": {
+      "src": {
+       "text": "Reynaud, J.-D. (1989). Les règles du jeu. Dans L'action collective et la régulation sociale.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h72",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.4 Les enfants comme acteurs sociaux (nouvelle sociologie de l'enfance)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r064",
+     "cells": {
+      "src": {
+       "text": "Côté, I. (2020). La recherche centrée sur l'enfant. Presses de l'Université Laval.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r065",
+     "cells": {
+      "src": {
+       "text": "Danic, I., Delalande, J., &amp; Rayou, P. (2006). Enquêter auprès d'enfants et de jeunes. PU Rennes.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r066",
+     "cells": {
+      "src": {
+       "text": "Salvi, F., &amp; Scherer, L. (2025). Children's agency across disciplines: From potential to actual. Global Studies of Childhood, 15(2), 145-148. https://doi.org/10.1177/20436106251340886",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Actualise le débat sur l'agentivité enfantine depuis Côté 2020 et Danic et al. 2006",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r067",
+     "cells": {
+      "src": {
+       "text": "Costa, C., Pereira, S., Brandão, D., Pinto, D., &amp; Jardim, C. (2025). Children and Youth Participation in Digital Environment: A Systematic Literature Review. Dans Perspectives on Design and Digital Communication V (p. 61-90). Springer. https://doi.org/10.1007/978-3-031-76156-0_4",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Revue systématique de 78 études sur la participation des enfants en environnement numérique",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r068",
+     "cells": {
+      "src": {
+       "text": "Piaget, J. (1936, 1937, 1974). La naissance de l'intelligence chez l'enfant ; La construction du réel chez l'enfant ; La prise de conscience. Delachaux et Niestlé / PUF.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Contrepoint développemental classique face à la nouvelle sociologie de l'enfance",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r069",
+     "cells": {
+      "src": {
+       "text": "Vygotsky, L. S. (1978). Le rôle du jeu dans le développement de l'enfant. Dans Mind in Society (p. 62-72).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h79",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.5 Produire du sens en jouant (communication, interaction, signification, socialisation, reconnaissance)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r070",
+     "cells": {
+      "src": {
+       "text": "Moscovici, S. (2004 [1961]). La psychanalyse, son image et son public. PUF.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r071",
+     "cells": {
+      "src": {
+       "text": "Jodelet, D. (2002). Les représentations sociales dans le champ de la culture. Social Science Information, 41(1), 111-133.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r072",
+     "cells": {
+      "src": {
+       "text": "Jodelet, D. (2015). Représentations sociales et mondes de vie (vol. 1). Archives contemporaines.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r073",
+     "cells": {
+      "src": {
+       "text": "Tajfel, H., &amp; Turner, J. C. (2004). The social identity theory of intergroup behavior. Dans Political psychology (p. 276-293).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r074",
+     "cells": {
+      "src": {
+       "text": "Moliner, P., &amp; Guimelli, C. (2015). Les représentations sociales. PU Grenoble.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r075",
+     "cells": {
+      "src": {
+       "text": "Boutet, M. (2012). Réseaux, 3(173-174), 207-234.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r076",
+     "cells": {
+      "src": {
+       "text": "Baldauf-Quilliatre, H., &amp; de Carvajal, I. C. (2015). Is the avatar considered as a participant by the players? A conversational analysis of multi-player videogames interactions. PsychNology Journal, 13(2), 127.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r077",
+     "cells": {
+      "src": {
+       "text": "Kerbrat-Orecchioni, C. (1986). « Nouvelle communication » et « analyse conversationnelle ». Langue française, (70), 7-25.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r078",
+     "cells": {
+      "src": {
+       "text": "Grellier, D. (2008). L'imaginaire face à l'angoisse : de la gestion ludique de la finitude. Figures de la mort dans les jeux vidéo de rôles et d'aventures. Quaderni, (67), 53-60.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r079",
+     "cells": {
+      "src": {
+       "text": "Voelckel, A.-C. (1995). Jouer ensemble. Approche biographique d'un loisir : le jeu de rôle. Sociétés contemporaines, 21(1), 57-74.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r080",
+     "cells": {
+      "src": {
+       "text": "Périer, I. (2017). Le jeu de rôle, une autre forme de narration sérielle ? Itinéraires. Littérature, textes, cultures, (2016-2).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r081",
+     "cells": {
+      "src": {
+       "text": "Féasson, V. (2017). Jeu de rôle, jeu de récit : la bataille pour l'histoire. Jeu de rôle 2017 : Engagements et Résistances.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r082",
+     "cells": {
+      "src": {
+       "text": "Gounod, S. (1970). Le jeu de rôle ou l'irruption des possibles… Bulletin de psychologie, 23(285), 758-759.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r083",
+     "cells": {
+      "src": {
+       "text": "Wieringa, C. F. (1968). Le jeu de rôle. Management International Review, 108-111.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r084",
+     "cells": {
+      "src": {
+       "text": "Le Breton, D. (2004). L'interactionnisme symbolique (4e éd.). PUF.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r085",
+     "cells": {
+      "src": {
+       "text": "Watzlawick, P. (1976). La réalité de la réalité : confusion, désinformation, communication. Éd. du Seuil.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_h96",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>2.6 Les limites de la littérature</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r086",
+     "cells": {
+      "src": {
+       "text": "Lissak, G. (2018) ; Oswald, T. K. et al. (2020) ; Santos, R. M. S. et al. (2023)",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Pour la critique du «temps d'écran» comme mesure homogénéisante.",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r087",
+     "cells": {
+      "src": {
+       "text": "Bassiouni, D. H., &amp; Hackley, C. (2016). Young Consumers, 17(2), 127-142.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c2_r088",
+     "cells": {
+      "src": {
+       "text": "Langehegermann, L. et al. (2025). La socialisation numérique des jeunes. Dans Rapport national Luxembourg 2025 (chap. 8).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  },
+  {
+   "id": "sec14_ch3",
+   "parentId": "sec14",
+   "title": "Chapitre 3 — Penser les pratiques vidéoludiques : dispositifs, usages et participation",
+   "color": "green",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c3_intro1",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "<i>Chapitre de cadrage théorique : il reprend et approfondit les concepts de 2.3 et 2.4 (dispositif, système sociotechnique, appropriation, nouvelle sociologie de l'enfance, posture constructiviste) pour construire le modèle conceptuel du chapitre 3.2.</i>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r001",
+     "cells": {
+      "src": {
+       "text": "Foucault, M. (1975). Surveiller et punir.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r002",
+     "cells": {
+      "src": {
+       "text": "Agamben, G. (2006). Po&amp;sie, 115(1), 25-33.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r003",
+     "cells": {
+      "src": {
+       "text": "Gavillet, I. (2010). Dans Les dispositifs d'information et de communication (p. 17-38).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r004",
+     "cells": {
+      "src": {
+       "text": "Zabban, V. (2012). Réseaux, 173-174(3), 137-176.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r005",
+     "cells": {
+      "src": {
+       "text": "Jouët, J. (2000). Réseaux, 18(100), 487-521.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r006",
+     "cells": {
+      "src": {
+       "text": "Proulx, S. (2005, 2015).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r007",
+     "cells": {
+      "src": {
+       "text": "Bouakka, O., &amp; Chakouk, S. (2024). Revue-IRS, 2(4), 2099-2116.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r008",
+     "cells": {
+      "src": {
+       "text": "Côté, I. (2020) ; Danic, I., Delalande, J., &amp; Rayou, P. (2006).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Nouvelle sociologie de l'enfance",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r009",
+     "cells": {
+      "src": {
+       "text": "Pretorius, L. (2024) ; Omodan, B. I. (2024) ; Burns, M. et al. (2022) ; William, F. K. A. (2024) ; Sol, K., &amp; Heng, K. (2022).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Posture constructiviste",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r010",
+     "cells": {
+      "src": {
+       "text": "Salvi, F., &amp; Scherer, L. (2025). Children's agency across disciplines: From potential to actual. Global Studies of Childhood, 15(2), 145-148. https://doi.org/10.1177/20436106251340886",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Voir aussi chap. 2.4",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c3_r011",
+     "cells": {
+      "src": {
+       "text": "Gøtzsche-Astrup, J., &amp; Villadsen, K. (2025). The dispositif is alive! Recovering social agents in Foucauldian analysis. The British Journal of Sociology, 76(2), 442-456. https://doi.org/10.1111/1468-4446.13174",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Voir aussi chap. 2.3",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  },
+  {
+   "id": "sec14_ch4",
+   "parentId": "sec14",
+   "title": "Chapitre 4 — Produire des connaissances avec les enfants : une démarche qualitative, participative et créative",
+   "color": "mauve",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c4_h1",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>4.1 Posture épistémologique constructiviste et interprétativiste</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r001",
+     "cells": {
+      "src": {
+       "text": "Pretorius, L. (2024). The Qualitative Report, 29(10), 2698-2715.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r002",
+     "cells": {
+      "src": {
+       "text": "Burns, M., Bally, J., Burles, M., Holtslander, L., &amp; Peacock, S. (2022). IJQM, 21.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r003",
+     "cells": {
+      "src": {
+       "text": "Roulston, K., &amp; Shelton, S. A. (2015). Reconceptualizing bias in teaching qualitative research methods. Qualitative Inquiry, 21(4), 332-342.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r004",
+     "cells": {
+      "src": {
+       "text": "Omodan, B. I. (2024) ; William, F. K. A. (2024) ; Sol, K., &amp; Heng, K. (2022).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r005",
+     "cells": {
+      "src": {
+       "text": "Bouvier, P. (2016). Socio-anthropologie. Anthropen.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r006",
+     "cells": {
+      "src": {
+       "text": "Olivier de Sardan, J.-P. (2008). La rigueur du qualitatif : les contraintes empiriques de l'interprétation socio-anthropologique. Academia.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r007",
+     "cells": {
+      "src": {
+       "text": "Hamel, J. (1997). La socio-anthropologie, un nouveau lien entre la sociologie et l'anthropologie. Socio-anthropologie, (1).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r008",
+     "cells": {
+      "src": {
+       "text": "Gadamer, H. G. (1996). Vérité et méthode : les grandes lignes d'une herméneutique philosophique (éd. intégrale rev. et corr.). Éditions du Seuil.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r009",
+     "cells": {
+      "src": {
+       "text": "Gaudet, S., Robert, D., &amp; Lavoie, K. (2018). L'aventure de la recherche qualitative : du questionnement à la rédaction scientifique. Presses de l'Université d'Ottawa.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_h11",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>4.3 Faire de la recherche avec les enfants (nouvelle sociologie de l'enfance, co-chercheurs, participation/pouvoir, éthique avec mineurs)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r010",
+     "cells": {
+      "src": {
+       "text": "Côté, I. (2020). PU Laval.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r011",
+     "cells": {
+      "src": {
+       "text": "Danic, I., Delalande, J., &amp; Rayou, P. (2006). PU Rennes.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r012",
+     "cells": {
+      "src": {
+       "text": "Christensen, P. H. (2004). Children's participation in ethnographic research. Children &amp; Society, 18(2), 165-176.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r013",
+     "cells": {
+      "src": {
+       "text": "Bradbury-Jones, C., Isham, L., &amp; Taylor, J. (2018). The complexities and contradictions in participatory research with vulnerable children and young people. Social Science &amp; Medicine.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r014",
+     "cells": {
+      "src": {
+       "text": "Eder, D., &amp; Corsaro, W. (1999). Ethnographic studies of children and youth. Journal of Contemporary Ethnography, 28(5), 520-531.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r015",
+     "cells": {
+      "src": {
+       "text": "Barbero, M. V. (2025). Between protection and participation. Children &amp; Society, 39(4), 739-748.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r016",
+     "cells": {
+      "src": {
+       "text": "Tourigny, S., &amp; Lafantaisie, V. (2022). L'approche participative en intervention avec les enfants. Revue de psychoéducation, 51(3), 199-225.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r017",
+     "cells": {
+      "src": {
+       "text": "Lafantaisie, V., Tourigny, S., &amp; David, M. (2022). «Montre-moi que tu t'intéresses à moi et que tu me crois». Recherches qualitatives, 41(1), 85-108.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r018",
+     "cells": {
+      "src": {
+       "text": "Clark, A., &amp; Moss, P. (2011). Listening to young children: The mosaic approach. Jessica Kingsley.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r019",
+     "cells": {
+      "src": {
+       "text": "Davies, H. (2008). Reflexivity in research practice. Sociological Research Online, 13(4), 17-30.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r020",
+     "cells": {
+      "src": {
+       "text": "Côté, I., Trottier Cyr, R. P., Lavoie, K., &amp; Pagé, G. (2018). «Veux-tu participer à ma recherche ?» ÉDUS.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Assentiment",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r021",
+     "cells": {
+      "src": {
+       "text": "Badillo-Urquiola, K., Shea, Z., Agha, Z., Lediaeva, I., &amp; Wisniewski, P. (2021). Conducting risky research with teens. Proceedings of the ACM on HCI, 4(CSCW3).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r022",
+     "cells": {
+      "src": {
+       "text": "Harcourt, D., &amp; Sargeant, J. (2012). Doing ethical research with children. McGraw-Hill.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r023",
+     "cells": {
+      "src": {
+       "text": "Mathews, B. (2022). Adolescent capacity to consent to participate in research. Laws, 12(1), art. 2.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r024",
+     "cells": {
+      "src": {
+       "text": "Miller, V. A., Drotar, D., &amp; Kodish, E. (2004). Children's competence for assent and consent. Ethics &amp; Behavior, 14(3), 255-295.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r025",
+     "cells": {
+      "src": {
+       "text": "Mishna, F., Antle, B. J., &amp; Regehr, C. (2004). Tapping the perspectives of children. Qualitative Social Work, 3(4), 449-468.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r026",
+     "cells": {
+      "src": {
+       "text": "Roth-Cline, M., &amp; Nelson, R. M. (2013). Parental permission and child assent in research on children. The Yale Journal of Biology and Medicine, 86(3), 291-301.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r027",
+     "cells": {
+      "src": {
+       "text": "Hardwick, T., Carter, M., Harkin, S., Zhang, T., &amp; Egliston, B. (2025). \"They're Scamming Me\": How Children Experience and Conceptualize Harm in Game Monetization. Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems. https://doi.org/10.1145/3706598.3713611",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Entretiens avec des enfants sur leur propre expérience de la monétisation en jeu ; modèle méthodologique proche du protocole envisagé",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r028",
+     "cells": {
+      "src": {
+       "text": "Sevón, E., Mustola, M., Siippainen, A., &amp; Vlasov, J. (2023). Participatory research methods with young children: a systematic literature review. Educational Review, 77(3). https://doi.org/10.1080/00131911.2023.2215465",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Revue systématique récente des méthodes participatives avec les jeunes enfants, complète Côté 2020 et Danic et al. 2006",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r029",
+     "cells": {
+      "src": {
+       "text": "Vilasís-Pamos, J., &amp; Pires, F. (2025). Researching Teens' Gamer Identity Construction in the COVID-19 Pandemic: Methodological Challenges. SAGE Open, 15(3). https://doi.org/10.1177/21582440251362737",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Réflexivité méthodologique sur l'enquête auprès d'adolescent·e·s joueur·euse·s ; voir aussi chap. 6",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r030",
+     "cells": {
+      "src": {
+       "text": "De Sardan, J.-P. O. (2001). L'enquête de terrain socio-anthropologique. Enquête, 8, 63-81.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r031",
+     "cells": {
+      "src": {
+       "text": "Olivier de Sardan, J.-P. (2003). Observation et description en socio-anthropologie.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r032",
+     "cells": {
+      "src": {
+       "text": "Lavoie, K., Vargas Diaz, R., Niang, A., Pouliot, È., &amp; Côté, I. (2026). La participation des enfants et des adolescents en recherche : la co-construction au cœur de pratiques novatrices. Presses de l'Université Laval.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Actualise directement Côté 2020 déjà mobilisé",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_h35",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>4.4 Les méthodes créatives comme dispositif de production des connaissances</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r033",
+     "cells": {
+      "src": {
+       "text": "Kara, H. (2020). Creative research methods: A practical guide. Policy Press.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r034",
+     "cells": {
+      "src": {
+       "text": "Catoir-Brisson, M. J., &amp; Jankeviciute, L. (2014). Entretien et méthodes visuelles. Sciences de la société, (92), 111-127.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r035",
+     "cells": {
+      "src": {
+       "text": "Archibald, M. M., Makinde, S., &amp; Tongo, N. (2024). Arts-based approaches to priority setting. IJQM, 23.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r036",
+     "cells": {
+      "src": {
+       "text": "Skains, R. L. (2018). Creative practice as research. Media Practice and Education, 19(1), 82-97.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r037",
+     "cells": {
+      "src": {
+       "text": "Konecki, K. T. (2019). Creative thinking in qualitative research and analysis. Qualitative Sociology Review, 15(3), 6-25.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r038",
+     "cells": {
+      "src": {
+       "text": "Schön, D. A. (1983). The reflective practitioner. Basic Books.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Réflexivité en action",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r039",
+     "cells": {
+      "src": {
+       "text": "Karcher, K., McCuaig, J., &amp; King-Hill, S. (2024). (Self-)reflection/reflexivity in sensitive, qualitative research. IJQM, 23.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r040",
+     "cells": {
+      "src": {
+       "text": "Margolin, I., Pearson, T., &amp; Jones, A. (2024). Arts-based research in psychology. Methods in Psychology, 11, 100144.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r041",
+     "cells": {
+      "src": {
+       "text": "Chapman, O., &amp; Sawchuk, K. (2012). Research-creation: Intervention, analysis and “family resemblances”. Canadian Journal of Communication, 37(1), 5-26.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r042",
+     "cells": {
+      "src": {
+       "text": "Glicenstein, J. (2024). Qu'est-ce que la recherche-création ? Marges, 2(39), 10-20.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r043",
+     "cells": {
+      "src": {
+       "text": "Goria, S. (2017). Méthodes et outils de veille créative. ISTE Group.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r044",
+     "cells": {
+      "src": {
+       "text": "Nathan, S., Hodgins, M., Wirth, J., Ramirez, J., Walker, N., &amp; Cullen, P. (2023). The use of arts-based methodologies and methods with young people with complex psychosocial needs: A systematic narrative review. Health Expectations, 26(2), 795-805. https://doi.org/10.1111/hex.13705",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Revue systématique récente, complète Kara 2020 et Catoir-Brisson &amp; Jankeviciute 2014",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r045",
+     "cells": {
+      "src": {
+       "text": "Harasym, J. A., Gross, D. P., MacLeod, A. A. N., &amp; Phelan, S. K. (2024). \"This Is a Look Into My Life\": Enhancing Qualitative Inquiry Into Communication Through Arts-Based Research Methods. International Journal of Qualitative Methods, 23. https://doi.org/10.1177/16094069241232603",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Même revue que Karcher et al. 2024, déjà mobilisée",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r046",
+     "cells": {
+      "src": {
+       "text": "Roberts, P., Boylan, F., Collins, P. R., &amp; Barblett, L. (2025). Co-Designing Health-Related Digital Tools with Children: A Scoping Review of Current Practice. Education Sciences, 15(6), art. 671. https://doi.org/10.3390/educsci15060671",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Revue de portée sur la co-conception avec les enfants, transposable au dispositif méthodologique créatif",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r047",
+     "cells": {
+      "src": {
+       "text": "Lameman, B. A., &amp; Lewis, J. E. (2011). Skins: Designing games with First Nations youth. Journal of Game Design and Development Education, 1(1), 63-75.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Conception participative de skins avec des jeunes, voir aussi chap. 5.1",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r048",
+     "cells": {
+      "src": {
+       "text": "Paquin, L.-C., &amp; Noury, C. (2018). Définir la recherche-création ou cartographier ses pratiques ?",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r049",
+     "cells": {
+      "src": {
+       "text": "Paquin, L.-C. (2019). Faire le récit de sa pratique de recherche-création.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r050",
+     "cells": {
+      "src": {
+       "text": "Paquin, L.-C. (2019). Faire de la recherche-création par cycles heuristiques.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r051",
+     "cells": {
+      "src": {
+       "text": "Paquin, L.-C. (2020). La pratique de la recherche-création.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r052",
+     "cells": {
+      "src": {
+       "text": "Leroux, L. P. À la recherche de la recherche-création. Dans Pour des recherches diaboliques : Théorie et création inter-artistique en laboratoire.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r053",
+     "cells": {
+      "src": {
+       "text": "St-Pierre, R. (2006). La conception de jeux vidéo éducatifs : une méthodologie de recherche/création (Thèse de doctorat, UQAM).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r054",
+     "cells": {
+      "src": {
+       "text": "Provost, C. (2021). La recherche-création à l'université : cadrage sociohistorique d'une nouvelle forme de recherche. Cahiers de recherche sociologique, (71), 111-137.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r055",
+     "cells": {
+      "src": {
+       "text": "Thomas, J. (2017). Les enjeux et le statut des méthodologies de l'imaginaire à l'ère du numérique. Interfaces numériques, 4(2), 187-208.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r056",
+     "cells": {
+      "src": {
+       "text": "Daniau, S., &amp; Bélanger, P. (2010). Jeu de rôle ludique et apprentissage. Dans Jeu et apprentissage, quelles relations (p. 203-226).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r057",
+     "cells": {
+      "src": {
+       "text": "Grégoire, A., &amp; Saulnier, M.-S. (2025). Artiste-chercheur·se sur le terrain. Presses de l'Université de Montréal.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_h61",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>4.5–4.11 Dispositif méthodologique, protocole, données, interprétation, scientificité, éthique, limites</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_n62",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "<i>Reprendre l'ensemble des lectures de 4.3 et 4.4 (recherche avec enfants + méthodes créatives).</i>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_h63",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>Jeux étudiés / corpus (4.5 « les jeux étudiés »)</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r058",
+     "cells": {
+      "src": {
+       "text": "Brawl Stars [Jeu vidéo]. (2017). Supercell.",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r059",
+     "cells": {
+      "src": {
+       "text": "Fortnite [Jeu vidéo]. (2017). Epic Games.",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r060",
+     "cells": {
+      "src": {
+       "text": "Minecraft [Jeu vidéo]. (2009). Mojang Studios.",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c4_r061",
+     "cells": {
+      "src": {
+       "text": "Roblox [Jeu vidéo]. (2004). Roblox Corporation.",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  },
+  {
+   "id": "sec14_ch5",
+   "parentId": "sec14",
+   "title": "Chapitre 5 — Les skins comme médiateurs de communication",
+   "color": "orange",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c5_intro1",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "<i>Chapitre cœur de la thèse : correspond très directement à la section 3 (« Skins, avatars et processus de signification ») de l'Examen rétrospectif — la majorité des lectures y sont déjà mobilisées en profondeur.</i>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_h2",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>5.1–5.3 Pratiques communicationnelles, processus de signification, le skin comme médiateur</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r001",
+     "cells": {
+      "src": {
+       "text": "Bourassa, R., &amp; Poissant, L. (2013). Avatars, personnages et acteurs virtuels. PUQ.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r002",
+     "cells": {
+      "src": {
+       "text": "Nachez, M., &amp; Schmoll, P. (2022). Hybrid, (9).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r003",
+     "cells": {
+      "src": {
+       "text": "Tordo, F. (2021). Imaginaire &amp; Inconscient, 1(47), 77-88.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r004",
+     "cells": {
+      "src": {
+       "text": "Renault, S. (2023). Mon avatar, la mode et moi. Décisions Marketing, 109(1), 35-56.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r005",
+     "cells": {
+      "src": {
+       "text": "Li, L., Freeman, G., &amp; Wohn, D. Y. (2020). Proceedings of CHI PLAY, 71-80.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r006",
+     "cells": {
+      "src": {
+       "text": "Reza, A., Chu, S., Nedd, A., &amp; Gardner, D. (2022). Convergence, 28(6), 1621-1642.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r007",
+     "cells": {
+      "src": {
+       "text": "Goffman, E. (2018 [1959]). La présentation de soi. Les Éd. de Minuit.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r008",
+     "cells": {
+      "src": {
+       "text": "Järvinen, L. (2023).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r009",
+     "cells": {
+      "src": {
+       "text": "Devlin, M. M., Ellithorpe, M. E., Gadino, N., Ewoldsen, D. R., &amp; Weir, S. (2024). Me, myself, and my avatar. Psychology of Popular Media.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r010",
+     "cells": {
+      "src": {
+       "text": "Zimmermann, D., Wehler, A., &amp; Kaspar, K. (2023). Self-representation through avatars in digital environments. Current Psychology, 42(25), 21775-21789.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r011",
+     "cells": {
+      "src": {
+       "text": "Fu, Y., Schwamm, S., Baughan, A., Powell, N., Kronberg, Z., Owens, A., Izenman, E., Alsabeh, D., Hunt, E., Rich, M., Bickham, D., Radesky, J., &amp; Hiniker, A. (2025). Understanding Children's Avatar Making in Social Online Games. Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems. https://doi.org/10.1145/3706598.3713262",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Motivations de personnalisation identifiées chez des enfants de 8-13 ans : auto-représentation, identités alter ego, besoins sociaux, effet de « garde-robe »",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r012",
+     "cells": {
+      "src": {
+       "text": "Georges, F. (2012). Avatars et identité. Hermès, La Revue, 2012/1(62), p. 33.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Référence de fond sur l'avatar comme construction identitaire, trouvée via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r013",
+     "cells": {
+      "src": {
+       "text": "Lyons, S. A. (2019). Costume design for video games: An exploration of historical and fantastical skins. CRC Press.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r014",
+     "cells": {
+      "src": {
+       "text": "Szolin, K., Kuss, D., Nuyens, F., &amp; Griffiths, M. (2022). Gaming disorder: A systematic review exploring the user-avatar relationship in videogames. Computers in Human Behavior, 128, 107124.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r015",
+     "cells": {
+      "src": {
+       "text": "Szolin, K., Kuss, D. J., Nuyens, F. M., &amp; Griffiths, M. D. (2023). Exploring the user-avatar relationship in videogames: A systematic review of the Proteus effect. Human–Computer Interaction, 38(5-6), 374-399.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r016",
+     "cells": {
+      "src": {
+       "text": "Szolin, K., Kuss, D. J., Nuyens, F. M., &amp; Griffiths, M. D. (2023). \"I am the character, the character is me\": A thematic analysis of the user-avatar relationship in videogames. Computers in Human Behavior, 143, 107694.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r017",
+     "cells": {
+      "src": {
+       "text": "Ng, R., &amp; Lindgren, R. (2013). Examining the effects of avatar customization and narrative on engagement and learning in video games. Proceedings of CGAMES'2013, 87-90.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r018",
+     "cells": {
+      "src": {
+       "text": "Movasagh, F. (2020). Digital clothes: Fashion in the virtual world.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r019",
+     "cells": {
+      "src": {
+       "text": "Farren, A., &amp; Hutchison, A. (2004). Digital clothes: Active, dynamic, and virtual textiles and garments. Textile, 2(3), 290-307.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r020",
+     "cells": {
+      "src": {
+       "text": "Everaert-Desmedt, N. (2011). La sémiotique de Peirce. Signo.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r021",
+     "cells": {
+      "src": {
+       "text": "Vaillant, P. (1999). Sémiotique des langages d'icônes. Honoré Champion.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r022",
+     "cells": {
+      "src": {
+       "text": "Berthelot-Guiet, K. (2004). Instrumentalisations de la sémiotique. Études de communication, (27).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r023",
+     "cells": {
+      "src": {
+       "text": "Coquet, J.-C., Arrivé, M., Calame, C., &amp; Geoltrain, P. (1982). Sémiotique : L'école de Paris. Hachette.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r024",
+     "cells": {
+      "src": {
+       "text": "Fontanille, J. (2001). La sémiotique est-elle générative ? Linx, (44), 107-132.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r025",
+     "cells": {
+      "src": {
+       "text": "Fontanille, J. (1998). Sémiotique du discours. Presses Univ. Limoges.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r026",
+     "cells": {
+      "src": {
+       "text": "Kalekin-Fishman, D., &amp; Hiscock, M. (1988). Jeux, rituels et théâtre : éléments de la grammaire d'action sociale de Goffman. Cahiers de sociologie économique et culturelle, 10(1), 81-94.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r027",
+     "cells": {
+      "src": {
+       "text": "Winkin, Y. (1984). Entretien avec Erving Goffman. Actes de la recherche en sciences sociales, 54(1), 85-87.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r028",
+     "cells": {
+      "src": {
+       "text": "Arino, M. Que peuvent s'apporter Sémiotique, Sciences de l'Information et de la Communication et Sociologie de la communication ?",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r029",
+     "cells": {
+      "src": {
+       "text": "Andacht, F. La sémiotique en débat chez les scientifiques.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r030",
+     "cells": {
+      "src": {
+       "text": "Longhi, J. (2016). Compte rendu de M. Mouillaud, Le discours et ses doubles. Sémiotique et politique. Quaderni, (89), 113-115.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r031",
+     "cells": {
+      "src": {
+       "text": "Marcellini, A., &amp; Miliani, M. (1999). Lecture de Goffman. L'homme comme objet rituel. Corps et culture, (4).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r032",
+     "cells": {
+      "src": {
+       "text": "Rawls, A. W. (2012). L'ordre constitutif de l'interaction selon Goffman. Dans Erving Goffman et l'ordre de l'interaction (p. 163-210). CURAPP-ESS/CEMS-IMM.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r033",
+     "cells": {
+      "src": {
+       "text": "Klinkenberg, J.-M. (2018). Sémiotique et sociologie. Kimé.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r034",
+     "cells": {
+      "src": {
+       "text": "Léonardi, C. (2015). L'œuvre d'art comme outil de lecture de la sociologie. Relire Goffman à partir de quelques pièces de Pina Bausch (Thèse, EHESS).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r035",
+     "cells": {
+      "src": {
+       "text": "Tore, G. M. (2011). Pour une sémiologie générale du spectaculaire : définitions et questions. Actes sémiotiques, (114).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r036",
+     "cells": {
+      "src": {
+       "text": "Landowski, E. (2019). Pour une sémiotique du goût. Actes sémiotiques, (122).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r037",
+     "cells": {
+      "src": {
+       "text": "Jakobson, R. (1985). Verbal art, verbal sign, verbal time. U of Minnesota Press.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r038",
+     "cells": {
+      "src": {
+       "text": "Cani, M.-P. (2015). Façonner l'imaginaire. De la création numérique 3D aux mondes virtuels animés. La lettre du Collège de France, (40).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r039",
+     "cells": {
+      "src": {
+       "text": "Gabriel, E. E. (2002). L'imaginaire des mondes virtuels. Imaginaire &amp; Inconscient, 7(3), 107-118.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r040",
+     "cells": {
+      "src": {
+       "text": "Leclerc, V. (2020). Produire une immersion sensorielle virtuelle : le défi des créateurs de jeux vidéo. Dans Regards croisés sur la transmission (p. 97).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r041",
+     "cells": {
+      "src": {
+       "text": "Goffman, E. (1987). Façons de parler. Éditions de Minuit.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r042",
+     "cells": {
+      "src": {
+       "text": "Peirce, C. S., Deledalle, G., &amp; Girel, M. (2017). Écrits sur le signe. Éditions Points.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r043",
+     "cells": {
+      "src": {
+       "text": "Eco, U. (2018 [1979]). Lector in fabula : le rôle du lecteur, ou la coopération interprétive dans les textes narratifs (éd. 14). Grasset.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r044",
+     "cells": {
+      "src": {
+       "text": "Eco, U. (1970). Sémiologie des messages visuels. Communications, 15(1), 11-51.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r045",
+     "cells": {
+      "src": {
+       "text": "Eco, U. (1988). Le signe : histoire et analyse d'un concept. Le Livre de poche.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r046",
+     "cells": {
+      "src": {
+       "text": "Eco, U., &amp; Bouzaher, M. (1992). Les limites de l'interprétation. Librairie Générale Française.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r047",
+     "cells": {
+      "src": {
+       "text": "Dearborn, G. V. N. (1918). The psychology of clothing. Psychological Review Company.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Fondateur pour la psychologie du vêtement, transposable au skin",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r048",
+     "cells": {
+      "src": {
+       "text": "Fauque, C. (2013). Les vêtements pour désirer le monde. La Géographie, 1551(4), 10-13.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_h51",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>5.4 Les processus identitaires — terminer par James, Mead, Markus</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r049",
+     "cells": {
+      "src": {
+       "text": "James, W. (1890). The consciousness of self [The principles of psychology].",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r050",
+     "cells": {
+      "src": {
+       "text": "Mead, G. H. (2006 [1934]). L'esprit, le soi et la société. PUF.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r051",
+     "cells": {
+      "src": {
+       "text": "Markus, H. (1977). Self-schemata and processing information about the self. JPSP, 35(2), 63.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r052",
+     "cells": {
+      "src": {
+       "text": "Markus, H., &amp; Wurf, E. (1987). The dynamic self-concept. Annual Review of Psychology.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r053",
+     "cells": {
+      "src": {
+       "text": "Deschamps, J.-C., &amp; Moliner, P. (2012). L'identité en psychologie sociale. Armand Colin.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r054",
+     "cells": {
+      "src": {
+       "text": "Hajji, M., &amp; Tordo, F. (2009). Avatars et moi ! Adolescence, 2009/3 (T. 27, n° 3), p. 657.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Multiplicité des avatars et jeu identitaire, en écho à Tordo 2021 déjà mobilisé ; trouvé via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r055",
+     "cells": {
+      "src": {
+       "text": "Li, D. D., Liau, A. K., &amp; Khoo, A. (2013). Player–Avatar Identification in video gaming: Concept and measurement. Computers in Human Behavior, 29(1), 257-263.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r056",
+     "cells": {
+      "src": {
+       "text": "Waggoner, Z. (2009). My avatar, my self: Identity in video role-playing games. McFarland.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r057",
+     "cells": {
+      "src": {
+       "text": "Tordo, F. (2012). Psychanalyse de l'action dans le jeu vidéo. Adolescence, 30(1), 119-132.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r058",
+     "cells": {
+      "src": {
+       "text": "Cascarino, A. (2021). Le corps transhumain dans le jeu vidéo : un corps pulsionnel. Dans Quand le transhumanisme interroge (p. 31).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r059",
+     "cells": {
+      "src": {
+       "text": "Lizé, W. (2004). Imaginaire masculin et identité sexuelle : le jeu de rôles et ses pratiquants. Sociétés contemporaines, 55(3), 43-67.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r060",
+     "cells": {
+      "src": {
+       "text": "Vachey, F. (2011). Fictions de personnages dans un MMORPG. Entre jeu de rôle et écriture de soi, écrire une persona fiction. Sociétés, 113(3), 81-90.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r061",
+     "cells": {
+      "src": {
+       "text": "Boulay, C. (2023). Jeu de rôle et fiction interactive : l'interactivité au service de la subjectivation. In Analysis, 7(1), 100333.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r062",
+     "cells": {
+      "src": {
+       "text": "Victoroff, D. (1972). La psychologie sociale de George H. Mead. Bulletin de psychologie, 25(295), 140-144.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r063",
+     "cells": {
+      "src": {
+       "text": "Daval, R. (1997). Société humaine et communication significative selon George Herbert Mead. Revue philosophique de la France et de l'étranger, 187(3), 285-304.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r064",
+     "cells": {
+      "src": {
+       "text": "Dewey, J., &amp; Mead, G. H. Entrer dans le jeu.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_h68",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>5.5 Les représentations sociales — Moscovici, Jodelet, Tajfel, Bourdieu</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r065",
+     "cells": {
+      "src": {
+       "text": "Moscovici, S. (2004 [1961]). La psychanalyse, son image et son public. PUF.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r066",
+     "cells": {
+      "src": {
+       "text": "Jodelet, D. (2002). Social Science Information, 41(1), 111-133.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r067",
+     "cells": {
+      "src": {
+       "text": "Jodelet, D. (2015). Représentations sociales et mondes de vie. Archives contemporaines.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r068",
+     "cells": {
+      "src": {
+       "text": "Tajfel, H., &amp; Turner, J. C. (2004). Dans Political psychology (p. 276-293).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r069",
+     "cells": {
+      "src": {
+       "text": "Bourdieu, P. (1979). Les trois états du capital culturel. ARSS, 30(1), 3-6.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r070",
+     "cells": {
+      "src": {
+       "text": "Moliner, P., &amp; Guimelli, C. (2015). Les représentations sociales. PU Grenoble.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r071",
+     "cells": {
+      "src": {
+       "text": "Pitroso, G. (2025). Beyond subcultures: A literature review of gaming communities and sociological analysis. New Media &amp; Society, 27(11), 6359-6375. https://doi.org/10.1177/14614448241252392",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Synthèse récente et très citée sur Bourdieu appliqué aux communautés de jeu",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r072",
+     "cells": {
+      "src": {
+       "text": "Oktavianingtyas, I., Rusadi, U., Jamalullail, J., &amp; Napitupulu, F. (2025). The role of symbolic capital and symbolic violence in shaping social hierarchies through digital consumption and production in Roblox online game. Bricolage: Jurnal Magister Ilmu Komunikasi, 11(2), 213-224. https://doi.org/10.30813/bricolage.v11i2.8113",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Application directe à Roblox, l'un des quatre jeux du corpus",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r073",
+     "cells": {
+      "src": {
+       "text": "Nau, J.-P., Garcia-Bardidia, R., Sohier, R., &amp; Velpry, A. (2019). Quand les mises à jour des jeux vidéo impactent la cocréation entre joueurs : apport d'une approche par le concept de champ. Décisions Marketing, 2019/2(94), 35-52. https://doi.org/10.7193/DM.094.35.52",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Mobilise directement le concept bourdieusien de champ appliqué au jeu vidéo ; trouvé via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r074",
+     "cells": {
+      "src": {
+       "text": "Bonales Daimiel, G., Gutiérrez-Manjón, S., Álvarez-García, S., &amp; Peinado, F. (2026). Visual identities and phygital branding in video games: symbolic consumption strategies among Spanish Generation Z. Frontiers in Communication, 11, art. 1789512. https://doi.org/10.3389/fcomm.2026.1789512",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Consommation symbolique et branding visuel chez de jeunes joueur·euse·s",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r075",
+     "cells": {
+      "src": {
+       "text": "Lignon, F., &amp; Derfoufi, M. Jeux vidéo et stéréotypes : jouer avec, s'en jouer, les déjouer. Dans Pratiques genrées et violences entre pairs (p. 237).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r076",
+     "cells": {
+      "src": {
+       "text": "Goffman, E. (1951). Symbols of class status. The British Journal of Sociology, 2(4), 294-304.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r077",
+     "cells": {
+      "src": {
+       "text": "Bourdieu, P. (2021). Forms of capital (P. Champagne, J. Duval, F. Poupeau, &amp; M.-C. Rivière, Éds. ; P. Collier, Trad.). Polity Press.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r078",
+     "cells": {
+      "src": {
+       "text": "Bourdieu, P. (2018). Classification struggles: General sociology, volume 1 (P. Collier, Trad.). Polity Press.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r079",
+     "cells": {
+      "src": {
+       "text": "Bourdieu, P., Champagne, P., Duval, J., Poupeau, F., &amp; Rivière, M.-C. (2020). Habitus and Field: General sociology, volume 2 (1982-1983) (P. Collier, Trad.). Polity Press.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r080",
+     "cells": {
+      "src": {
+       "text": "Arnoux, M. (2023). Le manteau d'Arlotto. Vêtement et statut social (Florence, XVe siècle). Rives méditerranéennes, (64), 71-81.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r081",
+     "cells": {
+      "src": {
+       "text": "Rodriguez-Lefebvre, R. (2014). Les pouvoirs sociaux du vêtement et du nu : quand la garde-robe de Diotime est le corset de Rachel. Eurostudia, 9(1), 12-21.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_h86",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>5.6 Reconnaissance, distinction et visibilité — Mauco, Järvinen</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r082",
+     "cells": {
+      "src": {
+       "text": "Mauco, O. (2020). Le marché des identités virtuelles dans le jeu vidéo. La revue lacanienne, 21(1), 139-151.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r083",
+     "cells": {
+      "src": {
+       "text": "Järvinen, L. (2023).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r084",
+     "cells": {
+      "src": {
+       "text": "Renault, S. (2023). Décisions Marketing, 109(1), 35-56.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r085",
+     "cells": {
+      "src": {
+       "text": "Li, L., Freeman, G., &amp; Wohn, D. Y. (2020).",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r086",
+     "cells": {
+      "src": {
+       "text": "Navarro-Gaviño, Á., &amp; García Fernández, P. (2026). Diseño de exclusividad, archivo y rotación en las skins de Prestigio de League of Legends (2018-2026). index.Comunicación, 16(2), 143-170. https://doi.org/10.62008/ixc/16/02Diseno",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Étude de cas la plus récente et la plus ciblée sur la conception de la rareté/exclusivité des skins",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r087",
+     "cells": {
+      "src": {
+       "text": "Mills, S., Ash, J., &amp; Gordon, R. (2023). Children and Young People's Experiences and Understandings of Gambling-Style Systems in Digital Games: Loot Boxes, Popular Culture, and Changing Childhoods. Annals of the American Association of Geographers, 114(1), 200-217. https://doi.org/10.1080/24694452.2023.2248293",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Voir aussi chap. 1.2",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r088",
+     "cells": {
+      "src": {
+       "text": "Garnier, M., &amp; Prostak, G. (2015). Pourquoi payer dans un jeu par navigateur gratuit ? Motivations à jouer et achat d'objets virtuels. Management &amp; Avenir, 2015/8(82), 183-201.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Étude empirique des motivations d'achat d'objets virtuels, transposable au skin ; trouvé via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r089",
+     "cells": {
+      "src": {
+       "text": "Garcia-Bardidia, R., Trizzulla, C., &amp; Maire, S. (2023). Usages sociaux des monnaies dans les jeux vidéo. Réseaux, 2023/2-3(238-239), 213-240. https://doi.org/10.3917/res.238.0213",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Économie symbolique des monnaies virtuelles, infrastructure de l'acquisition des skins ; trouvé via Cairn.info",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r090",
+     "cells": {
+      "src": {
+       "text": "Steinnes, K. K., &amp; Reich, C. J. (2026). Cosmetics as social currency: young people playing out identities through skins in free-to-play games. Consumption and Society, 5(2), p. 285. https://doi.org/10.1332/27528499Y2025D000000066",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Étude empirique auprès de jeunes montrant les skins comme monnaie sociale et laissez-passer d'accès au groupe de pairs ; voir aussi chap. 6",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r091",
+     "cells": {
+      "src": {
+       "text": "Gangadharbatla, H., Bradley, S., &amp; Wise, W. (2013). Psychophysiological responses to background brand placements in video games. Journal of Advertising, 42(2-3), 251-263.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r092",
+     "cells": {
+      "src": {
+       "text": "Moritz, K.-H., Schöber, T., &amp; Stadtmann, G. (2020). Product differentiation in video games: A closer look at Fortnite's success. Research Journal for Applied Management, 1(2), 43-57.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r093",
+     "cells": {
+      "src": {
+       "text": "Boutaud, J.-J. (2007). Du sens, des sens. Sémiotique, marketing et communication en terrain sensible. Semen, (23).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r094",
+     "cells": {
+      "src": {
+       "text": "Coutant, A. (2004). Sémiotique des publicités internationales. Sémio 2004 : 8e Congrès de l'AIS, 1-9.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r095",
+     "cells": {
+      "src": {
+       "text": "Soulages, J.-C. (2004). Le genre en publicité, ou le culte des apparences. Dans Sexe et Communication, MEI, 20, 51-59.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_h101",
+     "kind": "header",
+     "cells": {
+      "src": {
+       "text": "<b>5.7 Vers un modèle communicationnel du skin</b>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_n102",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "<i>Synthèse de l'ensemble des lectures de 5.1 à 5.6.</i>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r096",
+     "cells": {
+      "src": {
+       "text": "Ferrière, S., Wattelez, G., Perronnet, M., &amp; Cavaloc, Y. (2023). Identités plurielles dans l'École calédonienne. Journal de la Société des Océanistes, 157(2), 163-180.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Comparatif identité enfance",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c5_r097",
+     "cells": {
+      "src": {
+       "text": "Rodriguez, N. (2014). Identité, représentations de soi et socialisation horizontale chez les adolescentes... (Thèse de doctorat, Université Toulouse II).",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Comparatif identité en ligne",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  },
+  {
+   "id": "sec14_ch6",
+   "parentId": "sec14",
+   "title": "Chapitre 6 — Les significations produites par les enfants",
+   "color": "yellow",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c6_intro1",
+     "kind": "note",
+     "cells": {
+      "src": {
+       "text": "<i>Chapitre d'analyse empirique (données de terrain) : les lectures suivantes soutiennent la démarche d'interprétation plutôt que d'apporter du contenu théorique nouveau.</i>",
+       "tags": []
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c6_r001",
+     "cells": {
+      "src": {
+       "text": "Catoir-Brisson, M. J., &amp; Jankeviciute, L. (2014). Sciences de la société, (92), 111-127.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Analyse des productions visuelles",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c6_r002",
+     "cells": {
+      "src": {
+       "text": "Roulston, K., &amp; Shelton, S. A. (2015). Qualitative Inquiry, 21(4), 332-342.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Interprétation comme construction",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c6_r003",
+     "cells": {
+      "src": {
+       "text": "Margolin, I., Pearson, T., &amp; Jones, A. (2024). Methods in Psychology, 11, 100144.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c6_r004",
+     "cells": {
+      "src": {
+       "text": "Tissier-Desbordes, É. (2004). L'analyse de visuels : pour une complémentarité des principales approches. Décisions Marketing, 36(4), 63-74.",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Méthode d'analyse des productions visuelles des enfants",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c6_r005",
+     "cells": {
+      "src": {
+       "text": "Berger, M. Une image vaut mieux qu'un long discours (d'habitant). Sémiotique de la participation.",
+       "tags": [
+        "tag-appui"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c6_r006",
+     "cells": {
+      "src": {
+       "text": "Steinnes, K. K., &amp; Reich, C. J. (2026). Cosmetics as social currency: young people playing out identities through skins in free-to-play games. Consumption and Society, 5(2), p. 285. https://doi.org/10.1332/27528499Y2025D000000066",
+       "tags": [
+        "tag-coeur"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Les jeunes lecteurs construisent une économie d'échange informelle et résistent à la pression commerciale : matériau de comparaison direct pour l'analyse des significations produites par les enfants du corpus",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  },
+  {
+   "id": "sec14_ch7",
+   "parentId": "sec14",
+   "title": "Chapitre 7 — Conclusion générale",
+   "color": "pink",
+   "columns": [
+    {
+     "id": "src",
+     "label": "Sources"
+    },
+    {
+     "id": "res",
+     "label": "Résumé"
+    },
+    {
+     "id": "notes",
+     "label": "Notes"
+    }
+   ],
+   "rows": [
+    {
+     "id": "c7_r001",
+     "cells": {
+      "src": {
+       "text": "James, W. (1890) ; Mead, G. H. (2006 [1934]) ; Markus, H., &amp; Wurf, E. (1987) ; Deschamps, J.-C., &amp; Moliner, P. (2012).",
+       "tags": [
+        "tag-synthese"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Identité",
+       "tags": []
+      }
+     }
+    },
+    {
+     "id": "c7_r002",
+     "cells": {
+      "src": {
+       "text": "Moscovici, S. (2004 [1961]) ; Jodelet, D. (2002, 2015) ; Moliner, P., &amp; Guimelli, C. (2015).",
+       "tags": [
+        "tag-synthese"
+       ]
+      },
+      "res": {
+       "text": "",
+       "tags": []
+      },
+      "notes": {
+       "text": "Représentations sociales",
+       "tags": []
+      }
+     }
+    }
+   ],
+   "rowLines": "strong",
+   "view": "table"
+  }
+ ],
+ "diagrams": []
+}
