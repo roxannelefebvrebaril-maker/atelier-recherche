@@ -1,3 +1,6 @@
 .DS_Store
 .vercel
 node_modules
+
+# Images d'inspiration (œuvres de tiers) : gardées sur l'ordinateur seulement
+docs/inspiration/
