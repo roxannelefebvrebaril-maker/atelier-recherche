@@ -206,6 +206,33 @@
     var out = ["# " + (state.title || "Projet"), ""];
     if (state.sub) out.push(state.sub, "");
     var tagLabel = {}; (state.tags || []).forEach(function(t){ tagLabel[t.id] = t.label; });
+    var linksByEntity = new Map();
+    (state.links || []).forEach(function(link){ [link.a, link.b].forEach(function(id){ if (!linksByEntity.has(id)) linksByEntity.set(id, []); linksByEntity.get(id).push(link); }); });
+    var anchorTypes = {question:"répond à", objectif:"répond à", axe:"s'inscrit dans", concept:"mobilise", theorie:"s'appuie sur", reference:"vient de la lecture de"};
+    function inheritedAnchorType(table){
+      var current = table;
+      while (current){
+        if (current.anchorType && anchorTypes[current.anchorType]) return current.anchorType;
+        current = current.parentId ? state.tables.find(function(t){ return t.id === current.parentId; }) : null;
+      }
+      return null;
+    }
+    function anchorText(id){
+      var m = /^r:([^:]+):([^:]+)$/.exec(id || ""), table = m && state.tables.find(function(t){ return t.id === m[1]; });
+      var row = table && table.rows.find(function(r){ return r.id === m[2]; });
+      if (!table || !row) return "(supprimé)";
+      var col = table.columns.find(function(c){ return /^sources?$/i.test(c.label || ""); }) || table.columns[0];
+      return htmlToText(row.cells[col.id] && row.cells[col.id].text) || "(sans titre)";
+    }
+    function linkNotes(entityId){
+      return (linksByEntity.get(entityId) || []).map(function(link){
+        var other = link.a === entityId ? link.b : (link.b === entityId ? link.a : null);
+        if (!other || !/^r:/.test(other)) return null;
+        var m = /^r:([^:]+):/.exec(other), table = m && state.tables.find(function(t){ return t.id === m[1]; });
+        var type = table && inheritedAnchorType(table); if (!type) return null;
+        return (anchorTypes[type] || "lié à") + " : " + anchorText(other);
+      }).filter(Boolean);
+    }
     function cellMd(c){
       if (!c) return "";
       var t = htmlToText(c.text).replace(/\|/g, "\\|").replace(/\n+/g, "<br>");
@@ -233,6 +260,10 @@
         if (!cols.some(function(c){ return r.cells[c.id] && htmlToText(r.cells[c.id].text); })) return;
         openTable();
         out.push("| " + cols.map(function(c){ return cellMd(r.cells[c.id]); }).join(" | ") + " |");
+        cols.forEach(function(c){
+          var notes = linkNotes("t:" + t.id + ":" + r.id + ":" + c.id);
+          if (notes.length) out.push("  *→ " + notes.join(" · ") + "*");
+        });
       });
       if (regularOpen) out.push("");
       state.tables.filter(function(x){ return x.parentId === t.id; }).forEach(function(c){ table(c, depth + 1); });
