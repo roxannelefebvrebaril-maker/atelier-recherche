@@ -785,7 +785,27 @@ window.Editor = (function(){
       ]);
       grid.appendChild(card);
     });
+    var addCard = el("div", {class:"ov-card ov-add"}, [
+      btn("plus", "+ Nouveau sous-titre", function(){ addSubtitleTable(table, groups); }, "ghost")
+    ]);
+    grid.appendChild(addCard);
     content.appendChild(grid);
+  }
+
+  function addSubtitleTable(table, groups){
+    var columns = table.columns || [];
+    var source = columns.find(function(col){ return /^sources?$/i.test(col.label || ""); }) || columns[0];
+    var header = {id:uid("row"), kind:"header", cells:{}};
+    var reference = {id:uid("row"), cells:{}};
+    columns.forEach(function(col){
+      header.cells[col.id] = {text:"", tags:[]};
+      reference.cells[col.id] = {text:"", tags:[]};
+    });
+    header.cells[source.id].text = "Nouveau sous-titre";
+    table.rows.push(header, reference);
+    var groupId = "sub:" + table.id + ":" + header.id;
+    scheduleSave(true);
+    setSubchild(groupId);
   }
 
   function renderSubtitleView(content, secs, sec, idx, child, groups){
