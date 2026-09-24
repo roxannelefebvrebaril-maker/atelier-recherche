@@ -49,7 +49,7 @@
 [data-sec="indigo"]{--sec:var(--sec-indigo);--sec-bg:var(--sec-indigo-bg);}
 
 body{ background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; }
-body.in-editor{ max-width:none; padding:0; }
+body.in-editor{ max-width:none; padding:0; overflow-x:hidden; }
 h1,h2,h3{ font-family:'Source Serif 4',Georgia,serif; }
 
 /* ---------- icônes & boutons ---------- */
@@ -319,7 +319,7 @@ table.datatable.row-lines-strong td{ padding-top:4px; padding-bottom:4px; }
 .breadcrumb{ display:flex; align-items:center; gap:8px; margin:0 0 14px; font-size:12.5px; color:var(--ink-soft); }
 .breadcrumb button{ border:0; background:none; padding:2px 0; color:var(--accent-ink); font:inherit; cursor:pointer; }
 .breadcrumb button:hover{ text-decoration:underline; }
-.breadcrumb strong{ color:var(--ink); font-weight:600; }
+.breadcrumb strong{ color:var(--ink); font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* menus, fenêtres */
 .pop{ border-radius:14px; border:1px solid var(--border); box-shadow:var(--shadow-lg); padding:6px; }

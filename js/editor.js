@@ -106,6 +106,7 @@ window.Editor = (function(){
 
   var activeSection = null;   // id de la section affichée, ou null = vue d'ensemble
   var activeChild = null;     // id du sous-tableau affiché dans une section à cartes
+  var activeSubchild = null;  // id virtuel du sous-titre affiché dans un chapitre
   var SECTION_COLORS = ["coral","amber","green","teal","blue","violet","pink","indigo"];
   var TAGCOLOR_TO_SECTION = {blue:"blue", mauve:"violet", green:"green", yellow:"amber", orange:"coral", pink:"pink"};
 
@@ -198,6 +199,24 @@ window.Editor = (function(){
       .concat(state.diagrams.filter(function(x){ return x.parentId === t.id; }).map(function(x){ return {kind:"diagram", id:x.id, obj:x}; }));
   }
   function isCardSection(t){ return !!t && !(t.columns || []).length && t.cards !== false && sectionChildren(t).length >= 2; }
+  function subtitleGroups(t){
+    var groups = [], current = null;
+    (t.rows || []).forEach(function(row){
+      if (row.kind === "header"){
+        current = {id:"sub:" + t.id + ":" + row.id, table:t, header:row, title:subtitleText(t, row), rows:[]};
+        groups.push(current);
+      } else if (current && !row.kind){ current.rows.push(row); }
+    });
+    return groups;
+  }
+  function subtitleText(t, row){
+    var source = (t.columns || []).find(function(c){ return /^sources?$/i.test(c.label || ""); }) || t.columns[0];
+    return source && row.cells[source.id] ? stripHtml(row.cells[source.id].text).trim() : "Sous-titre";
+  }
+  function subtitleGroupForRow(t, rowId){
+    return subtitleGroups(t).find(function(group){ return group.rows.some(function(row){ return row.id === rowId; }); }) || null;
+  }
+  function isSubtitleCardChapter(t){ return !!t && subtitleGroups(t).length >= 2; }
   function directChildFor(id){
     var current = state.tables.find(function(t){ return t.id === id; });
     if (current && current.parentId){
@@ -238,7 +257,7 @@ window.Editor = (function(){
     var ae = document.activeElement;
     if (ae && ae.isContentEditable && document.getElementById("app").contains(ae)) ae.blur();
     activeSection = id;
-    if (!(opts && opts.child)) activeChild = null;
+    if (!(opts && opts.child)) { activeChild = null; activeSubchild = null; }
     try { if (id) localStorage.setItem(viewKey(), id); else localStorage.removeItem(viewKey()); } catch(e){}
     document.body.classList.remove("nav-open");
     render();
@@ -248,9 +267,22 @@ window.Editor = (function(){
     var ae = document.activeElement;
     if (ae && ae.isContentEditable && document.getElementById("app").contains(ae)) ae.blur();
     activeChild = id;
+    activeSubchild = null;
     try {
       if (id) localStorage.setItem(viewKey() + ":child:" + activeSection, id);
       else localStorage.removeItem(viewKey() + ":child:" + activeSection);
+    } catch(e){}
+    document.body.classList.remove("nav-open");
+    render();
+    window.scrollTo(0, 0);
+  }
+  function setSubchild(id){
+    var ae = document.activeElement;
+    if (ae && ae.isContentEditable && document.getElementById("app").contains(ae)) ae.blur();
+    activeSubchild = id;
+    try {
+      if (id) localStorage.setItem(viewKey() + ":subchild:" + activeChild, id);
+      else localStorage.removeItem(viewKey() + ":subchild:" + activeChild);
     } catch(e){}
     document.body.classList.remove("nav-open");
     render();
@@ -269,6 +301,7 @@ window.Editor = (function(){
       var activeTop = state.tables.find(function(t){ return t.id === activeSection; });
       if (!activeTop || !isCardSection(activeTop) || directChildFor(activeChild) !== activeChild) activeChild = null;
     }
+    if (activeSubchild && (!activeChild || !state.tables.some(function(t){ return subtitleGroups(t).some(function(g){ return g.id === activeSubchild; }); }))) activeSubchild = null;
 
     var shell = el("div", {class:"ed-shell"});
     shell.appendChild(el("div", {class:"nav-scrim", onclick:function(){ document.body.classList.remove("nav-open"); }}));
@@ -329,6 +362,11 @@ window.Editor = (function(){
             var short = childObj && childObj.title ? shortChildTitle(childObj.title, childIndex) : n.title;
             var childColor = childObj && childObj.color && TAGCOLOR_TO_SECTION[childObj.color] ? TAGCOLOR_TO_SECTION[childObj.color] : sectionColor({id:n.id, obj:childObj}, childIndex);
             sub.appendChild(el("li", {}, [el("button", {class:"sb-subitem" + (activeChild === n.id ? " active" : ""), type:"button", style:"padding-left:10px", onclick:function(){ setChild(n.id); }}, [el("span", {class:"sb-child-dot", "data-sec":childColor}), el("span", {text:short})])]));
+            if (childObj && childObj.columns && isSubtitleCardChapter(childObj) && activeChild === n.id){
+              subtitleGroups(childObj).forEach(function(group, groupIndex){
+                sub.appendChild(el("li", {}, [el("button", {class:"sb-subitem sb-subtitle" + (activeSubchild === group.id ? " active" : ""), type:"button", style:"padding-left:28px", text:String(groupIndex + 1) + " · " + group.title, onclick:function(){ setSubchild(group.id); }})]));
+              });
+            }
           });
           li.appendChild(sub);
         }
@@ -457,6 +495,11 @@ window.Editor = (function(){
         var childCount = parent ? sectionChildren(parent).length : 0;
         var childIndex = parent ? sectionChildren(parent).findIndex(function(c){ return c.id === activeChild; }) : -1;
         if (child) crumb.appendChild(el("span", {class:"hb-count", text:" › Chapitre " + (childIndex + 1) + " sur " + childCount}));
+        if (child && activeSubchild){
+          var subGroups = child.columns ? subtitleGroups(child) : [];
+          var subIndex = subGroups.findIndex(function(g){ return g.id === activeSubchild; });
+          if (subIndex >= 0) crumb.appendChild(el("span", {class:"hb-count", text:" › Sous-titre " + (subIndex + 1) + " sur " + subGroups.length}));
+        }
       }
     } else {
       crumb.appendChild(el("span", {class:"hb-count", text:"Vue d'ensemble"}));
@@ -681,6 +724,12 @@ window.Editor = (function(){
     var children = sectionChildren(sec.obj), childIndex = children.findIndex(function(child){ return child.id === activeChild; });
     var child = children[childIndex];
     if (!child){ activeChild = null; renderSectionCards(content, sec, idx); return; }
+    if (child.kind === "table" && isSubtitleCardChapter(child.obj)){
+      var groups = subtitleGroups(child.obj);
+      if (activeSubchild){ renderSubtitleView(content, secs, sec, idx, child, groups); }
+      else { renderSubtitleCards(content, sec, idx, child, groups); }
+      return;
+    }
     try { localStorage.setItem(viewKey() + ":child:" + sec.id, child.id); } catch(e){}
     var display = childDisplay(child, childIndex), color = child.kind === "table" && child.obj.color && TAGCOLOR_TO_SECTION[child.obj.color] ? TAGCOLOR_TO_SECTION[child.obj.color] : sectionColor(child, childIndex), p = sectionProgress(child);
     var crumb = el("nav", {class:"breadcrumb", "aria-label":"Fil d'Ariane"}, [
@@ -701,6 +750,65 @@ window.Editor = (function(){
     var previous = children[childIndex - 1], next = children[childIndex + 1];
     pager.appendChild(previous ? el("button", {class:"pg-btn", type:"button", onclick:function(){ setChild(previous.id); }}, [icon("back"), el("span", {}, [el("small", {text:"Chapitre précédent"}), el("strong", {text:childDisplay(previous, childIndex - 1).number + " · " + childDisplay(previous, childIndex - 1).title})])]) : el("span"));
     pager.appendChild(next ? el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setChild(next.id); }}, [el("span", {}, [el("small", {text:"Chapitre suivant"}), el("strong", {text:childDisplay(next, childIndex + 1).number + " · " + childDisplay(next, childIndex + 1).title})]), icon("next")]) : el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setChild(null); }}, [el("span", {}, [el("small", {text:"Terminé"}), el("strong", {text:"Retour aux chapitres"})]), icon("grid")]));
+    content.appendChild(pager);
+  }
+
+  function renderSubtitleCards(content, sec, idx, child, groups){
+    var table = child.obj, childIndex = sectionChildren(sec.obj).findIndex(function(item){ return item.id === child.id; }), p = sectionProgress(child);
+    try { localStorage.setItem(viewKey() + ":child:" + sec.id, child.id); } catch(e){}
+    var hero = el("section", {class:"ov-hero", "data-sec":sectionColor(child, childIndex)});
+    hero.appendChild(el("div", {class:"eyebrow", text:"Chapitre " + childDisplay(child, childIndex).number}));
+    hero.appendChild(el("h1", {class:"ov-title", text:childDisplay(child, childIndex).title}));
+    var refs = groups.reduce(function(total, group){ return total + group.rows.length; }, 0);
+    var complete = groups.filter(function(group){ return pct(tableProgress({columns:table.columns, rows:group.rows})) === 100; }).length;
+    var summary = groups.reduce(function(total, group){
+      var stats = summaryStats({columns:table.columns, rows:group.rows}); return total + stats.filled;
+    }, 0);
+    hero.appendChild(el("div", {class:"ov-stats"}, [
+      stat(pct(p) + " %", "du chapitre", progressBar(p, "big")),
+      stat(complete + " / " + groups.length, "sous-titres complets"),
+      stat(String(refs), "références"),
+      stat(String(summary), "résumés rédigés")
+    ]));
+    content.appendChild(hero);
+    content.appendChild(renderTagsRow());
+    var grid = el("div", {class:"ov-grid"});
+    groups.forEach(function(group, groupIndex){
+      var groupProgress = tableProgress({columns:table.columns, rows:group.rows});
+      var stats = summaryStats({columns:table.columns, rows:group.rows});
+      var card = el("button", {class:"ov-card", type:"button", "data-sec":sectionColor(child, childIndex), onclick:function(){ setSubchild(group.id); }}, [
+        el("div", {class:"ov-card-top"}, [el("span", {class:"ov-num", text:String(groupIndex + 1).padStart(2, "0")}), progressRing(groupProgress, 30)]),
+        el("div", {class:"ov-card-title", text:group.title}),
+        el("div", {class:"ov-card-meta", text:stats.hasSummary ? stats.filled + " / " + stats.refs + " résumés rédigés" : stats.filled + " / " + stats.total + " cases remplies"}),
+        el("div", {class:"tagbar card-tags"}, tagPills(tagCountsFor(group.rows))),
+        progressBar(groupProgress)
+      ]);
+      grid.appendChild(card);
+    });
+    content.appendChild(grid);
+  }
+
+  function renderSubtitleView(content, secs, sec, idx, child, groups){
+    var groupIndex = groups.findIndex(function(group){ return group.id === activeSubchild; }), group = groups[groupIndex];
+    if (!group){ activeSubchild = null; renderSubtitleCards(content, sec, idx, child, groups); return; }
+    var childIndex = sectionChildren(sec.obj).findIndex(function(item){ return item.id === child.id; });
+    var display = childDisplay(child, childIndex), color = sectionColor(child, childIndex), p = tableProgress({columns:child.obj.columns, rows:group.rows});
+    try { localStorage.setItem(viewKey() + ":subchild:" + child.id, group.id); } catch(e){}
+    content.appendChild(el("nav", {class:"breadcrumb", "aria-label":"Fil d'Ariane"}, [
+      el("button", {type:"button", text:"Vue d'ensemble", onclick:function(){ setSection(null); }}), el("span", {text:"›"}),
+      el("button", {type:"button", text:(idx + 1) + " · " + titleOf(sec.obj), onclick:function(){ setChild(null); }}), el("span", {text:"›"}),
+      el("button", {type:"button", text:display.number + " · " + display.title, onclick:function(){ setSubchild(null); }}), el("span", {text:"›"}),
+      el("strong", {text:group.title})
+    ]));
+    content.appendChild(el("div", {class:"sec-head", "data-sec":color}, [el("div", {class:"sec-num", text:String(groupIndex + 1).padStart(2, "0")}), el("div", {class:"sec-meta"}, [el("div", {class:"sec-kicker", text:"Chapitre · Sous-titre"}), el("div", {class:"sec-progress"}, [progressBar(p), el("span", {text:p.total ? p.filled + " / " + p.total + " remplies" : ""})])])]));
+    content.appendChild(renderTagsRow());
+    var board = el("div", {class:"board", "data-sec":color});
+    board.appendChild(renderTable(child.obj, {top:true, rows:group.rows, title:group.title, header:group.header}));
+    content.appendChild(board);
+    var pager = el("nav", {class:"sec-pager", "aria-label":"Sous-titres précédent et suivant"});
+    var previous = groups[groupIndex - 1], next = groups[groupIndex + 1];
+    pager.appendChild(previous ? el("button", {class:"pg-btn", type:"button", onclick:function(){ setSubchild(previous.id); }}, [icon("back"), el("span", {}, [el("small", {text:"Sous-titre précédent"}), el("strong", {text:previous.title})])]) : el("span"));
+    pager.appendChild(next ? el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setSubchild(next.id); }}, [el("span", {}, [el("small", {text:"Sous-titre suivant"}), el("strong", {text:next.title})]), icon("next")]) : el("button", {class:"pg-btn pg-next", type:"button", onclick:function(){ setSubchild(null); }}, [el("span", {}, [el("small", {text:"Terminé"}), el("strong", {text:"Retour aux sous-titres"})]), icon("grid")]));
     content.appendChild(pager);
   }
 
@@ -1318,15 +1426,22 @@ window.Editor = (function(){
   function renderTable(t, opts){
     opts = opts || {};
     var nested = !!opts.nested;
+    var displayRows = opts.rows || t.rows;
     var head = el("div", {class:"table-card-head"});
     var handle = el("button", {class:"drag-handle", type:"button", title: "Glisser pour déplacer ce sous-tableau (dans ce tableau, vers un autre, ou pour en faire une section)", text:"⠿"});
     if (nested) head.appendChild(handle);
-    var h2 = el("h2", {contenteditable:"true", spellcheck:"false", "data-table-title":t.id, text:t.title});
+    var h2 = el("h2", {contenteditable:"true", spellcheck:"false", "data-table-title":t.id, text:opts.title || t.title});
     plainPaste(h2);
-    h2.addEventListener("input", function(){ t.title = h2.textContent; dirty = true; });
+    h2.addEventListener("input", function(){
+      if (opts.header){
+        var source = t.columns.find(function(c){ return /^sources?$/i.test(c.label || ""); }) || t.columns[0];
+        if (source) opts.header.cells[source.id].text = h2.innerHTML;
+      } else t.title = h2.textContent;
+      dirty = true;
+    });
     h2.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); h2.blur(); } });
     h2.addEventListener("focus", function(){ lastFocus = {kind:"table", tableId:t.id, rowId:null, colId:null, diagramId:null}; });
-    h2.addEventListener("blur", function(){ scheduleSave(true); if (!nested){ var lab = document.querySelector(".sb-item.active .sb-label"); if (lab) lab.textContent = stripHtml(t.title) || "(sans titre)"; } });
+    h2.addEventListener("blur", function(){ scheduleSave(true); if (!nested && !opts.header){ var lab = document.querySelector(".sb-item.active .sb-label"); if (lab) lab.textContent = stripHtml(t.title) || "(sans titre)"; } });
     head.appendChild(h2);
     var actions = el("div", {class:"table-card-actions"});
     function addColumn(){
@@ -1411,7 +1526,7 @@ window.Editor = (function(){
     table.appendChild(thead);
 
     var tbody = el("tbody");
-    t.rows.forEach(function(row){
+    displayRows.forEach(function(row){
       var tr = el("tr");
       var rowdragTd = el("td", {class:"rowdrag-td"});
       var rowHandle = el("button", {class:"row-drag-handle", title:"Déplacer cette ligne (dans ce tableau ou vers un autre)", text:"⠿"});
@@ -2099,6 +2214,12 @@ window.Editor = (function(){
     // La future navigation en fichiers cliquables doit réutiliser activeChild ici,
     // plutôt que créer un second état de navigation.
     if (child && activeChild !== child){ setChild(child); return true; }
+    if (child){
+      var childTable = state.tables.find(function(t){ return t.id === child; });
+      var entityMatch = /^t:([^:]+):([^:]+):/.exec(id || "");
+      var group = childTable && entityMatch && entityMatch[1] === child ? subtitleGroupForRow(childTable, entityMatch[2]) : null;
+      if (group && activeSubchild !== group.id){ setSubchild(group.id); return true; }
+    }
     return false;
   }
   function goToBlock(kind, id){
@@ -2199,7 +2320,8 @@ window.Editor = (function(){
     var sec = topSections().find(function(s){ return s.id === activeSection; });
     if (!sec) return;
     var current = activeChild ? (state.tables.find(function(t){ return t.id === activeChild; }) || state.diagrams.find(function(d){ return d.id === activeChild; })) : null;
-    var p = current ? sectionProgress({kind:state.tables.indexOf(current) >= 0 ? "table" : "diagram", obj:current}) : sectionProgress(sec);
+    var currentGroup = current && activeSubchild ? subtitleGroups(current).find(function(group){ return group.id === activeSubchild; }) : null;
+    var p = currentGroup ? tableProgress({columns:current.columns, rows:currentGroup.rows}) : current ? sectionProgress({kind:state.tables.indexOf(current) >= 0 ? "table" : "diagram", obj:current}) : sectionProgress(sec);
     var progress = document.querySelector(".sec-progress");
     if (progress){
       var fill = progress.querySelector(".pbar > span");
@@ -2289,6 +2411,9 @@ window.Editor = (function(){
     else { try { activeSection = localStorage.getItem(viewKey()) || null; } catch(e){} }
     if (activeSection){
       try { activeChild = localStorage.getItem(viewKey() + ":child:" + activeSection) || null; } catch(e){}
+    }
+    if (activeChild){
+      try { activeSubchild = localStorage.getItem(viewKey() + ":subchild:" + activeChild) || null; } catch(e){}
     }
     render();
     window.scrollTo(0,0);
