@@ -476,6 +476,136 @@ window.Editor = (function(){
     overlay.appendChild(box); overlay.addEventListener("mousedown", function(e){ if (e.target === overlay) close(); }); document.body.appendChild(overlay);
   }
 
+  function projectSearchMatches(query){
+    var q = normalizeText(query || "").trim();
+    var results = [];
+    function addTableMatch(table, matchType, excerpt, entityId){
+      if (!table) return;
+      var topSectionId = null;
+      var current = table;
+      while (current && current.parentId){ current = state.tables.find(function(t){ return t.id === current.parentId; }); }
+      topSectionId = current ? current.id : null;
+      results.push({
+        id: entityId || table.id,
+        sectionId: topSectionId,
+        tableId: table.id,
+        rowId: null,
+        colId: null,
+        matchType: matchType,
+        label: titleOf(table),
+        excerpt: excerpt,
+        kind: "table"
+      });
+    }
+    function addCellMatch(table,row,col,cellText){
+      var doc = stripHtml(cellText || "").trim();
+      if (!doc) return;
+      var topSectionId = null;
+      var current = table;
+      while (current && current.parentId){ current = state.tables.find(function(t){ return t.id === current.parentId; }); }
+      topSectionId = current ? current.id : null;
+      results.push({
+        id: entityKeyForCell(table.id, row.id, col.id),
+        sectionId: topSectionId,
+        tableId: table.id,
+        rowId: row.id,
+        colId: col.id,
+        matchType: "Cellule",
+        label: titleOf(table),
+        excerpt: doc.slice(0, 180),
+        kind: "cell"
+      });
+    }
+
+    state.tables.forEach(function(table){
+      var title = titleOf(table);
+      if (!q || normalizeText(title).indexOf(q) >= 0){ addTableMatch(table, "Section", title, table.id); }
+      (table.rows || []).forEach(function(row){
+        if (row.kind) return;
+        Object.keys(row.cells || {}).forEach(function(colId){
+          var col = (table.columns || []).find(function(c){ return c.id === colId; });
+          var cell = row.cells[colId];
+          var text = stripHtml((cell && cell.text) || "").trim();
+          if (!text) return;
+          if (!q || normalizeText(text).indexOf(q) >= 0){ addCellMatch(table, row, col || {id:colId,label:"Cellule"}, text); }
+        });
+      });
+      if (table.tags && table.tags.length && (!q || normalizeText((table.tags || []).join(" ")).indexOf(q) >= 0)) {
+        addTableMatch(table, "Repères", table.tags.join(", "), table.id);
+      }
+    });
+
+    state.diagrams.forEach(function(diagram){
+      var title = titleOf(diagram);
+      if (!q || normalizeText(title).indexOf(q) >= 0){
+        var topSectionId = null;
+        var current = state.tables.find(function(t){ return t.id === diagram.parentId; });
+        while (current && current.parentId){ current = state.tables.find(function(t){ return t.id === current.parentId; }); }
+        topSectionId = current ? current.id : null;
+        results.push({id:diagram.id, sectionId:topSectionId, tableId:null, rowId:null, colId:null, matchType:"Espace libre", label:title, excerpt:title, kind:"diagram"});
+      }
+      (diagram.notes || []).forEach(function(note){
+        var text = stripHtml(note.text || "").trim();
+        if (!text) return;
+        if (!q || normalizeText(text).indexOf(q) >= 0){
+          var topSectionId = null;
+          var current = state.tables.find(function(t){ return t.id === diagram.parentId; });
+          while (current && current.parentId){ current = state.tables.find(function(t){ return t.id === current.parentId; }); }
+          topSectionId = current ? current.id : null;
+          results.push({id:note.id, sectionId:topSectionId, tableId:null, rowId:null, colId:null, matchType:"Note", label: titleOf(diagram), excerpt:text.slice(0,180), kind:"note"});
+        }
+      });
+    });
+
+    return results.slice(0, 60);
+  }
+
+  function openGlobalSearchModal(){
+    var overlay = el("div", {class:"overlay"});
+    var box = el("div", {class:"modal", role:"dialog", "aria-modal":"true", style:"max-width:700px; width:min(90vw, 700px);"});
+    var input = el("input", {class:"field", type:"search", placeholder:"Recherche dans tout le projet…", "aria-label":"Recherche dans tout le projet"});
+    var list = el("div", {class:"choice-list"});
+
+    function renderResults(){
+      var q = input.value || "";
+      list.innerHTML = "";
+      var matches = projectSearchMatches(q);
+      if (!matches.length){
+        list.appendChild(el("p", {class:"lib-hint", text: q.trim() ? "Aucun résultat trouvé." : "Tape un mot-clé pour chercher dans le projet."}));
+        return;
+      }
+      matches.forEach(function(match){
+        var btn = el("button", {class:"choice", type:"button", onclick:function(){
+          if (match.sectionId) setSection(match.sectionId);
+          var target = null;
+          if (match.kind === "cell" && match.tableId && match.rowId && match.colId){
+            target = document.querySelector('[data-entity="' + cssEscape(entityKeyForCell(match.tableId, match.rowId, match.colId)) + '"]');
+          }
+          overlay.remove();
+          setTimeout(function(){
+            if (target){ target.scrollIntoView({behavior:"smooth", block:"center"}); target.focus && target.focus(); }
+          }, 120);
+        }});
+        btn.appendChild(el("span", {class:"choice-tag", text:match.matchType}));
+        btn.appendChild(el("div", {class:"choice-text"}, [el("strong", {text:match.label}), el("small", {text:match.excerpt})]));
+        list.appendChild(btn);
+      });
+    }
+
+    input.addEventListener("input", renderResults);
+    box.appendChild(el("h3", {text:"Recherche dans le projet"}));
+    box.appendChild(input);
+    box.appendChild(list);
+    box.appendChild(el("div", {class:"row", style:"justify-content:flex-end;"}, [
+      el("button", {class:"btn ghost", type:"button", text:"Fermer", onclick:function(){ overlay.remove(); }})
+    ]));
+    overlay.appendChild(box);
+    overlay.addEventListener("mousedown", function(e){ if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+    input.focus();
+    renderResults();
+  }
+
   function renderSidebar(secs){
     var side = el("aside", {class:"ed-sidebar", "aria-label":"Sections du projet"});
     var top = el("div", {class:"sb-top"});
@@ -675,6 +805,7 @@ window.Editor = (function(){
       el("span", {class:"dot"}), el("span", {text: STATUS_LABELS[saveStatus] || "…"})
     ]);
     bar.appendChild(status);
+    bar.appendChild(el("button", {class:"btn small header-search", type:"button", text:"Rechercher", onclick:function(){ openGlobalSearchModal(); }}));
     bar.appendChild(el("button", {class:"btn small header-links", type:"button", text:"Liens", onclick:function(){ toggleContextPanel(); }}));
     if (dimAnchor) bar.appendChild(el("button", {class:"btn small", type:"button", text:"× Filtre de lien", title:"Retirer le filtre de lien", onclick:function(){ dimAnchor = null; render(); }}));
     bar.appendChild(iconBtn("help", "Aide : comment utiliser l'outil", function(){ openHelp(); }, "hb-help"));
