@@ -1058,18 +1058,13 @@ window.Editor = (function(){
     var grid = el("div", {class:"ov-grid"});
     filtered.forEach(function(item, index){
       var table = item.obj;
-      var type = ficheTypeValue(table); var status = ficheStatusValue(table); var rel = ficheRelevanceValue(table); var progress = countFilledFicheRows(table);
+      var type = ficheTypeValue(table);
+      var summary = (ficheRowValue(table, "f1_08") || type || "Fiche vide").trim();
       var card = el("button", {class:"ov-card", type:"button", onclick:function(){ setChild(table.id); }}, [
-        el("div", {class:"ov-card-top"}, [el("span", {class:"ov-num", text:String(index + 1).padStart(2, "0")}), progressRing({total:(table.rows||[]).filter(function(r){ return !r.kind; }).length || 1, filled:progress}, 30)]),
+        el("div", {class:"ov-card-top"}, [el("span", {class:"ov-num", text:String(index + 1).padStart(2, "0")})]),
         el("div", {class:"ov-card-title", text:titleOf(table) || "Sans titre"}),
-        el("div", {class:"ov-card-meta", text:(ficheRowValue(table, "f1_05") || "").slice(0,80) || "Fiche vide"}),
-        el("div", {class:"tagbar card-tags"}, [
-          type ? el("span", {class:"mini-tag", text:type}) : null,
-          status ? el("span", {class:"mini-tag", text:status}) : null,
-          rel ? el("span", {class:"mini-tag", text:rel}) : null
-        ]),
-        el("div", {class:"ov-card-meta", text:progress + " / " + ((table.rows||[]).filter(function(r){ return !r.kind; }).length || 1) + " rubriques remplies"}),
-        progressBar({total:(table.rows||[]).filter(function(r){ return !r.kind; }).length || 1, filled:progress}, "big")
+        el("div", {class:"ov-card-meta", text:summary}),
+        el("div", {class:"ov-card-meta", text:(ficheRowValue(table, "f1_02") || "Référence non saisie").slice(0, 90) || "Référence non saisie"})
       ]);
       grid.appendChild(card);
     });
@@ -1119,22 +1114,12 @@ window.Editor = (function(){
     meta.querySelector(".fiche-title").addEventListener("input", function(){ table.title = meta.querySelector(".fiche-title").textContent; dirty = true; });
     meta.querySelector(".fiche-title").addEventListener("blur", function(){ table.title = (meta.querySelector(".fiche-title").textContent || "").trim() || "Sans titre"; scheduleSave(true); });
     content.appendChild(meta);
-    var sideSummary = el("aside", {class:"fiche-summary"});
     var groups = [];
     var current = null;
     (table.rows || []).forEach(function(row){
       if (row.kind === "header"){ current = {title: stripHtml((row.cells && row.cells.rub && row.cells.rub.text) || ""), rows:[]}; groups.push(current); }
       else if (current && !row.kind){ current.rows.push(row); }
     });
-    groups.forEach(function(group, idx){
-      var count = group.rows.length;
-      var done = group.rows.filter(function(row){
-        var cell = row.cells && row.cells.cont ? row.cells.cont : null;
-        return cell && stripHtml(cell.text || "").trim();
-      }).length;
-      sideSummary.appendChild(el("button", {class:"fiche-summary-item", type:"button", text:group.title + " · " + done + " / " + count, onclick:function(){ document.getElementById("fiche-part-" + idx).scrollIntoView({behavior:"smooth", block:"start"}); }}));
-    });
-    content.appendChild(sideSummary);
     var form = el("div", {class:"fiche-form"});
     var partIndex = 0;
     groups.forEach(function(group){
