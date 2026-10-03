@@ -4,3 +4,6 @@ node_modules
 
 # Images d'inspiration (œuvres de tiers) : gardées sur l'ordinateur seulement
 docs/inspiration/
+
+# Fichiers de travail de Claude (maquettes) : gardés sur l'ordinateur seulement
+Claude outputs/

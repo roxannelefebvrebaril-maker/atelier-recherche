@@ -71,6 +71,48 @@ window.Editor = (function(){
     return d.textContent || "";
   }
   function normalizeText(text){ return String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+  function cloneDeep(value){ return JSON.parse(JSON.stringify(value || {})); }
+  function defaultFicheTemplate(){ return cloneDeep(window.FICHE_LECTURE_TEMPLATE || {format:"atelier-recherche/fiche-template", columns:[{id:"rub",label:"Rubrique"},{id:"cont",label:"Contenu"}], rows:[], rowLines:"strong"}); }
+  function ficheRowValue(table, keyOrLabel){
+    var rows = (table && table.rows) || [];
+    var target = rows.find(function(row){ return row.key && row.key === keyOrLabel; }) || rows.find(function(row){ return String((row.cells && row.cells.rub && row.cells.rub.text) || "").replace(/<[^>]+>/g, "") === String(keyOrLabel || ""); });
+    if (!target || target.kind) return "";
+    var cell = target.cells && target.cells.cont ? target.cells.cont : null;
+    return cell ? stripHtml(cell.text || "").trim() : "";
+  }
+  function ficheStatusValue(table){
+    var value = ficheRowValue(table, "f2_02") || ficheRowValue(table, "Statut") || "";
+    var text = normalizeText(value);
+    if (/relue/.test(text)) return "Relue";
+    if (/lue/.test(text)) return "Lue";
+    if (/en cours|cours/.test(text)) return "En cours";
+    if (/a lire|à lire/.test(text)) return "À lire";
+    return "À lire";
+  }
+  function ficheTypeValue(table){
+    var value = ficheRowValue(table, "f1_01") || ficheRowValue(table, "Type de document") || "";
+    var text = normalizeText(value);
+    if (/chapitre/.test(text) || /ouvrage collectif/.test(text) || /collectif/.test(text)) return "Chapitre";
+    if (/livre|ouvrage|edition|presses|harrington|fayard|policy press|routledge|harmattan|puq|puf/.test(text)) return "Livre";
+    if (/article|revue|journal|volume|num/.test(text)) return "Article";
+    return "Autre";
+  }
+  function ficheRelevanceValue(table){
+    var value = ficheRowValue(table, "f2_03") || ficheRowValue(table, "Pertinence pour ma thèse") || "";
+    var text = normalizeText(value);
+    if (/coeur|cœur/.test(text)) return "Cœur";
+    if (/appui/.test(text)) return "Appui";
+    return "";
+  }
+  function ensureFicheContainer(){
+    var existing = state.tables.find(function(t){ return t.childKind === "fiche"; });
+    if (existing) return existing;
+    var container = {id:uid("tbl"), title:"Fiches de lecture", columns:[], rows:[], childKind:"fiche", childTemplate:defaultFicheTemplate(), cards:true};
+    state.tables.push(container);
+    if (!Array.isArray(state.order)) state.order = [];
+    state.order.push(container.id);
+    return container;
+  }
   var ANCHOR_TYPES = {
     question:{label:"Question / objet", color:"coral", verb:"répond à", icon:"question"},
     objectif:{label:"Objectif", color:"amber", verb:"répond à", icon:"target"},
@@ -270,7 +312,7 @@ window.Editor = (function(){
     return state.tables.filter(function(x){ return x.parentId === t.id; }).map(function(x){ return {kind:"table", id:x.id, obj:x}; })
       .concat(state.diagrams.filter(function(x){ return x.parentId === t.id; }).map(function(x){ return {kind:"diagram", id:x.id, obj:x}; }));
   }
-  function isCardSection(t){ return !!t && !(t.columns || []).length && t.cards !== false && sectionChildren(t).length >= 2; }
+  function isCardSection(t){ return !!t && ((t.childKind === "fiche") || (!(t.columns || []).length && t.cards !== false && sectionChildren(t).length >= 2)); }
   function subtitleGroups(t){
     var groups = [], current = null;
     (t.rows || []).forEach(function(row){
@@ -288,7 +330,7 @@ window.Editor = (function(){
   function subtitleGroupForRow(t, rowId){
     return subtitleGroups(t).find(function(group){ return group.rows.some(function(row){ return row.id === rowId; }); }) || null;
   }
-  function isSubtitleCardChapter(t){ return !!t && subtitleGroups(t).length >= 2; }
+  function isSubtitleCardChapter(t){ if (!t || t.kind === "fiche" || t.childKind === "fiche") return false; return subtitleGroups(t).length >= 2; }
   function directChildFor(id){
     var current = state.tables.find(function(t){ return t.id === id; });
     if (current && current.parentId){
@@ -488,7 +530,9 @@ window.Editor = (function(){
     });
     side.appendChild(list);
 
+    var hasFicheSection = !!state.tables.find(function(t){ return t.childKind === "fiche"; });
     side.appendChild(el("div", {class:"sb-add"}, [
+      !hasFicheSection ? btn("plus", "+ Fiches de lecture", function(){ createFicheSection(); }, "ghost small") : null,
       btn("plus", "Nouvelle section", function(){ addTopTable(); }, "ghost small"),
       btn("canvas", "Espace libre", function(){ addTopDiagram(); }, "ghost small"),
       btn("download", "Importer une section", importSection, "ghost small")
@@ -554,6 +598,8 @@ window.Editor = (function(){
     function copyRow(row){
       var copy = {id:remap("row", row.id), cells:{}};
       if (row.kind) copy.kind = row.kind;
+      if (row.key) copy.key = row.key;
+      if (row.hint) copy.hint = row.hint;
       Object.keys(row.cells || {}).forEach(function(colId){
         var cell = row.cells[colId] || {};
         copy.cells[colId] = {text:cell.text || "", tags:(cell.tags || []).map(function(tagId){ return tagMap[tagId] || tagId; })};
@@ -567,6 +613,10 @@ window.Editor = (function(){
       if (table.rowLines) copy.rowLines = table.rowLines;
       if (table.view) copy.view = table.view;
       if (table.anchorType) copy.anchorType = table.anchorType;
+      if (table.childKind) copy.childKind = table.childKind;
+      if (table.childTemplate) copy.childTemplate = JSON.parse(JSON.stringify(table.childTemplate));
+      if (table.kind) copy.kind = table.kind;
+      if (table.sourceRef) copy.sourceRef = table.sourceRef;
       return copy;
     }
     var root = copyTable({id:sourceSection.id, title:title, columns:sourceSection.columns || [], rows:sourceSection.rows || []}, true);
@@ -692,6 +742,7 @@ window.Editor = (function(){
       grid.appendChild(card);
     });
     var addCard = el("div", {class:"ov-card ov-add"}, [
+      !state.tables.find(function(t){ return t.childKind === "fiche"; }) ? btn("plus", "+ Fiches de lecture", function(){ createFicheSection(); }, "ghost") : null,
       btn("plus", "Nouvelle section", function(){ addTopTable(); }, "ghost"),
       btn("canvas", "Nouvel espace libre", function(){ addTopDiagram(); }, "ghost"),
       btn("download", "Importer une section", importSection, "ghost")
@@ -768,7 +819,9 @@ window.Editor = (function(){
     return {refs:refs.length, filled:filled, total:refs.length * columns.length, hasSummary:!!summaryCol};
   }
   function renderSectionCards(content, sec, idx){
-    var root = sec.obj, children = sectionChildren(root), color = sectionColor(sec, idx), p = sectionProgress(sec);
+    var root = sec.obj;
+    if (root && root.childKind === "fiche"){ renderFicheSectionCards(content, sec, idx); return; }
+    var children = sectionChildren(root), color = sectionColor(sec, idx), p = sectionProgress(sec);
     try { localStorage.setItem(viewKey() + ":last", sec.id); } catch(e){}
     var hero = el("section", {class:"ov-hero", "data-sec":color});
     hero.appendChild(el("div", {class:"eyebrow", text:"Section " + (idx + 1)}));
@@ -822,6 +875,301 @@ window.Editor = (function(){
     ]);
     grid.appendChild(addCard); content.appendChild(grid);
   }
+  function createFicheSection(){
+    var existing = state.tables.find(function(t){ return t.childKind === "fiche"; });
+    if (existing){ setSection(existing.id); return; }
+    var section = {id:uid("tbl"), title:"Fiches de lecture", columns:[], rows:[], childKind:"fiche", childTemplate:defaultFicheTemplate(), cards:true};
+    state.tables.push(section);
+    if (!Array.isArray(state.order)) state.order = [];
+    state.order.push(section.id);
+    scheduleSave(true); setSection(section.id);
+  }
+
+  function cloneFicheFromTemplate(template, title, sourceRef){
+    var base = template && template.rows ? cloneDeep(template) : defaultFicheTemplate();
+    var colMap = {};
+    var columns = base.columns.map(function(col){ var newId = uid("col"); colMap[col.id] = newId; return {id:newId, label:col.label}; });
+    var rows = (base.rows || []).map(function(row){
+      var copy = {id:uid("row")};
+      if (row.kind) copy.kind = row.kind;
+      if (row.key) copy.key = row.key;
+      if (row.hint) copy.hint = row.hint;
+      copy.cells = {};
+      Object.keys(row.cells || {}).forEach(function(colId){
+        var cell = row.cells[colId] || {text:"", tags:[]};
+        copy.cells[colMap[colId] || colId] = {text:cell.text || "", tags:(cell.tags || []).slice()};
+      });
+      return copy;
+    });
+    var fiche = {id:uid("tbl"), parentId:null, title:title || "Nouvelle fiche", columns:columns, rows:rows, kind:"fiche", rowLines:"strong", view:"page"};
+    if (sourceRef) fiche.sourceRef = sourceRef;
+    return fiche;
+  }
+
+  function createBlankFiche(title){
+    var parent = ensureFicheContainer();
+    var fiche = cloneFicheFromTemplate(parent.childTemplate || defaultFicheTemplate(), title || "Nouvelle fiche", null);
+    fiche.parentId = parent.id;
+    insertNestedChildAfterFocus(state.tables, fiche, parent.id, "table");
+    scheduleSave(true); setChild(fiche.id);
+  }
+
+  function createFicheFromReference(refId){
+    var parent = ensureFicheContainer();
+    var anchor = anchorById(refId);
+    if (!anchor) return;
+    var existing = state.tables.find(function(t){ return t.kind === "fiche" && t.sourceRef === refId; });
+    if (existing){ setSection(parent.id); setChild(existing.id); return; }
+    var fiche = cloneFicheFromTemplate(parent.childTemplate || defaultFicheTemplate(), shortCitation(anchor.text || anchor.fullText || "Référence"), refId);
+    fiche.parentId = parent.id;
+    var fullCol = fiche.columns.find(function(col){ return /^rubrique$/i.test(col.label || ""); }) || fiche.columns[0];
+    var contCol = fiche.columns.find(function(col){ return /^contenu$/i.test(col.label || ""); }) || fiche.columns[1] || fiche.columns[0];
+    var byKey = {};
+    fiche.rows.forEach(function(row){ if (row.key) byKey[row.key] = row; });
+    function setValue(key, value){ var row = byKey[key]; if (!row || !row.cells) return; row.cells[contCol.id] = {text:value || "", tags:[]}; }
+    var fullText = stripHtml((anchor.fullText || anchor.text || "")).trim();
+    setValue("f1_02", fullText);
+    var authorText = fullText.replace(/\s*\((\d{4}).*?\)\.?\s*.*$/i, "");
+    setValue("f1_03", authorText.trim());
+    var match = fullText.match(/^(.*)\s*\((\d{4})\)/i);
+    if (match) setValue("f1_04", match[2]);
+    if (match && match[1]){
+      var titlePart = fullText.replace(/^.*?\)\.\s*/, "");
+      var title = titlePart.split(/[.](?=\s+[A-Z])/)[0].trim();
+      if (title) setValue("f1_05", title);
+    }
+    var source = anchor.table && anchor.table.columns ? (anchor.table.columns.find(function(c){ return /^sources?$/i.test(c.label || ""); }) || anchor.table.columns[0]) : null;
+    var sourceText = source && anchor.row && anchor.row.cells[source.id] ? stripHtml(anchor.row.cells[source.id].text) : fullText;
+    if (sourceText) setValue("f1_06", sourceText.replace(/^.*?\)\.\s*/, "").replace(/^[^\.]*(?:\.)\s*/i, "").trim());
+    var typeGuess = "Article scientifique";
+    if (/Dans\s/i.test(sourceText)) typeGuess = "Chapitre d'ouvrage collectif";
+    else if (/(volume\s*\(|\b[a-z]+\s*\d*\([^\)]*\)|journal|revue|imaginaire|inconscient)/i.test(sourceText)) typeGuess = "Article scientifique";
+    else if (/(PUQ|PUF|Presses|Éditions|Harmattan|Routledge|Fayard|Policy Press)/i.test(sourceText)) typeGuess = "Livre / ouvrage";
+    setValue("f1_01", typeGuess);
+    setValue("f2_02", "À lire");
+    var rel = ficheRelevanceValue(anchor.table) || "Cœur";
+    setValue("f2_03", rel);
+    var tags = (anchor.row && anchor.row.cells[source && source.id] && anchor.row.cells[source.id].tags) || [];
+    if (tags.length) {
+      var relTag = state.tags.find(function(t){ return /coeur|cœur/i.test(t.label || ""); });
+      if (relTag) { var rowTagCell = (byKey["f2_03"] || {}).cells; if (rowTagCell) rowTagCell[contCol.id] = {text: relTag.label, tags:[relTag.id]}; }
+    }
+    if (fullText) {
+      var refCell = byKey["f1_02"] && byKey["f1_02"].cells[contCol.id];
+      if (refCell) refCell.tags = [];
+    }
+    insertNestedChildAfterFocus(state.tables, fiche, parent.id, "table");
+    var link = {id:uid("lnk"), a:anchorId(anchor.table.id, anchor.row.id), b:"t:" + fiche.id + ":" + fiche.rows[0].id + ":" + contCol.id, rel:"reference"};
+    state.links.push(link);
+    scheduleSave(true); setChild(fiche.id);
+  }
+
+  function openFicheCreationModal(){
+    var overlay = el("div", {class:"overlay"});
+    var box = el("div", {class:"modal", role:"dialog", "aria-modal":"true"});
+    var refs = [];
+    state.tables.forEach(function(table){
+      if (!table.anchorType && !table.columns.some(function(c){ return /sources?/i.test(c.label || ""); })) return;
+      (table.rows || []).forEach(function(row){
+        if (row.kind) return;
+        var anchor = anchorById(anchorId(table.id, row.id));
+        if (!anchor || anchor.type !== "reference") return;
+        refs.push({anchor:anchor, table:table, row:row});
+      });
+    });
+    refs.sort(function(a, b){ return String(a.anchor.text || "").localeCompare(String(b.anchor.text || "")); });
+    var search = el("input", {class:"field", type:"search", placeholder:"Cherche une référence…"});
+    var list = el("div", {class:"choice-list"});
+    function renderList(query){
+      var q = normalizeText(query || "");
+      list.innerHTML = "";
+      var filtered = refs.filter(function(item){ return !q || normalizeText(item.anchor.text + " " + (item.anchor.fullText || "")).indexOf(q) >= 0; });
+      if (!filtered.length){ list.appendChild(el("p", {class:"lib-hint", text:"Aucune référence trouvée."})); }
+      filtered.forEach(function(item){
+        var existing = state.tables.find(function(t){ return t.kind === "fiche" && t.sourceRef === item.anchor.id; });
+        var btn = el("button", {class:"choice", type:"button", onclick:function(){ if (existing){ setSection(ensureFicheContainer().id); setChild(existing.id); overlay.remove(); } else { createFicheFromReference(item.anchor.id); overlay.remove(); } }});
+        var label = el("div", {class:"choice-text"}, [el("strong", {text:item.anchor.text}), el("small", {text:item.anchor.fullText || ""})]);
+        if (existing) btn.appendChild(el("span", {class:"choice-tag", text:"Ouvrir la fiche existante"}));
+        else btn.appendChild(el("span", {class:"choice-tag", text:"Créer"}));
+        btn.appendChild(label);
+        list.appendChild(btn);
+      });
+    }
+    search.addEventListener("input", function(){ renderList(search.value); });
+    box.appendChild(el("h3", {text:"Nouvelle fiche de lecture"}));
+    box.appendChild(el("div", {class:"row"}, [el("button", {class:"btn primary", type:"button", text:"Fiche vide", onclick:function(){ overlay.remove(); var title = window.prompt("Titre de la fiche (Auteur·e (année))", ""); createBlankFiche(title && title.trim() ? title.trim() : "Nouvelle fiche"); }}), el("button", {class:"btn ghost", type:"button", text:"Annuler", onclick:function(){ overlay.remove(); }})]));
+    box.appendChild(el("label", {class:"field-label"}, ["Rechercher dans ma bibliographie", search]));
+    box.appendChild(list);
+    overlay.appendChild(box); overlay.addEventListener("mousedown", function(e){ if (e.target===overlay) overlay.remove(); }); document.body.appendChild(overlay);
+    renderList("");
+  }
+
+  function renderFicheSectionCards(content, sec, idx){
+    var root = sec.obj, fiches = sectionChildren(root).filter(function(child){ return child.kind === "table" && child.obj && child.obj.kind === "fiche"; });
+    var key = "atelier-recherche:fiche-filters:" + (ctx && ctx.id || "local");
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(key) || "null"); } catch(e){}
+    saved = saved || {q:"", type:"Toutes", status:"Tous"};
+    var q = saved.q || "";
+    var filtered = fiches.filter(function(item){
+      var table = item.obj;
+      var query = normalizeText(q);
+      var haystack = normalizeText(titleOf(table) + " " + (ficheRowValue(table, "f1_03") || "") + " " + (ficheRowValue(table, "f1_09") || ""));
+      var matchesText = !query || haystack.indexOf(query) >= 0;
+      var type = ficheTypeValue(table);
+      var status = ficheStatusValue(table);
+      var typeMatch = saved.type === "Toutes" || type === saved.type;
+      var statusMatch = saved.status === "Tous" || status === saved.status;
+      return matchesText && typeMatch && statusMatch;
+    });
+    var total = fiches.length;
+    var lues = fiches.filter(function(item){ var v = ficheStatusValue(item.obj); return v === "Lue" || v === "Relue"; }).length;
+    var enCours = fiches.filter(function(item){ return ficheStatusValue(item.obj) === "En cours"; }).length;
+    var filled = fiches.reduce(function(sum, item){ return sum + countFilledFicheRows(item.obj); }, 0);
+    var possible = fiches.reduce(function(sum, item){ return sum + (item.obj.rows || []).filter(function(r){ return !r.kind; }).length; }, 0) || 1;
+    var hero = el("section", {class:"ov-hero", "data-sec":sectionColor(sec, idx)});
+    hero.appendChild(el("div", {class:"eyebrow", text:"Section " + (idx + 1)}));
+    hero.appendChild(el("h1", {class:"ov-title", text:root.title || "Fiches de lecture"}));
+    hero.appendChild(el("div", {class:"ov-stats"}, [
+      stat(String(total), "fiches", null),
+      stat(String(lues), "lues", null),
+      stat(String(enCours), "en cours", null),
+      stat(Math.round((filled / possible) * 100) + " %", "rubriques remplies", progressBar({total:possible, filled:filled}, "big"))
+    ]));
+    content.appendChild(hero);
+    var filters = el("div", {class:"filter-bar"});
+    var searchInput = el("input", {type:"search", class:"field", value:q || "", placeholder:"Recherche…"});
+    searchInput.addEventListener("input", function(){ saved.q = searchInput.value; try { localStorage.setItem(key, JSON.stringify(saved)); } catch(e){} render(); });
+    filters.appendChild(searchInput);
+    ["Toutes","Articles","Livres","Chapitres","Autres"].forEach(function(type){
+      var btn = el("button", {class:"chip" + (saved.type === type ? " active" : ""), type:"button", text:type, onclick:function(){ saved.type = type; try { localStorage.setItem(key, JSON.stringify(saved)); } catch(e){} render(); }});
+      filters.appendChild(btn);
+    });
+    ["Tous","À lire","En cours","Lue"].forEach(function(status){
+      var btn = el("button", {class:"chip status" + (saved.status === status ? " active" : ""), type:"button", text:status, onclick:function(){ saved.status = status; try { localStorage.setItem(key, JSON.stringify(saved)); } catch(e){} render(); }});
+      filters.appendChild(btn);
+    });
+    content.appendChild(filters);
+    if (!filtered.length){
+      var empty = el("div", {class:"ov-empty"}, [el("p", {text:"Ta première fiche de lecture ? Pars d'une référence de ta bibliographie ou d'une fiche vide."}), btn("plus", "+ Nouvelle fiche de lecture", function(){ openFicheCreationModal(); }, "primary")]);
+      content.appendChild(empty); return;
+    }
+    var grid = el("div", {class:"ov-grid"});
+    filtered.forEach(function(item, index){
+      var table = item.obj;
+      var type = ficheTypeValue(table); var status = ficheStatusValue(table); var rel = ficheRelevanceValue(table); var progress = countFilledFicheRows(table);
+      var card = el("button", {class:"ov-card", type:"button", onclick:function(){ setChild(table.id); }}, [
+        el("div", {class:"ov-card-top"}, [el("span", {class:"ov-num", text:String(index + 1).padStart(2, "0")}), progressRing({total:(table.rows||[]).filter(function(r){ return !r.kind; }).length || 1, filled:progress}, 30)]),
+        el("div", {class:"ov-card-title", text:titleOf(table) || "Sans titre"}),
+        el("div", {class:"ov-card-meta", text:(ficheRowValue(table, "f1_05") || "").slice(0,80) || "Fiche vide"}),
+        el("div", {class:"tagbar card-tags"}, [
+          type ? el("span", {class:"mini-tag", text:type}) : null,
+          status ? el("span", {class:"mini-tag", text:status}) : null,
+          rel ? el("span", {class:"mini-tag", text:rel}) : null
+        ]),
+        el("div", {class:"ov-card-meta", text:progress + " / " + ((table.rows||[]).filter(function(r){ return !r.kind; }).length || 1) + " rubriques remplies"}),
+        progressBar({total:(table.rows||[]).filter(function(r){ return !r.kind; }).length || 1, filled:progress}, "big")
+      ]);
+      grid.appendChild(card);
+    });
+    var addCard = el("div", {class:"ov-card ov-add"}, [btn("plus", "+ Nouvelle fiche de lecture", function(){ openFicheCreationModal(); }, "ghost")]);
+    grid.appendChild(addCard);
+    content.appendChild(grid);
+  }
+
+  function countFilledFicheRows(table){
+    var rows = table && table.rows ? table.rows.filter(function(r){ return !r.kind; }) : [];
+    var total = 0;
+    rows.forEach(function(row){
+      Object.keys(row.cells || {}).forEach(function(k){
+        var cell = row.cells[k];
+        if (cell && stripHtml(cell.text || "").trim()) total++;
+      });
+    });
+    return total;
+  }
+
+  function renderFichePage(content, sec, idx, table){
+    var p = {total:(table.rows||[]).filter(function(r){ return !r.kind; }).length || 1, filled:countFilledFicheRows(table)};
+    var type = ficheTypeValue(table);
+    var status = ficheStatusValue(table);
+    var relevance = ficheRelevanceValue(table);
+    var fullRef = ficheRowValue(table, "f1_02");
+    var crumb = el("nav", {class:"breadcrumb", "aria-label":"Fil d'Ariane"}, [
+      el("button", {type:"button", text:"Vue d'ensemble", onclick:function(){ setSection(null); }}),
+      el("span", {text:"›"}),
+      el("button", {type:"button", text:"15 · Fiches de lecture", onclick:function(){ setChild(null); }}),
+      el("span", {text:"›"}),
+      el("strong", {text:titleOf(table)})
+    ]);
+    content.appendChild(crumb);
+    content.appendChild(el("div", {class:"sec-head", "data-sec":sectionColor(sec, idx)}, [
+      el("div", {class:"sec-num", text:String(idx + 1).padStart(2, "0")}),
+      el("div", {class:"sec-meta"}, [
+        el("div", {class:"sec-kicker", text:"Fiche de lecture · " + (type || "Autre")}),
+        el("div", {class:"sec-progress"}, [progressBar(p), el("span", {text:p.total ? p.filled + " / " + p.total + " rubriques remplies" : ""})])
+      ])
+    ]));
+    var meta = el("div", {class:"fiche-meta"}, [
+      el("h2", {class:"fiche-title", contenteditable:"true", spellcheck:"false", text:titleOf(table)}),
+      fullRef ? el("div", {class:"fiche-ref", text:fullRef}) : null,
+      el("div", {class:"tagbar"}, [status ? el("span", {class:"mini-tag", text:status}) : null, relevance ? el("span", {class:"mini-tag", text:relevance}) : null, table.sourceRef ? el("button", {class:"mini-tag", type:"button", text:"Référence", onclick:function(){ goTo(table.sourceRef); }}) : null])
+    ]);
+    meta.querySelector(".fiche-title").addEventListener("input", function(){ table.title = meta.querySelector(".fiche-title").textContent; dirty = true; });
+    meta.querySelector(".fiche-title").addEventListener("blur", function(){ table.title = (meta.querySelector(".fiche-title").textContent || "").trim() || "Sans titre"; scheduleSave(true); });
+    content.appendChild(meta);
+    var sideSummary = el("aside", {class:"fiche-summary"});
+    var groups = [];
+    var current = null;
+    (table.rows || []).forEach(function(row){
+      if (row.kind === "header"){ current = {title: stripHtml((row.cells && row.cells.rub && row.cells.rub.text) || ""), rows:[]}; groups.push(current); }
+      else if (current && !row.kind){ current.rows.push(row); }
+    });
+    groups.forEach(function(group, idx){
+      var count = group.rows.length;
+      var done = group.rows.filter(function(row){
+        var cell = row.cells && row.cells.cont ? row.cells.cont : null;
+        return cell && stripHtml(cell.text || "").trim();
+      }).length;
+      sideSummary.appendChild(el("button", {class:"fiche-summary-item", type:"button", text:group.title + " · " + done + " / " + count, onclick:function(){ document.getElementById("fiche-part-" + idx).scrollIntoView({behavior:"smooth", block:"start"}); }}));
+    });
+    content.appendChild(sideSummary);
+    var form = el("div", {class:"fiche-form"});
+    var partIndex = 0;
+    groups.forEach(function(group){
+      var part = el("section", {class:"fiche-part", id:"fiche-part-" + partIndex});
+      partIndex++;
+      part.appendChild(el("h3", {text:group.title}));
+      (group.rows || []).forEach(function(row){
+        if (row.kind) return;
+        var rub = row.cells && row.cells.rub ? stripHtml(row.cells.rub.text || "") : "";
+        var cont = row.cells && row.cells.cont ? row.cells.cont : {text:"", tags:[]};
+        var cell = el("div", {class:"fiche-field"});
+        var label = el("label", {class:"fiche-label", text:rub});
+        var hint = row.hint ? el("small", {class:"fiche-hint", text:row.hint}) : null;
+        var box = el("div", {class:"cellwrap entity-wrap"});
+        var entityId = entityKeyForCell(table.id, row.id, Object.keys(row.cells || {})[1] || (table.columns && table.columns[1] ? table.columns[1].id : "cont"));
+        box.setAttribute("data-entity", entityId);
+        var text = el("div", {class:"celltext rich", contenteditable:"true", spellcheck:"false", "data-ph":row.hint || "…"});
+        text.innerHTML = cont.text || "";
+        attachRichText(text, cont, "text");
+        plainPaste(text);
+        box.appendChild(text);
+        box.appendChild(renderCellTags(cont));
+        box.appendChild(renderIcons(entityId, cont));
+        label.setAttribute("for", entityId);
+        text.setAttribute("aria-labelledby", label.id || entityId);
+        label.id = entityId + "-label";
+        cell.appendChild(label);
+        if (hint) cell.appendChild(hint);
+        cell.appendChild(box);
+        part.appendChild(cell);
+      });
+      form.appendChild(part);
+    });
+    content.appendChild(form);
+  }
+
   function addChildTable(root, children){
     var first = children.find(function(child){ return child.kind === "table"; });
     var columns = (first && first.obj.columns.length ? first.obj.columns : [{id:uid("col"),label:"Colonne 1"},{id:uid("col"),label:"Colonne 2"}]).map(function(col){ return {id:uid("col"), label:col.label}; });
@@ -842,6 +1190,7 @@ window.Editor = (function(){
     var children = sectionChildren(sec.obj), childIndex = children.findIndex(function(child){ return child.id === activeChild; });
     var child = children[childIndex];
     if (!child){ activeChild = null; renderSectionCards(content, sec, idx); return; }
+    if (child.kind === "table" && child.obj && child.obj.kind === "fiche"){ renderFichePage(content, sec, idx, child.obj); return; }
     if (child.kind === "table" && isSubtitleCardChapter(child.obj)){
       var groups = subtitleGroups(child.obj);
       if (activeSubchild){ renderSubtitleView(content, secs, sec, idx, child, groups); }
@@ -1728,6 +2077,12 @@ window.Editor = (function(){
         if (rowAnchor && ci === 0){
           var used = linkIndex.byAnchor.get(rowAnchor.id) || [];
           wrap.appendChild(el("button", {class:"anchor-used", type:"button", text:"Utilisée dans " + used.length, title:"Ouvrir la fiche de l'ancre", onclick:function(e){ e.stopPropagation(); openAnchorSheet(rowAnchor.id); }}));
+          var ficheMatch = rowAnchor.type === "reference" && state.tables.find(function(t){ return t.kind === "fiche" && t.sourceRef === rowAnchor.id; });
+          if (ficheMatch){
+            wrap.appendChild(el("button", {class:"anchor-used anchor-fiche", type:"button", text:"Ouvrir la fiche", title:"Ouvrir la fiche de lecture associée", onclick:function(e){ e.stopPropagation(); var parent = ensureFicheContainer(); setSection(parent.id); setChild(ficheMatch.id); }}));
+          } else if (rowAnchor.type === "reference"){
+            wrap.appendChild(el("button", {class:"anchor-used anchor-fiche", type:"button", text:"+ Fiche de lecture", title:"Créer une fiche de lecture à partir de cette référence", onclick:function(e){ e.stopPropagation(); createFicheFromReference(rowAnchor.id); }}));
+          }
         }
         var linkEntity = rowAnchor && ci === 0 ? rowAnchor.id : eid;
         if (dimAnchor && !entityMatchesAnchor(linkEntity)) wrap.classList.add("dim-anchor");
@@ -2645,6 +3000,10 @@ window.Editor = (function(){
     box.appendChild(el("p", {class:"anchor-sheet-full", text:anchor.fullText}));
     box.appendChild(el("h4", {text:"Tout ce qui s'y rattache"}));
     (linkIndex.byAnchor.get(anchor.id) || []).forEach(function(link){ var other = link.a === anchor.id ? link.b : link.a; box.appendChild(contextLinkRow({link:link, other:other, anchor:null}, anchor.id)); });
+    if (anchor.type === "reference"){
+      var existing = state.tables.find(function(t){ return t.kind === "fiche" && t.sourceRef === anchor.id; });
+      box.appendChild(el("button", {class:"btn small", type:"button", text: existing ? "Ouvrir la fiche" : "+ Fiche de lecture", onclick:function(){ if (existing){ var parent = ensureFicheContainer(); overlay.remove(); setSection(parent.id); setChild(existing.id); } else { overlay.remove(); createFicheFromReference(anchor.id); } }}));
+    }
     box.appendChild(el("button", {class:"btn small", type:"button", text:"Voir les cases liées à cette ancre", onclick:function(){ dimAnchor = anchor.id; overlay.remove(); render(); }}));
     box.appendChild(el("button", {class:"btn primary", type:"button", text:"Fermer", onclick:function(){ overlay.remove(); }}));
     overlay.appendChild(box); overlay.addEventListener("mousedown", function(e){ if (e.target === overlay) overlay.remove(); }); document.body.appendChild(overlay);
