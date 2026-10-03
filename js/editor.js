@@ -998,7 +998,8 @@ window.Editor = (function(){
     search.addEventListener("input", function(){ renderList(search.value); });
     box.appendChild(el("h3", {text:"Nouvelle fiche de lecture"}));
     box.appendChild(el("div", {class:"row"}, [el("button", {class:"btn primary", type:"button", text:"Fiche vide", onclick:function(){ overlay.remove(); var title = window.prompt("Titre de la fiche (Auteur·e (année))", ""); createBlankFiche(title && title.trim() ? title.trim() : "Nouvelle fiche"); }}), el("button", {class:"btn ghost", type:"button", text:"Annuler", onclick:function(){ overlay.remove(); }})]));
-    box.appendChild(el("label", {class:"field-label"}, ["Rechercher dans ma bibliographie", search]));
+    var label = el("label", {class:"field-label"}, [el("span", {text:"Rechercher dans ma bibliographie"}), search]);
+    box.appendChild(label);
     box.appendChild(list);
     overlay.appendChild(box); overlay.addEventListener("mousedown", function(e){ if (e.target===overlay) overlay.remove(); }); document.body.appendChild(overlay);
     renderList("");
