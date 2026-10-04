@@ -59,10 +59,19 @@ window.Editor = (function(){
     return state.diagrams.find(function(d){ return d.nodes.some(function(n){return n.id===entityId;}); }) || null;
   }
   function isNodeEntity(entityId){ return !!findNode(entityId); }
+  function findDiagramNote(entityId){
+    for (var i=0;i<state.diagrams.length;i++){
+      var note = (state.diagrams[i].notes || []).find(function(n){ return n.id===entityId; });
+      if (note) return {diagram:state.diagrams[i], note:note};
+    }
+    return null;
+  }
   function getEntity(entityId){
     var anchor = anchorById(entityId);
     if (anchor) return {kind:"anchor", obj:anchor};
     if (isNodeEntity(entityId)) return { kind:"node", obj: findNode(entityId) };
+    var diagramNote = findDiagramNote(entityId);
+    if (diagramNote) return { kind:"note", obj: diagramNote.note, diagram: diagramNote.diagram };
     var ficheMatch = /^f:([^:]+)$/.exec(entityId || "");
     if (ficheMatch){
       var fiche = state.tables.find(function(table){ return table.id === ficheMatch[1] && table.kind === "fiche"; });
@@ -233,6 +242,10 @@ window.Editor = (function(){
     if (e.kind === "anchor") return e.obj.fullText || e.obj.text;
     if (e.kind === "node") return stripHtml(e.obj.text) || "(sans titre)";
     if (e.kind === "fiche") return stripHtml(e.obj.title || "") || "Fiche de lecture";
+    if (e.kind === "note"){
+      var noteText = stripHtml(e.obj.text || "").trim();
+      return (stripHtml(e.diagram.title || "") || "Espace libre") + " · note" + (noteText ? " — " + (noteText.length>46 ? noteText.slice(0,46)+"…" : noteText) : "");
+    }
     var m = /^t:([^:]+):([^:]+):([^:]+)$/.exec(entityId);
     var table = state.tables.find(function(t){return t.id===m[1];});
     var col = table ? table.columns.find(function(c){return c.id===m[3];}) : null;
@@ -2800,11 +2813,9 @@ window.Editor = (function(){
     var attachBtn = iconBtn("anchor", "Rattacher cette case", null, "icon-btn attach-btn");
     attachBtn.addEventListener("click", function(e){ e.stopPropagation(); openAnchorPicker(entityId); });
     box.appendChild(attachBtn);
-    if (n>0){
-      var showLinksBtn = iconBtn("arrow", "Voir les " + n + " lien(s) et y aller", null, "icon-btn");
-      showLinksBtn.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(showLinksBtn, entityId); });
-      box.appendChild(showLinksBtn);
-    }
+    var showLinksBtn = iconBtn("arrow", n>0 ? "Voir les " + n + " lien(s) et y aller" : "Cases reliées (aucune pour l'instant)", null, "icon-btn links-btn");
+    showLinksBtn.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(showLinksBtn, entityId); });
+    box.appendChild(showLinksBtn);
     if (isNode){
       var shapeBtn = iconBtn("shape", "Forme et contour", null, "icon-btn");
       shapeBtn.addEventListener("click", function(e){ e.stopPropagation(); openNodeStylePopover(shapeBtn, cellOrNode); });
@@ -2837,6 +2848,13 @@ window.Editor = (function(){
           var text = cell && stripHtml(cell.text).trim();
           if (text) result.push({id:entityKeyForCell(table.id, row.id, col.id), text:text.slice(0,80) + (text.length > 80 ? "…" : ""), fullText:text, path:titleOf(table) + " › " + (col.label || "")});
         });
+      });
+    });
+    state.diagrams.forEach(function(diagram){
+      var path = stripHtml(diagram.title || "") || "Espace libre";
+      (diagram.nodes || []).concat(diagram.notes || []).forEach(function(item){
+        var text = stripHtml(item.text || "").trim();
+        if (text) result.push({id:item.id, text:text.slice(0,80) + (text.length > 80 ? "…" : ""), fullText:text, path:path});
       });
     });
     return result;
@@ -2969,16 +2987,26 @@ window.Editor = (function(){
     if (diagram.notes.length === 0) diagram.notes.push({id:uid("note"), text:""});
     var hint = el("div", {class:"diagram-notes"});
     diagram.notes.forEach(function(note){
+      note.tags = note.tags || [];
       var lineWrap = el("div", {class:"diagram-note-line"});
+      var noteBox = el("div", {class:"cellwrap entity-wrap diagram-note-box", "data-entity":note.id});
+      if (dimTag && note.tags.indexOf(dimTag)>=0) noteBox.classList.add("tag-match");
+      if (dimAnchor && !entityMatchesAnchor(note.id)) noteBox.classList.add("dim-anchor");
       var lineText = el("div", {class:"celltext", contenteditable:"true", spellcheck:"false", "data-ph":"Écrire une note…", "data-note-id":note.id});
       lineText.innerHTML = note.text || "";
-      lineText.addEventListener("focus", function(){ lastFocus = {kind:"diagram", tableId:null, rowId:null, colId:null, diagramId:diagram.id}; });
+      lineText.addEventListener("focus", function(){ lastFocus = {kind:"diagram", tableId:null, rowId:null, colId:null, diagramId:diagram.id}; setContextEntity(note.id); });
       attachRichText(lineText, note, "text");
       plainPaste(lineText);
-      lineWrap.appendChild(lineText);
+      noteBox.appendChild(lineText);
+      var noteAttachments = renderAttachmentPills(note.id);
+      if (noteAttachments) noteBox.appendChild(noteAttachments);
+      noteBox.appendChild(renderCellTags(note));
+      noteBox.appendChild(renderIcons(note.id, note));
+      lineWrap.appendChild(noteBox);
       if (diagram.notes.length > 1){
         lineWrap.appendChild(el("button", {class:"diagram-note-rm", title:"Supprimer cette ligne", text:"✕", onclick:function(){
           diagram.notes = diagram.notes.filter(function(n){ return n.id!==note.id; });
+          state.links = state.links.filter(function(l){ return l.a!==note.id && l.b!==note.id; });
           scheduleSave(true); render();
         }}));
       }
@@ -3220,7 +3248,7 @@ window.Editor = (function(){
   function deleteDiagram(diagramId){
     var d = state.diagrams.find(function(x){return x.id===diagramId;});
     if (!d) return;
-    var nodeIds = d.nodes.map(function(n){return n.id;});
+    var nodeIds = d.nodes.map(function(n){return n.id;}).concat((d.notes || []).map(function(n){return n.id;}));
     state.links = state.links.filter(function(l){ return nodeIds.indexOf(l.a)<0 && nodeIds.indexOf(l.b)<0; });
     state.diagrams = state.diagrams.filter(function(x){return x.id!==diagramId;});
     if (Array.isArray(state.order)){
@@ -3346,6 +3374,7 @@ window.Editor = (function(){
     closePopover();
     var pop = el("div", {class:"pop"});
     pop.appendChild(el("h4", {text:"Cases reliées"}));
+    if (!linksFor(entityId).length) pop.appendChild(el("p", {class:"lib-hint", text:"Aucune case reliée pour l'instant. Clique le 🔗 ici, puis le 🔗 d'une autre case, ou rattache-la avec l'ancre."}));
     linksFor(entityId).forEach(function(l){
       var other = l.a===entityId ? l.b : l.a;
       var row = el("div", {class:"row"});
@@ -3388,7 +3417,7 @@ window.Editor = (function(){
   function reopenLinksPopoverFor(entityId){
     var wrap = document.querySelector('[data-entity="'+cssEscape(entityId)+'"]');
     if (!wrap) return;
-    var btn = Array.prototype.filter.call(wrap.querySelectorAll(".icon-btn"), function(b){ return b.title === "Voir les liens"; })[0];
+    var btn = wrap.querySelector(".links-btn");
     if (btn) openLinksPopover(btn, entityId);
   }
 
@@ -3532,7 +3561,8 @@ window.Editor = (function(){
     }
     var ficheMatch = /^f:([^:]+)$/.exec(entityId || "");
     var m = /^t:([^:]+):/.exec(entityId);
-    var owner = ficheMatch ? ["table", ficheMatch[1]] : (m ? ["table", m[1]] : (findNodeDiagram(entityId) ? ["diagram", findNodeDiagram(entityId).id] : null));
+    var noteOwner = findDiagramNote(entityId);
+    var owner = ficheMatch ? ["table", ficheMatch[1]] : (m ? ["table", m[1]] : (findNodeDiagram(entityId) ? ["diagram", findNodeDiagram(entityId).id] : (noteOwner ? ["diagram", noteOwner.diagram.id] : null)));
     if (owner && ensureSectionFor(owner[0], owner[1])) return setTimeout(function(){ goTo(entityId); }, 30);
     var target = document.querySelector('[data-entity="'+cssEscape(entityId)+'"]');
     if (!target && ficheMatch) target = document.querySelector('.fiche-v2-card[data-fiche-id="' + cssEscape(ficheMatch[1]) + '"]');

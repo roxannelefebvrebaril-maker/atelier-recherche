@@ -628,3 +628,6 @@ table.datatable.row-lines-strong td{ padding-top:4px; padding-bottom:4px; }
 @media (max-width:640px){
   .ed-content .rowrm{ writing-mode:horizontal-tb; left:auto; right:30px; top:-24px; opacity:.55; }
 }
+
+/* Notes des espaces libres : mêmes outils que les cases (liens, repères, ancrages). */
+.diagram-note-line .cellwrap.diagram-note-box{ flex:1; min-width:0; padding:2px 2px 30px; }
