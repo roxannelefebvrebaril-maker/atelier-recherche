@@ -72,7 +72,7 @@ window.Editor = (function(){
   }
   function normalizeText(text){ return String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
   function cloneDeep(value){ return JSON.parse(JSON.stringify(value || {})); }
-  function defaultFicheTemplate(){ return cloneDeep(window.FICHE_LECTURE_TEMPLATE_V1 || window.FICHE_LECTURE_TEMPLATE || {format:"atelier-recherche/fiche-template", columns:[{id:"rub",label:"Rubrique"},{id:"cont",label:"Contenu"}], rows:[], rowLines:"strong"}); }
+  function defaultFicheTemplate(){ return cloneDeep(window.FICHE_LECTURE_TEMPLATE || window.FICHE_LECTURE_TEMPLATE_V1 || {format:"atelier-recherche/fiche-template", version:2, columns:[{id:"rub",label:"Rubrique"},{id:"cont",label:"Contenu"}], rows:[], tables:[]}); }
   function ficheRowValue(table, keyOrLabel){
     var rows = (table && table.rows) || [];
     var target = rows.find(function(row){ return row.key && row.key === keyOrLabel; }) || rows.find(function(row){ return String((row.cells && row.cells.rub && row.cells.rub.text) || "").replace(/<[^>]+>/g, "") === String(keyOrLabel || ""); });
@@ -1042,25 +1042,9 @@ window.Editor = (function(){
     scheduleSave(true); setSection(section.id);
   }
 
-  function cloneFicheFromTemplate(template, title, sourceRef){
-    var base = template && template.rows ? cloneDeep(template) : defaultFicheTemplate();
-    var colMap = {};
-    var columns = base.columns.map(function(col){ var newId = uid("col"); colMap[col.id] = newId; return {id:newId, label:col.label}; });
-    var rows = (base.rows || []).map(function(row){
-      var copy = {id:uid("row")};
-      if (row.kind) copy.kind = row.kind;
-      if (row.key) copy.key = row.key;
-      if (row.hint) copy.hint = row.hint;
-      copy.cells = {};
-      Object.keys(row.cells || {}).forEach(function(colId){
-        var cell = row.cells[colId] || {text:"", tags:[]};
-        copy.cells[colMap[colId] || colId] = {text:cell.text || "", tags:(cell.tags || []).slice()};
-      });
-      return copy;
-    });
-    var fiche = {id:uid("tbl"), parentId:null, title:title || "Nouvelle fiche", columns:columns, rows:rows, kind:"fiche", rowLines:"strong", view:"page"};
-    if (sourceRef) fiche.sourceRef = sourceRef;
-    return fiche;
+  function cloneFicheFromTemplate(_template, title, sourceRef, section){
+    var parent = ensureFicheContainer(section);
+    return parent ? createV2Fiche(parent, title, sourceRef, []) : null;
   }
 
   function createV2Fiche(parent, title, sourceRef, tags){
@@ -1068,7 +1052,7 @@ window.Editor = (function(){
     var rubCol = uid("col"), contCol = uid("col");
     var fiche = {id:uid("tbl"), parentId:parent.id, title:(title || "").trim() || "Nouvelle fiche", columns:[{id:rubCol,label:"Rubrique"},{id:contCol,label:"Contenu"}], rows:[], kind:"fiche", ficheVersion:2, ficheItems:[], tags:(tags || []).slice(), rowLines:"strong", view:"page"};
     (template.rows || []).forEach(function(def){
-      var row = {id:uid("row"), key:def.key, hint:def.hint || "", cells:{}};
+      var row = {id:uid("row"), key:def.key, hint:def.hint || "", long:!!def.long, cells:{}};
       row.cells[rubCol] = {text:def.label || "", tags:[]};
       row.cells[contCol] = {text:"", tags:[]};
       fiche.rows.push(row);
@@ -1341,6 +1325,7 @@ window.Editor = (function(){
         isCustom ? {icon:"trash", label:"Supprimer « " + labelText + " »", danger:true, run:function(){ deleteFicheItem(fiche, item, entry); }} : null
       ].filter(Boolean)); });
       left.appendChild(more);
+      if (isCustom) left.appendChild(el("button", {class:"fiche-v2-item-remove", type:"button", "aria-label":"Supprimer « " + labelText + " »", title:"Supprimer « " + labelText + " »", text:"×", onclick:function(){ deleteFicheItem(fiche, item, entry); }}));
       itemEl.appendChild(left);
       var right = el("div", {class:"fiche-v2-content"});
       if (isTable) renderFicheV2Table(right, fiche, entry);
@@ -1362,7 +1347,8 @@ window.Editor = (function(){
   function renderFicheV2Text(container, fiche, row, labelId){
     var col = fiche.columns[1], cell = row.cells[col.id] || (row.cells[col.id] = {text:"", tags:[]});
     var eid = entityKeyForCell(fiche.id, row.id, col.id), labelId = "fiche-item-label-" + row.id;
-    var editor = el("div", {class:"fiche-v2-editor entity-wrap", contenteditable:"true", spellcheck:"false", role:"textbox", "aria-multiline":"true", "aria-labelledby":labelId, "data-ph":row.custom ? "Rédige ici…" : row.hint || "…", "data-entity":eid});
+    var isLong = row.long === true || row.custom || row.key === "resume" || row.key === "hypothese" || row.key === "notes" || /^zone_/.test(row.key || "");
+    var editor = el("div", {class:"fiche-v2-editor entity-wrap" + (isLong ? " long" : ""), contenteditable:"true", spellcheck:"false", role:"textbox", "aria-multiline":"true", "aria-labelledby":labelId, "data-ph":row.custom ? "Rédige ici…" : row.hint || "…", "data-entity":eid});
     editor.innerHTML = cell.text || "";
     attachRichText(editor, cell, "text"); plainPaste(editor);
     editor.addEventListener("focus", function(){ setContextEntity(eid); });
@@ -1483,6 +1469,7 @@ window.Editor = (function(){
     var n = fiche.ficheItems.filter(function(item){ var row = (fiche.rows || []).find(function(r){ return r.id === item.id; }); return item.type === "row" && row && row.custom; }).length + 1;
     var rub = fiche.columns[0], cont = fiche.columns[1], row = {id:uid("row"),key:"zone_" + uid("zone"),hint:"",custom:true,cells:{}};
     row.cells[rub.id] = {text:"Zone de rédaction " + n,tags:[]}; row.cells[cont.id] = {text:"",tags:[]};
+    row.long = true;
     fiche.rows.push(row); fiche.ficheItems.push({type:"row",id:row.id});
     scheduleSave(true); render();
     setTimeout(function(){ var name = document.querySelector('[data-fiche-item="' + row.id + '"] .fiche-v2-item-name'); if (name){ name.focus(); document.execCommand("selectAll"); } }, 0);
@@ -1818,7 +1805,7 @@ window.Editor = (function(){
     items.forEach(function(it){
       if (!it) return;
       if (it.sep){ pop.appendChild(el("div", {class:"menu-sep"})); return; }
-      var b = el("button", {class:"menu-item" + (it.danger ? " danger" : ""), type:"button", role:"menuitem", onclick:function(){ closePopover(); it.run(); }});
+      var b = el("button", {class:"menu-item" + (it.danger ? " danger" : ""), type:"button", role:"menuitem", "aria-label":it.label, onclick:function(){ closePopover(); it.run(); }});
       if (it.icon) b.appendChild(icon(it.icon));
       b.appendChild(el("span", {text: it.label}));
       pop.appendChild(b);
