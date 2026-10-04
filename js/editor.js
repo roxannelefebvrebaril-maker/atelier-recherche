@@ -2919,7 +2919,12 @@ window.Editor = (function(){
     var anchor = anchorById(entityId), selector = anchor ? '[data-anchor="' + cssEscape(entityId) + '"]' : '[data-entity="' + cssEscape(entityId) + '"]';
     var target = document.querySelector(selector); if (!target) return;
     var old = target.querySelector(".attachment-pills"); if (old) old.remove();
-    var pills = renderAttachmentPills(entityId); if (pills) target.appendChild(pills);
+    var pills = renderAttachmentPills(entityId), tagsBox = target.querySelector(":scope > .cell-tags");
+    if (pills) target.insertBefore(pills, tagsBox || null);
+    // Les icônes changent aussi : compteur de liens et bouton « Cases reliées ».
+    var oldIcons = target.querySelector(":scope > .cell-icons"), entity = getEntity(entityId);
+    var owner = entity && entity.kind === "anchor" ? findCell(target.getAttribute("data-entity")) : entity && entity.obj;
+    if (oldIcons && owner) target.replaceChild(renderIcons(entityId, owner, entity.kind === "node"), oldIcons);
     if (contextPanel) updateContextPanel();
   }
   function recentAnchor(id){
