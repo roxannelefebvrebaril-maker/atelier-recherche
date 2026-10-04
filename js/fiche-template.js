@@ -1,4 +1,4 @@
-window.FICHE_LECTURE_TEMPLATE = {
+window.FICHE_LECTURE_TEMPLATE_V1 = {
   "format": "atelier-recherche/fiche-template",
   "version": 1,
   "name": "Fiche de lecture — version simplifiée",
@@ -30,4 +30,24 @@ window.FICHE_LECTURE_TEMPLATE = {
     { "id": "f5_06", "key": "f5_06", "hint": "Questions, pistes, éléments à vérifier ou à approfondir", "cells": { "rub": { "text": "Questions et idées à creuser", "tags": [] }, "cont": { "text": "", "tags": [] } } }
   ],
   "rowLines": "strong"
+};
+
+window.FICHE_LECTURE_TEMPLATE = {
+  "format": "atelier-recherche/fiche-template",
+  "version": 2,
+  "name": "Fiche de lecture — version 2",
+  "columns": [
+    { "id": "rub", "label": "Rubrique" },
+    { "id": "cont", "label": "Contenu" }
+  ],
+  "rows": [
+    { "key": "kw", "label": "Mots-clés", "hint": "Mots-clés de l'auteur·e et les miens, séparés par des virgules", "long": false },
+    { "key": "resume", "label": "Résumé", "hint": "L'essentiel du texte, dans mes mots", "long": true },
+    { "key": "hypothese", "label": "Hypothèse", "hint": "Ce que l'auteur·e cherche à démontrer ou à vérifier", "long": true },
+    { "key": "notes", "label": "Notes", "hint": "Mes notes libres sur ce texte", "long": true }
+  ],
+  "tables": [
+    { "key": "definitions", "label": "Définitions", "hint": "Un mot par ligne et sa définition (avec la page)", "columns": ["Mot", "Définition"] },
+    { "key": "concepts", "label": "Concepts et théories", "hint": "Un concept ou une théorie par ligne et ce qu'il ou elle veut dire", "columns": ["Concept ou théorie", "Définition"] }
+  ]
 };

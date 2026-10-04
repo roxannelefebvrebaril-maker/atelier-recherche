@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette — Fiche de lecture (v2)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f5f3f9; --surface:#fff; --surface-2:#f4f1fa; --ink:#1f1a2b; --ink-soft:#5d5670; --ink-faint:#8d86a0;
+  --border:#e9e5f1; --border-strong:#d8d1e5; --accent:#d9467f; --accent-ink:#a3285c; --accent-soft:#fde4ef;
+  --sec:#5a5fd8; --sec-bg:#ecedff; --zone:#1e7a52; --zone-bg:#e1f5ea; --tbl:#2463cf; --tbl-bg:#e6efff;
+  --danger:#c62f2f; --danger-bg:#fde3e3;
+  --shadow:0 1px 2px rgba(31,26,43,.05),0 10px 28px -14px rgba(31,26,43,.22);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+.demo{background:linear-gradient(90deg,#fde4ef,#efe8ff);color:var(--accent-ink);font-size:12.5px;font-weight:600;padding:7px 16px;text-align:center}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 80px}
+.crumb{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+.crumb b{color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--border);border-top:5px solid var(--sec);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.head{padding:20px 24px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--sec-bg),#fff 60%);position:relative}
+.kicker{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;font-weight:700;color:var(--sec)}
+.title{font-family:'Source Serif 4',Georgia,serif;font-weight:600;font-size:21px;line-height:1.4;margin:6px 150px 0 -4px;outline:none;border-radius:8px;padding:2px 4px}
+.title:empty::before{content:attr(data-ph);color:var(--ink-faint);font-style:italic}
+.title:focus{background:#fff;box-shadow:0 0 0 3px var(--accent-soft)}
+.del-fiche{position:absolute;right:20px;top:18px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--danger-bg);background:#fff;color:var(--danger);border-radius:10px;padding:6px 11px;font-size:12.5px;font-weight:600}
+.del-fiche:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+.progress{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12.5px;color:var(--ink-soft)}
+.bar{flex:0 0 220px;height:6px;border-radius:99px;background:#fff;overflow:hidden;border:1px solid var(--border)}
+.bar span{display:block;height:100%;background:var(--sec);width:0;transition:width .3s}
+table.fiche{width:100%;border-collapse:collapse}
+.fiche > thead th{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--ink-faint);text-align:left;padding:12px 20px 8px;border-bottom:1px solid var(--border)}
+.fiche > tbody > tr > td{vertical-align:top;border-bottom:2px solid var(--border)}
+.fiche > tbody > tr:last-child > td{border-bottom:0}
+td.rub{width:26%;padding:16px 14px 16px 20px;background:#fbfaff;border-right:1px solid var(--border)}
+td.rub .lbl{font-weight:600;font-size:14px;display:flex;align-items:flex-start;gap:8px}
+td.rub .hint{font-size:12px;color:var(--ink-faint);margin-top:4px;line-height:1.45}
+td.cont{padding:12px 16px}
+tr.zone td.rub{background:var(--zone-bg)} tr.zone td.rub .lbl{color:var(--zone)}
+tr.tbl td.rub{background:var(--tbl-bg)} tr.tbl td.rub .lbl{color:var(--tbl)}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;background:#fff;border-radius:999px;padding:1px 8px;margin-top:6px;display:inline-block}
+tr.zone .badge{color:var(--zone)} tr.tbl .badge{color:var(--tbl)}
+.edit{min-height:44px;outline:none;border-radius:8px;padding:6px 8px;font-size:14.5px;line-height:1.6;white-space:pre-wrap}
+.edit.long{min-height:96px}
+.edit:empty::before{content:attr(data-ph);color:var(--ink-faint);font-style:italic}
+.edit:focus{background:var(--surface-2);box-shadow:0 0 0 2px var(--accent-soft)}
+.rname{outline:none;border-radius:6px;padding:0 3px;margin-left:-3px}
+.rname:focus{background:#fff;box-shadow:0 0 0 2px var(--accent-soft)}
+.rm{margin-left:auto;border:0;background:none;color:var(--ink-faint);font-size:16px;line-height:1;padding:0 3px;border-radius:6px}
+.rm:hover{color:var(--danger);background:var(--danger-bg)}
+/* tableau intégré */
+.inner{width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.inner th{background:var(--tbl-bg);color:var(--tbl);font-size:11px;letter-spacing:.6px;text-transform:uppercase;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+.inner th .hname{outline:none;border-radius:4px;padding:0 2px}
+.inner th .hname:focus{background:#fff;box-shadow:0 0 0 2px var(--accent-soft)}
+.inner td{border-bottom:2px solid var(--border);vertical-align:top;padding:2px 4px;position:relative}
+.inner tr:last-child td{border-bottom:0}
+.inner td.term{width:34%;border-right:1px solid var(--border);font-weight:600}
+.inner .edit{min-height:36px;font-size:14px}
+.inner td.term .edit{font-weight:600}
+.inner .rowrm{position:absolute;right:4px;top:6px;opacity:0;border:0;background:none;color:var(--ink-faint);font-size:14px;border-radius:6px;padding:0 4px}
+.inner tr:hover .rowrm{opacity:1}
+.inner .rowrm:hover{color:var(--danger);background:var(--danger-bg)}
+.addrow{margin-top:8px;border:0;background:none;color:var(--tbl);font-weight:600;font-size:12.5px;padding:4px 6px;border-radius:8px}
+.addrow:hover{background:var(--tbl-bg)}
+.add{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 20px;border-top:1px dashed var(--border-strong);background:#fcfbff}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px dashed;background:#fff;border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px}
+.btn.z{border-color:var(--zone);color:var(--zone)} .btn.z:hover{background:var(--zone-bg)}
+.btn.t{border-color:var(--tbl);color:var(--tbl)} .btn.t:hover{background:var(--tbl-bg)}
+.add small{color:var(--ink-faint);font-size:12px;flex-basis:100%}
+.overlay{position:fixed;inset:0;background:rgba(20,16,30,.4);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:#fff;border-radius:16px;padding:20px;max-width:420px;box-shadow:var(--shadow)}
+.modal p{margin:0 0 14px}
+.modal .row{display:flex;justify-content:flex-end;gap:8px}
+.mbtn{border:1px solid var(--border-strong);background:#fff;border-radius:10px;padding:7px 14px;font-weight:600}
+.mbtn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.gone{text-align:center;padding:60px 20px;color:var(--ink-soft)}
+.gone button{margin-top:12px}
+@media (max-width:640px){
+  td.rub{width:auto;display:block;border-right:0;padding:12px 14px 4px}
+  td.cont{display:block;padding:4px 10px 12px}
+  .fiche > thead{display:none}
+  .fiche > tbody > tr{display:block;border-bottom:2px solid var(--border)}
+  .fiche > tbody > tr > td{border-bottom:0}
+  .bar{flex:1}
+  .wrap{padding:16px 12px 60px}
+  .title{margin-right:0}
+  .del-fiche{position:static;margin-top:10px}
+}
+</style>
+</head>
+<body>
+<div class="demo">Maquette v2 : rien n'est enregistré. Essaie « + Ajouter une ligne », « + Insérer un tableau », « + Ajouter une zone de rédaction » et « Supprimer la fiche ».</div>
+<div class="wrap" id="wrap">
+  <div class="crumb">Vue d'ensemble › 15 · Fiches de lecture › <b>Fiche de lecture</b></div>
+  <section class="card" aria-label="Fiche de lecture" id="card">
+    <div class="head">
+      <div class="kicker">Fiche de lecture · Titre (référence APA)</div>
+      <div class="title" id="title" contenteditable="true" spellcheck="false" data-ph="Colle ici la référence APA 7 complète…">Tordo, F. (2021). Soi-même comme un avatar. Imaginaire &amp; Inconscient, 1(47), 77-88.</div>
+      <button class="del-fiche" id="delFiche" type="button" aria-label="Supprimer toute la fiche de lecture">🗑 Supprimer la fiche</button>
+      <div class="progress"><span class="bar"><span id="fill"></span></span><span id="count"></span></div>
+    </div>
+    <table class="fiche">
+      <thead><tr><th>Rubrique</th><th>Contenu</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="add">
+      <button class="btn t" id="addTable" type="button">+ Insérer un tableau</button>
+      <button class="btn z" id="addZone" type="button">+ Ajouter une zone de rédaction</button>
+      <small>Les tableaux et les zones que tu ajoutes appartiennent à cette fiche seulement. Tu peux les renommer ou les supprimer.</small>
+    </div>
+  </section>
+</div>
+<script>
+(function(){
+  var items = [
+    {kind:"text", label:"Mots-clés", hint:"Mots-clés de l'auteur·e et les miens, séparés par des virgules", text:"avatar, identité, jeu vidéo, double numérique"},
+    {kind:"text", label:"Résumé", hint:"L'essentiel du texte, dans mes mots", long:true, text:""},
+    {kind:"text", label:"Hypothèse", hint:"Ce que l'auteur·e cherche à démontrer ou à vérifier", long:true, text:""},
+    {kind:"table", label:"Définitions", hint:"Un mot par ligne et sa définition (avec la page)", fixed:true, cols:["Mot","Définition"], rows:[["Avatar","Représentation graphique du joueur dans l'espace du jeu (p. 78)"],["",""]]},
+    {kind:"table", label:"Concepts et théories", hint:"Un concept ou une théorie par ligne et ce qu'il ou elle veut dire", fixed:true, cols:["Concept ou théorie","Définition"], rows:[["",""]]},
+    {kind:"text", label:"Notes", hint:"Mes notes libres sur ce texte", long:true, text:""}
+  ];
+  var nz = 0, nt = 0;
+  var tbody = document.getElementById("rows");
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function filled(it){
+    if (it.kind === "table") return it.rows.some(function(r){ return (r[0]+r[1]).trim(); });
+    return (it.text || "").trim().length > 0;
+  }
+  function draw(){
+    tbody.innerHTML = "";
+    items.forEach(function(it, i){
+      var tr = document.createElement("tr");
+      tr.className = it.zone ? "zone" : (it.kind === "table" && !it.fixed ? "tbl" : (it.kind === "table" ? "tbl" : ""));
+      var removable = !it.fixed && (it.zone || it.kind === "table");
+      var left = '<td class="rub"><div class="lbl" id="l'+i+'">' +
+        (removable ? '<span class="rname" contenteditable="true" spellcheck="false">'+esc(it.label)+'</span><button class="rm" type="button" aria-label="Supprimer « '+esc(it.label)+' »" title="Supprimer">×</button>' : esc(it.label)) +
+        '</div>' + (it.zone ? '<span class="badge">Zone de rédaction</span>' : (it.kind === "table" && !it.fixed ? '<span class="badge">Tableau ajouté</span>' : '<div class="hint">'+esc(it.hint)+'</div>')) + '</td>';
+      var right = '<td class="cont"></td>';
+      tr.innerHTML = left + right;
+      tbody.appendChild(tr);
+      var cont = tr.querySelector(".cont");
+      if (it.kind === "text"){
+        var ed = document.createElement("div");
+        ed.className = "edit" + (it.long || it.zone ? " long" : "");
+        ed.contentEditable = "true"; ed.setAttribute("role","textbox"); ed.setAttribute("aria-multiline","true"); ed.setAttribute("aria-labelledby","l"+i);
+        ed.setAttribute("data-ph", it.zone ? "Rédige ici…" : it.hint);
+        ed.textContent = it.text || "";
+        ed.addEventListener("input", function(){ it.text = ed.textContent; prog(); });
+        cont.appendChild(ed);
+      } else {
+        var t = document.createElement("table"); t.className = "inner";
+        var th = '<thead><tr>' + it.cols.map(function(c, ci){ return '<th><span class="hname" contenteditable="'+(!it.fixed)+'" spellcheck="false" data-ci="'+ci+'">'+esc(c)+'</span></th>'; }).join("") + '</tr></thead>';
+        t.innerHTML = th + '<tbody></tbody>';
+        var tb = t.querySelector("tbody");
+        it.rows.forEach(function(r, ri){
+          var row = document.createElement("tr");
+          row.innerHTML = '<td class="term"><div class="edit" contenteditable="true" data-ph="'+esc(it.cols[0])+'…"></div></td><td><div class="edit" contenteditable="true" data-ph="Définition…"></div><button class="rowrm" type="button" aria-label="Supprimer cette ligne">×</button></td>';
+          var eds = row.querySelectorAll(".edit");
+          eds[0].textContent = r[0]; eds[1].textContent = r[1];
+          eds[0].addEventListener("input", function(){ r[0] = eds[0].textContent; prog(); });
+          eds[1].addEventListener("input", function(){ r[1] = eds[1].textContent; prog(); });
+          row.querySelector(".rowrm").addEventListener("click", function(){ it.rows.splice(it.rows.indexOf(r),1); if (!it.rows.length) it.rows.push(["",""]); draw(); });
+          tb.appendChild(row);
+        });
+        t.querySelectorAll(".hname").forEach(function(h){ h.addEventListener("input", function(){ it.cols[+h.getAttribute("data-ci")] = h.textContent; }); });
+        cont.appendChild(t);
+        var ar = document.createElement("button"); ar.className = "addrow"; ar.type = "button"; ar.textContent = "+ Ajouter une ligne";
+        ar.addEventListener("click", function(){ it.rows.push(["",""]); draw(); var eds = tbody.children[i].querySelectorAll(".inner tbody tr:last-child .edit"); eds[0] && eds[0].focus(); });
+        cont.appendChild(ar);
+      }
+      if (removable){
+        var nm = tr.querySelector(".rname");
+        nm.addEventListener("input", function(){ it.label = nm.textContent; });
+        nm.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); nm.blur(); } });
+        tr.querySelector(".rm").addEventListener("click", function(){
+          ask((filled(it) ? "Supprimer « " + it.label + " » et son contenu ?" : "Supprimer « " + it.label + " » ?"), "Supprimer", function(){ items.splice(items.indexOf(it), 1); draw(); });
+        });
+      }
+    });
+    prog();
+  }
+  function prog(){
+    var f = items.filter(filled).length;
+    document.getElementById("fill").style.width = Math.round(100 * f / items.length) + "%";
+    document.getElementById("count").textContent = f + " / " + items.length + " rubriques remplies";
+  }
+  function ask(msg, ok, run){
+    var ov = document.createElement("div"); ov.className = "overlay";
+    ov.innerHTML = '<div class="modal" role="dialog" aria-modal="true"><p>'+esc(msg)+'</p><div class="row"><button class="mbtn" type="button">Annuler</button><button class="mbtn danger" type="button">'+esc(ok)+'</button></div></div>';
+    document.body.appendChild(ov);
+    var b = ov.querySelectorAll("button");
+    b[0].onclick = function(){ ov.remove(); };
+    b[1].onclick = function(){ ov.remove(); run(); };
+    ov.addEventListener("mousedown", function(e){ if (e.target === ov) ov.remove(); });
+    b[1].focus();
+  }
+  document.getElementById("addZone").addEventListener("click", function(){
+    nz++; items.push({kind:"text", zone:true, label:"Zone de rédaction " + nz, text:""}); draw();
+    var n = tbody.lastElementChild.querySelector(".rname"); n.focus(); document.execCommand && document.execCommand("selectAll");
+  });
+  document.getElementById("addTable").addEventListener("click", function(){
+    nt++; items.push({kind:"table", label:"Tableau " + nt, cols:["Terme","Définition"], rows:[["",""]]}); draw();
+    var n = tbody.lastElementChild.querySelector(".rname"); n.focus(); document.execCommand && document.execCommand("selectAll");
+  });
+  document.getElementById("delFiche").addEventListener("click", function(){
+    var title = document.getElementById("title").textContent.trim().slice(0, 60) || "cette fiche";
+    ask("Supprimer définitivement toute la fiche « " + title + "… », avec tout son contenu ?", "Supprimer la fiche", function(){
+      document.getElementById("card").outerHTML = '<div class="gone">La fiche a été supprimée. Dans l\'app, tu reviendrais à la galerie de la section 15, et un message « Annuler » te permettrait de la récupérer pendant quelques secondes.<br><button class="mbtn" type="button" onclick="location.reload()">Recommencer la maquette</button></div>';
+    });
+  });
+  draw();
+})();
+</script>
+</body>
+</html>

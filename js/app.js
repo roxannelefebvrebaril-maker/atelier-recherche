@@ -240,6 +240,29 @@
       return t + (tags.length ? " _(" + tags.join(", ") + ")_" : "");
     }
     function table(t, depth){
+      if (t.ficheVersion === 2){
+        out.push("## Référence", "", htmlToText(t.title || ""), "");
+        (t.ficheItems || []).forEach(function(item){
+          if (item.type === "row"){
+            var ficheRow = (t.rows || []).find(function(row){ return row.id === item.id; });
+            if (!ficheRow) return;
+            var rubric = t.columns[0] && ficheRow.cells[t.columns[0].id] ? htmlToText(ficheRow.cells[t.columns[0].id].text) : "Rubrique";
+            var answer = t.columns[1] && ficheRow.cells[t.columns[1].id] ? htmlToText(ficheRow.cells[t.columns[1].id].text) : "";
+            out.push("**" + rubric + "** : " + answer, "");
+          } else if (item.type === "table"){
+            var embedded = state.tables.find(function(child){ return child.id === item.id; });
+            if (!embedded) return;
+            out.push("### " + (embedded.title || "Tableau"), "");
+            out.push("| " + embedded.columns.map(function(col){ return htmlToText(col.label || "").replace(/\|/g,"\\|"); }).join(" | ") + " |");
+            out.push("| " + embedded.columns.map(function(){ return "---"; }).join(" | ") + " |");
+            embedded.rows.forEach(function(row){
+              out.push("| " + embedded.columns.map(function(col){ return row.cells[col.id] ? cellMd(row.cells[col.id]) : ""; }).join(" | ") + " |");
+            });
+            out.push("");
+          }
+        });
+        return;
+      }
       out.push("#".repeat(Math.min(depth + 2, 6)) + " " + (t.title || "Tableau"), "");
       var cols = t.columns || [];
       var rows = t.rows || [], regularOpen = false;
@@ -585,7 +608,8 @@
     }
   });
 
-  Cloud.init().then(function(res){
+  var isLocalStatic = location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "::1";
+  (isLocalStatic ? Promise.resolve({mode:"local", reason:"local"}) : Cloud.init()).then(function(res){
     if (res.mode === "login") return renderLogin();
     if (res.mode === "cloud") return res.offline ? route() : startCloud();
     localReason = res.reason;
