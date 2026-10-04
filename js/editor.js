@@ -75,9 +75,11 @@ window.Editor = (function(){
   function defaultFicheTemplate(){ return cloneDeep(window.FICHE_LECTURE_TEMPLATE || window.FICHE_LECTURE_TEMPLATE_V1 || {format:"atelier-recherche/fiche-template", version:2, columns:[{id:"rub",label:"Rubrique"},{id:"cont",label:"Contenu"}], rows:[], tables:[]}); }
   function ficheRowValue(table, keyOrLabel){
     var rows = (table && table.rows) || [];
-    var target = rows.find(function(row){ return row.key && row.key === keyOrLabel; }) || rows.find(function(row){ return String((row.cells && row.cells.rub && row.cells.rub.text) || "").replace(/<[^>]+>/g, "") === String(keyOrLabel || ""); });
+    var rubricId = table && table.columns && table.columns[0] ? table.columns[0].id : "rub";
+    var contentId = table && table.columns && table.columns[1] ? table.columns[1].id : "cont";
+    var target = rows.find(function(row){ return row.key && row.key === keyOrLabel; }) || rows.find(function(row){ return String((row.cells && (row.cells[rubricId] || row.cells.rub) && (row.cells[rubricId] || row.cells.rub).text) || "").replace(/<[^>]+>/g, "") === String(keyOrLabel || ""); });
     if (!target || target.kind) return "";
-    var cell = target.cells && target.cells.cont ? target.cells.cont : null;
+    var cell = target.cells && (target.cells[contentId] || target.cells.cont) ? (target.cells[contentId] || target.cells.cont) : null;
     return cell ? stripHtml(cell.text || "").trim() : "";
   }
   function ficheStatusValue(table){
@@ -1171,7 +1173,7 @@ window.Editor = (function(){
         el("div", {class:"ov-card-title fiche-gallery-title", text:shortCitation(table.title || "Fiche sans référence")}),
         el("div", {class:"fiche-gallery-reference", text:table.title || "Référence à compléter"}),
         ficheTagPills(table),
-        el("div", {class:"fiche-gallery-progress"}, [el("span", {text:p.filled + " / " + p.total + " rubriques"}), progressBar(p)])
+        el("div", {class:"fiche-gallery-progress"}, [progressRing(p, 22), el("span", {text:p.filled + " / " + p.total + " rubriques"})])
       ]);
       entries.push({table:table, card:card, letter:letter});
       grid.appendChild(card);
@@ -1623,11 +1625,20 @@ window.Editor = (function(){
         el("div", {class:"sec-progress"}, [progressBar(p), el("span", {text:p.total ? p.filled + " / " + p.total + " rubriques remplies" : ""})])
       ])
     ]));
+    var legacyFicheTags = el("div", {class:"fiche-v2-tags fiche-legacy-tags"});
+    function refreshLegacyFicheTags(){
+      legacyFicheTags.innerHTML = "";
+      var pills = ficheTagPills(table);
+      while (pills.firstChild) legacyFicheTags.appendChild(pills.firstChild);
+      legacyFicheTags.appendChild(el("button", {class:"fiche-add-tag", type:"button", "aria-label":"Ajouter un repère à cette fiche", text:"+ Repère", onclick:function(){ openFicheTagPicker(table, refreshLegacyFicheTags); }}));
+    }
+    refreshLegacyFicheTags();
     var meta = el("div", {class:"fiche-meta"}, [
       el("h2", {class:"fiche-title", contenteditable:"true", spellcheck:"false", text:titleOf(table)}),
       ficheDeleteActions(table),
       fullRef ? el("div", {class:"fiche-ref", text:fullRef}) : null,
-      el("div", {class:"tagbar"}, [status ? el("span", {class:"mini-tag", text:status}) : null, relevance ? el("span", {class:"mini-tag", text:relevance}) : null, table.sourceRef ? el("button", {class:"mini-tag", type:"button", text:"Référence", onclick:function(){ goTo(table.sourceRef); }}) : null])
+      el("div", {class:"tagbar"}, [status ? el("span", {class:"mini-tag", text:status}) : null, relevance ? el("span", {class:"mini-tag", text:relevance}) : null, table.sourceRef ? el("button", {class:"mini-tag", type:"button", text:"Référence", onclick:function(){ goTo(table.sourceRef); }}) : null]),
+      legacyFicheTags
     ]);
     meta.querySelector(".fiche-title").addEventListener("input", function(){ table.title = meta.querySelector(".fiche-title").textContent; dirty = true; });
     meta.querySelector(".fiche-title").addEventListener("blur", function(){

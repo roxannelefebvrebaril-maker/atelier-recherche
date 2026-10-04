@@ -284,8 +284,8 @@ h1,h2,h3{ font-family:'Source Serif 4',Georgia,serif; }
 .fiche-gallery-card::before{ background:#d9467f; }
 .fiche-gallery-title{ min-height:0; font-size:17px; color:#33243a; }
 .fiche-gallery-reference{ display:-webkit-box; min-height:2.8em; overflow:hidden; color:#514b5a; font-size:12px; line-height:1.4; overflow-wrap:anywhere; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
-.fiche-gallery-progress{ display:grid; grid-template-columns:1fr; gap:5px; margin-top:auto; color:#514b5a; font-size:11.5px; }
-.fiche-gallery-progress .pbar{ height:5px; }
+.fiche-gallery-progress{ display:flex; align-items:center; gap:7px; margin-top:auto; color:#514b5a; font-size:11.5px; }
+.fiche-gallery-progress .pring{ width:22px; height:22px; }
 .fiche-no-results{ margin-top:10px; color:var(--ink-soft); }
 .fiche-v2-pager{ margin-top:18px; }
 .fiche-gallery-tags .tagbar:empty{ display:none; }
