@@ -1421,37 +1421,49 @@ window.Editor = (function(){
   function makeFicheItemReorderable(handle, itemEl, fiche, item){
     handle.addEventListener("pointerdown", function(event){
       event.preventDefault();
-      var startY = event.clientY, list = itemEl.parentNode, original = fiche.ficheItems.indexOf(item), current = original;
-      handle.setPointerCapture(event.pointerId);
+      event.stopPropagation();
+      var startY = event.clientY, list = itemEl.parentNode, started = false;
+      function itemIds(){
+        return Array.prototype.map.call(list.children, function(child){ return child.getAttribute("data-fiche-item"); }).filter(Boolean);
+      }
+      var originalOrder = itemIds();
+      list.setPointerCapture(event.pointerId);
       function move(ev){
-        var delta = ev.clientY - startY;
-        if (Math.abs(delta) < 8) return;
-        var siblings = Array.prototype.filter.call(list.children, function(child){ return child.hasAttribute("data-fiche-item"); });
-        var center = ev.clientY, target = original;
-        siblings.forEach(function(sibling, i){
+        if (!started && Math.abs(ev.clientY - startY) < 8) return;
+        started = true;
+        itemEl.classList.add("dragging");
+        var siblings = Array.prototype.filter.call(list.children, function(child){ return child !== itemEl && child.hasAttribute("data-fiche-item"); });
+        var target = siblings.length;
+        for (var i=0;i<siblings.length;i++){
+          var sibling = siblings[i];
           var rect = sibling.getBoundingClientRect();
-          if (center > rect.top + rect.height / 2) target = i + 1;
-        });
-        target = Math.max(0, Math.min(siblings.length - 1, target));
-        if (target !== current){
-          siblings.forEach(function(s){ s.classList.remove("fiche-drop-before"); });
-          var before = siblings[target];
-          if (before && before !== itemEl){ before.classList.add("fiche-drop-before"); list.insertBefore(itemEl, before); }
-          else list.appendChild(itemEl);
-          current = target;
+          if (ev.clientY < rect.top + rect.height / 2){ target = i; break; }
+        }
+        siblings.forEach(function(s){ s.classList.remove("fiche-drop-before", "fiche-drop-after"); });
+        if (target < siblings.length){
+          siblings[target].classList.add("fiche-drop-before");
+          list.insertBefore(itemEl, siblings[target]);
+        } else {
+          if (siblings.length) siblings[siblings.length - 1].classList.add("fiche-drop-after");
+          list.appendChild(itemEl);
         }
       }
       function end(){
-        handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", end); handle.removeEventListener("pointercancel", end);
+        list.removeEventListener("pointermove", move); list.removeEventListener("pointerup", end); list.removeEventListener("pointercancel", end);
         Array.prototype.forEach.call(list.children, function(child){ child.classList.remove("fiche-drop-before"); });
-        if (current !== original){
+        Array.prototype.forEach.call(list.children, function(child){ child.classList.remove("fiche-drop-after"); });
+        itemEl.classList.remove("dragging");
+        if (started){
+          var nextOrder = itemIds();
+          var changed = nextOrder.length !== originalOrder.length || nextOrder.some(function(id,index){ return id !== originalOrder[index]; });
+          if (!changed) return;
           var byId = {};
           fiche.ficheItems.forEach(function(entry){ byId[entry.id] = entry; });
-          fiche.ficheItems = Array.prototype.map.call(list.children, function(child){ return byId[child.getAttribute("data-fiche-item")]; }).filter(Boolean);
-          scheduleSave(true);
+          fiche.ficheItems = nextOrder.map(function(id){ return byId[id]; }).filter(Boolean);
+          scheduleSave(true); render();
         }
       }
-      handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", end); handle.addEventListener("pointercancel", end);
+      list.addEventListener("pointermove", move); list.addEventListener("pointerup", end); list.addEventListener("pointercancel", end);
     });
   }
 

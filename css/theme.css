@@ -256,7 +256,7 @@ h1,h2,h3{ font-family:'Source Serif 4',Georgia,serif; }
 .fiche-add-zone{ border-color:#1e7a52 !important; color:#155f3e; }
 .fiche-add-zone:hover{ background:#e1f5ea; }
 .fiche-v2-add small{ flex-basis:100%; color:#625d6a; font-size:12px; }
-.fiche-item-drag{ position:absolute; left:7px; top:16px; z-index:3; padding:2px 4px; border:0; border-radius:5px; background:transparent; color:#625d6a; font-size:17px; line-height:1; cursor:grab; touch-action:none; opacity:0; }
+.fiche-item-drag{ position:absolute; left:7px; top:16px; z-index:3; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; padding:0; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--ink-faint); font-size:12px; line-height:1; cursor:grab; touch-action:none; opacity:0; }
 .fiche-item-drag:hover{ background:var(--surface-2); color:var(--ink); }
 .fiche-v2-item:hover .fiche-item-drag, .fiche-item-drag:focus-visible{ opacity:1; }
 .fiche-item-more{ position:absolute; top:10px; right:38px; width:28px; height:28px; opacity:0; }
@@ -264,8 +264,9 @@ h1,h2,h3{ font-family:'Source Serif 4',Georgia,serif; }
 .fiche-v2-item-remove{ position:absolute; top:12px; right:8px; z-index:3; width:26px; height:26px; border:0; border-radius:7px; background:transparent; color:var(--ink-soft); font:inherit; font-size:18px; line-height:1; cursor:pointer; opacity:0; }
 .fiche-v2-item:hover .fiche-v2-item-remove, .fiche-v2-item-remove:focus-visible{ opacity:1; }
 .fiche-v2-item-remove:hover{ background:var(--danger-soft); color:var(--danger); }
-.fiche-v2-item.dragging{ opacity:.7; }
-.fiche-v2-item.fiche-drop-before{ border-top:3px solid var(--sec); }
+.fiche-v2-item.dragging{ opacity:.4; cursor:grabbing; box-shadow:var(--shadow-lg); }
+.fiche-v2-item.fiche-drop-before{ box-shadow:inset 0 3px 0 var(--sec); }
+.fiche-v2-item.fiche-drop-after{ box-shadow:inset 0 -3px 0 var(--sec); }
 .fiche-tag-modal{ width:min(440px,100%); max-height:85vh; overflow:auto; }
 .fiche-tag-modal h3{ margin:0 0 12px; }
 .fiche-tag-options{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
