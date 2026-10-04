@@ -1941,7 +1941,7 @@ window.Editor = (function(){
       ["table", "Écris directement dans les cases", "Tout est modifiable : titres, colonnes, cases. La première colonne donne souvent la consigne ; écris dans « Rédaction » ou « Réponses ». Tout s'enregistre pendant que tu tapes."],
       ["more", "Ajoute ou supprime", "Le bouton ⋯ d'un tableau permet d'ajouter une colonne, un sous-tableau ou un espace libre, de changer la couleur ou de supprimer."],
       ["tag", "Repères de couleur", "Crée des repères (ex. « à vérifier ») et applique-les à une case avec l'icône d'étiquette. Clique un repère pour surligner toutes les cases qui l'ont."],
-      ["link", "Relie des idées", "Clique l'icône de lien d'une case, puis celle d'une autre case, même dans une autre section. Le nombre de liens s'affiche sur l'icône ; la flèche permet d'y naviguer."],
+      ["link", "Relie des idées", "Clique le maillon 🔗 d'une case : cherche une autre zone de texte n'importe où dans le projet et clique « + Lier ». Le nombre de liens s'affiche sur le maillon ; rouvre-le pour aller d'une idée liée à l'autre ou retirer un lien."],
       ["drag", "Réorganise", "Glisse la poignée ⠿ d'une ligne, d'une colonne ou d'un sous-tableau pour le déplacer, même vers un autre tableau. Dans le menu de gauche, glisse une section pour changer l'ordre."]
     ];
     var list = el("div", {class:"help-list"});
@@ -2519,7 +2519,7 @@ window.Editor = (function(){
       insertAfterFocusedTopLevel(d.id);
       scheduleSave(true); render();
     }}));
-    bar.appendChild(el("button", {class:"btn ghost", text:armedEntity? "Annuler la connexion (Échap)" : "🔗 Cliquer un maillon sur deux cases pour les relier", onclick:function(){
+    bar.appendChild(el("button", {class:"btn ghost", text:armedEntity? "Annuler la connexion (Échap)" : "🔗 Clique le maillon d'une case pour la lier à une autre zone de texte", onclick:function(){
       if (armedEntity){ armedEntity=null; render(); }
     }}));
     bar.appendChild(el("span", {style:"color:var(--ink-faint); font-size:12.5px; padding-left:2px;", text:"⠿ Glisse la poignée d'un tableau (ou du schéma) pour changer son ordre sur la page. Les lignes et les colonnes ont aussi leur ⠿ — glisse-les vers un autre tableau pour les y déplacer."}));
@@ -2773,6 +2773,13 @@ window.Editor = (function(){
       return {link:link, other:other, anchor:anchorById(other)};
     });
   }
+  function shortLinkLabel(entityId){
+    var e = getEntity(entityId), text = "";
+    if (e && e.kind === "fiche") text = stripHtml(e.obj.title || "");
+    else if (e && e.obj) text = stripHtml(e.obj.text || "");
+    text = text.replace(/\s+/g, " ").trim() || "Zone liée";
+    return text.length > 32 ? text.slice(0,32) + "…" : text;
+  }
   function renderAttachmentPills(entityId){
     var related = anchorLinksFor(entityId), pills = [];
     related.forEach(function(item){
@@ -2780,7 +2787,7 @@ window.Editor = (function(){
         var meta = ANCHOR_TYPES[item.anchor.type];
         pills.push(el("button", {class:"attachment-pill", type:"button", title:meta.verb + " : " + item.anchor.fullText, "aria-label":meta.verb + " : " + item.anchor.fullText, onclick:function(e){ e.stopPropagation(); goTo(item.anchor.id); }}, [icon(meta.icon), el("span", {text:meta.label + " · " + item.anchor.text})]));
       } else if (item.other && getEntity(item.other)){
-        pills.push(el("button", {class:"attachment-pill attachment-reflection", type:"button", title:"lié à : " + entityLabel(item.other), "aria-label":"Réflexion liée : " + entityLabel(item.other), onclick:function(e){ e.stopPropagation(); goTo(item.other); }}, [icon("link"), el("span", {text:"Réflexion"})]));
+        pills.push(el("button", {class:"attachment-pill attachment-reflection", type:"button", title:"lié à : " + entityLabel(item.other), "aria-label":"Réflexion liée : " + entityLabel(item.other), onclick:function(e){ e.stopPropagation(); goTo(item.other); }}, [icon("link"), el("span", {text:shortLinkLabel(item.other)})]));
       }
     });
     if (!pills.length) return null;
@@ -2804,18 +2811,13 @@ window.Editor = (function(){
   function renderIcons(entityId, cellOrNode, isNode){
     var box = el("div", {class:"cell-icons"});
     var n = linksFor(entityId).length;
-    var linkBtn = iconBtn("link", armedEntity===entityId ? "Annuler la liaison" : (armedEntity ? "Relier à cette case" : "Relier cette case à une autre"), function(e){ e.stopPropagation(); handleLinkClick(entityId); }, "icon-btn" + (armedEntity===entityId ? " armed" : "") + (armedEntity && armedEntity!==entityId ? " target" : ""));
+    var linkBtn = iconBtn("link", n>0 ? "Liens de cette case (" + n + ")" : "Lier cette case à une autre zone de texte", null, "icon-btn links-btn");
+    linkBtn.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(linkBtn, entityId); });
     if (n>0){ linkBtn.classList.add("has-links"); linkBtn.setAttribute("data-count", n); }
     box.appendChild(linkBtn);
     var tagBtn = iconBtn("tag", "Ajouter des repères", null, "icon-btn");
     tagBtn.addEventListener("click", function(e){ e.stopPropagation(); openTagPopover(tagBtn, cellOrNode); });
     box.appendChild(tagBtn);
-    var attachBtn = iconBtn("anchor", "Rattacher cette case", null, "icon-btn attach-btn");
-    attachBtn.addEventListener("click", function(e){ e.stopPropagation(); openAnchorPicker(entityId); });
-    box.appendChild(attachBtn);
-    var showLinksBtn = iconBtn("arrow", n>0 ? "Voir les " + n + " lien(s) et y aller" : "Cases reliées (aucune pour l'instant)", null, "icon-btn links-btn");
-    showLinksBtn.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(showLinksBtn, entityId); });
-    box.appendChild(showLinksBtn);
     if (isNode){
       var shapeBtn = iconBtn("shape", "Forme et contour", null, "icon-btn");
       shapeBtn.addEventListener("click", function(e){ e.stopPropagation(); openNodeStylePopover(shapeBtn, cellOrNode); });
@@ -2836,6 +2838,15 @@ window.Editor = (function(){
     });
     return result;
   }
+  function linkTargetPath(table, row, col){
+    if (table.kind === "fiche" && table.ficheVersion === 2){
+      var rubric = stripHtml(row.cells[table.columns[0].id] && row.cells[table.columns[0].id].text || "").trim();
+      return "Fiche · " + shortCitation(table.title || "Fiche de lecture") + " › " + rubric;
+    }
+    var parent = table.parentId && state.tables.find(function(t){ return t.id === table.parentId; });
+    if (parent && parent.kind === "fiche") return "Fiche · " + shortCitation(parent.title || "Fiche de lecture") + " › " + titleOf(table) + " › " + (col.label || "");
+    return titleOf(table) + " › " + (col.label || "");
+  }
   function allReflections(){
     var result = [];
     state.tables.forEach(function(table){
@@ -2846,7 +2857,7 @@ window.Editor = (function(){
         (table.columns || []).forEach(function(col){
           var cell = row.cells[col.id];
           var text = cell && stripHtml(cell.text).trim();
-          if (text) result.push({id:entityKeyForCell(table.id, row.id, col.id), text:text.slice(0,80) + (text.length > 80 ? "…" : ""), fullText:text, path:titleOf(table) + " › " + (col.label || "")});
+          if (text) result.push({id:entityKeyForCell(table.id, row.id, col.id), text:text.slice(0,80) + (text.length > 80 ? "…" : ""), fullText:text, path:linkTargetPath(table, row, col)});
         });
       });
     });
@@ -2867,71 +2878,21 @@ window.Editor = (function(){
     }
     return parts.join(" › ");
   }
+  function linkHolder(entityId){
+    return document.querySelector('[data-anchor="'+cssEscape(entityId)+'"]') || document.querySelector('[data-entity="'+cssEscape(entityId)+'"]');
+  }
   function openAnchorPicker(entityId){
-    closePopover();
-    var pop = el("div", {class:"pop anchor-picker", role:"dialog", "aria-label":"Rattacher une case"});
-    var input = el("input", {class:"field anchor-search", type:"search", placeholder:"Rechercher une ancre…", "aria-label":"Rechercher une ancre"});
-    var filter = "all", list = el("div", {class:"anchor-results"});
-    var filters = el("div", {class:"anchor-filters"});
-    function draw(){
-      list.innerHTML = "";
-      var query = normalizeText(input.value), anchors = allAnchors().filter(function(anchor){ return filter !== "reflection" && (filter === "all" || anchor.type === filter) && (!query || normalizeText(anchor.text).indexOf(query) >= 0 || normalizeText(anchor.fullText).indexOf(query) >= 0); });
-      var reflections = filter === "reflection" ? allReflections().filter(function(item){ return !query || normalizeText(item.text).indexOf(query) >= 0 || normalizeText(item.fullText).indexOf(query) >= 0; }) : [];
-      var recent = [];
-      if (!query && filter === "all"){
-        try { recent = JSON.parse(localStorage.getItem(recentAnchorsKey || ("atelier-recherche:recent-anchors:" + (ctx && ctx.id))) || "[]").map(anchorById).filter(Boolean).slice(0,8); } catch(e){}
-        if (recent.length) list.appendChild(el("h4", {class:"anchor-results-heading", text:"Récents"}));
-      }
-      var shown = new Set();
-      recent.forEach(function(anchor){ shown.add(anchor.id); renderAnchorResult(anchor, entityId, list); });
-      if (!anchors.length && !reflections.length) list.appendChild(el("p", {class:"lib-hint", text:"Aucune ancre trouvée."}));
-      anchors.filter(function(anchor){ return !shown.has(anchor.id); }).forEach(function(anchor){
-        renderAnchorResult(anchor, entityId, list);
-      });
-      reflections.forEach(function(reflection){
-        var existingReflection = state.links.some(function(link){ return (link.a === entityId && link.b === reflection.id) || (link.a === reflection.id && link.b === entityId); });
-        var result = el("button", {class:"anchor-result" + (existingReflection ? " selected" : ""), type:"button", title:reflection.fullText}, [icon("link"), el("span", {class:"anchor-result-main"}, [el("strong", {text:reflection.text}), el("small", {text:reflection.path})]), existingReflection ? icon("check") : null]);
-        result.addEventListener("click", function(){
-          var existing = state.links.find(function(link){ return (link.a === entityId && link.b === reflection.id) || (link.a === reflection.id && link.b === entityId); });
-          if (existing) state.links = state.links.filter(function(link){ return link !== existing; });
-          else state.links.push({id:uid("lnk"), a:entityId, b:reflection.id, rel:"lie"});
-          buildLinkIndex(); scheduleSave(true); draw(); refreshAttachmentDisplay(entityId);
-        });
-        list.appendChild(result);
-      });
-    }
-    function renderAnchorResult(anchor, entityId, list){
-      var related = anchorLinksFor(entityId).some(function(item){ return item.other === anchor.id; });
+    var holder = linkHolder(entityId), button = holder && holder.querySelector(".links-btn");
+    openLinksPopover(button || holder || document.body, entityId);
+  }
+  // Toutes les zones de texte du projet qu'on peut lier : cases, ancres, fiches, formes et notes.
+  function allLinkTargets(){
+    var targets = allAnchors().map(function(anchor){
       var meta = ANCHOR_TYPES[anchor.type];
-      var result = el("button", {class:"anchor-result" + (related ? " selected" : ""), type:"button", role:"option", "aria-selected":String(related), title:anchor.fullText}, [icon(meta.icon), el("span", {class:"anchor-result-main"}, [el("strong", {text:anchor.text}), el("small", {text:anchorPath(anchor)})]), related ? icon("check") : null]);
-      result.addEventListener("click", function(){
-        var existing = state.links.find(function(link){ return link.a === entityId && link.b === anchor.id; }) || state.links.find(function(link){ return link.a === anchor.id && link.b === entityId; });
-        if (existing) state.links = state.links.filter(function(link){ return link !== existing; });
-        else state.links.push({id:uid("lnk"), a:entityId, b:anchor.id});
-        recentAnchor(anchor.id); buildLinkIndex(); scheduleSave(true); draw(); refreshAttachmentDisplay(entityId);
-      });
-      list.appendChild(result);
-    }
-    var allButton = el("button", {class:"anchor-filter", type:"button", text:"Tous"});
-    allButton.addEventListener("click", function(){ filter = "all"; draw(); }); filters.appendChild(allButton);
-    Object.keys(ANCHOR_TYPES).forEach(function(type){
-      var meta = ANCHOR_TYPES[type];
-      var count = allAnchors().filter(function(anchor){ return anchor.type === type; }).length;
-      var button = el("button", {class:"anchor-filter", type:"button", text:meta.label + " " + count});
-      button.addEventListener("click", function(){ filter = filter === type ? "all" : type; draw(); });
-      filters.appendChild(button);
+      return {id:anchor.id, text:anchor.text, fullText:anchor.fullText, path:anchorPath(anchor), icon:meta ? meta.icon : "link"};
     });
-    var reflectionButton = el("button", {class:"anchor-filter", type:"button", text:"Réflexions " + allReflections().length});
-    reflectionButton.addEventListener("click", function(){ filter = "reflection"; draw(); }); filters.appendChild(reflectionButton);
-    pop.appendChild(input); pop.appendChild(filters); pop.appendChild(list);
-    positionPopover(pop, document.querySelector('[data-entity="'+cssEscape(entityId)+'"] .attach-btn, [data-anchor="'+cssEscape(entityId)+'"] .attach-btn') || document.body);
-    openPopover = {el:pop};
-    input.addEventListener("input", draw);
-    input.addEventListener("keydown", function(e){
-      if (e.key === "Escape") closePopover();
-      if (e.key === "Enter"){ var first = list.querySelector(".anchor-result"); if (first){ e.preventDefault(); first.click(); } }
-    });
-    draw(); setTimeout(function(){ input.focus(); }, 0);
+    allReflections().forEach(function(item){ item.icon = "link"; targets.push(item); });
+    return targets;
   }
   function refreshAttachmentDisplay(entityId){
     var anchor = anchorById(entityId), selector = anchor ? '[data-anchor="' + cssEscape(entityId) + '"]' : '[data-entity="' + cssEscape(entityId) + '"]';
@@ -3372,50 +3333,108 @@ window.Editor = (function(){
 
   function openLinksPopover(anchor, entityId){
     closePopover();
-    var pop = el("div", {class:"pop"});
-    pop.appendChild(el("h4", {text:"Cases reliées"}));
-    if (!linksFor(entityId).length) pop.appendChild(el("p", {class:"lib-hint", text:"Aucune case reliée pour l'instant. Clique le 🔗 ici, puis le 🔗 d'une autre case, ou rattache-la avec l'ancre."}));
-    linksFor(entityId).forEach(function(l){
-      var other = l.a===entityId ? l.b : l.a;
-      var row = el("div", {class:"row"});
-      row.appendChild(el("span", {class:"lbl", text: entityLabel(other), title: entityLabel(other), onclick:function(){
-        closePopover();
-        goTo(other);
-      }}));
-      row.appendChild(el("button", {text:"✕", title:"Retirer ce lien", onclick:function(){
-        state.links = state.links.filter(function(x){return x.id!==l.id;});
-        buildLinkIndex(); scheduleSave(true); closePopover(); render();
-      }}));
-      pop.appendChild(row);
-      if (!anchorById(other)){
-        var rel = el("select", {class:"link-relation", "aria-label":"Relation du lien"});
-        [{v:"lie",t:"lié à"},{v:"approfondit",t:"approfondit"},{v:"nuance",t:"nuance / contredit"},{v:"mene",t:"mène à"}].forEach(function(option){ rel.appendChild(el("option", {value:option.v, text:option.t})); });
-        rel.value = l.rel || "lie";
-        rel.addEventListener("change", function(){ l.rel = rel.value === "lie" ? "lie" : rel.value; scheduleSave(true); });
-        pop.appendChild(rel);
-      }
-      var sameDiagram = isNodeEntity(entityId) && isNodeEntity(other) && findNodeDiagram(entityId) && findNodeDiagram(entityId)===findNodeDiagram(other);
-      if (sameDiagram){
-        l.dir = l.dir || "right"; l.style = l.style || "solid";
-        var ctrl = el("div", {style:"display:flex; gap:4px; padding:2px 2px 10px; align-items:center;"});
-        [["right","→"],["left","←"],["both","↔"],["none","–"]].forEach(function(d2){
-          ctrl.appendChild(el("button", {class:"btn small ghost", style: l.dir===d2[0] ? "background:var(--accent-soft); color:var(--accent-ink);" : "", text:d2[1], title:"Direction de la flèche : "+d2[0], onclick:function(){
-            l.dir = d2[0]; scheduleSave(true); render(); reopenLinksPopoverFor(entityId);
-          }}));
-        });
-        ctrl.appendChild(el("button", {class:"btn small ghost", text: l.style==="dashed" ? "┄ pointillé" : "▬ plein", title:"Trait plein / pointillé", onclick:function(){
-          l.style = l.style==="dashed" ? "solid" : "dashed"; scheduleSave(true); render(); reopenLinksPopoverFor(entityId);
+    var pop = el("div", {class:"pop anchor-picker link-picker", role:"dialog", "aria-label":"Liens de cette case"});
+    var existingBox = el("div", {class:"link-existing"});
+    var input = el("input", {class:"field anchor-search", type:"search", placeholder:"Chercher une zone de texte à lier…", "aria-label":"Chercher une zone de texte dans tout le projet"});
+    var list = el("div", {class:"anchor-results", role:"listbox"});
+    function linkBetween(other){
+      return state.links.find(function(l){ return (l.a===entityId && l.b===other) || (l.a===other && l.b===entityId); });
+    }
+    function changed(other){
+      buildLinkIndex(); scheduleSave(true);
+      refreshAttachmentDisplay(entityId); refreshAttachmentDisplay(other);
+      drawExisting(); drawResults();
+    }
+    function toggle(other){
+      var existing = linkBetween(other);
+      if (existing) state.links = state.links.filter(function(l){ return l !== existing; });
+      else { state.links.push({id:uid("lnk"), a:entityId, b:other, rel:"lie"}); if (anchorById(other)) recentAnchor(other); }
+      changed(other);
+    }
+    function drawExisting(){
+      existingBox.innerHTML = "";
+      var links = linksFor(entityId);
+      existingBox.appendChild(el("h4", {text:links.length ? "Liée à (" + links.length + ")" : "Liée à"}));
+      if (!links.length) existingBox.appendChild(el("p", {class:"lib-hint", text:"Aucun lien pour l'instant. Cherche ci-dessous une autre zone de texte du projet."}));
+      links.forEach(function(l){
+        var other = l.a===entityId ? l.b : l.a, otherAnchor = anchorById(other);
+        var label = otherAnchor ? (ANCHOR_TYPES[otherAnchor.type].label + " · " + otherAnchor.text) : entityLabel(other);
+        var row = el("div", {class:"row link-existing-row"});
+        row.appendChild(el("button", {class:"lbl link-go", type:"button", title:"Aller à : " + label, text:"→ " + label, onclick:function(){ closePopover(); goTo(other); }}));
+        if (!otherAnchor){
+          var rel = el("select", {class:"link-relation", "aria-label":"Relation du lien"});
+          [{v:"lie",t:"lié à"},{v:"approfondit",t:"approfondit"},{v:"nuance",t:"nuance / contredit"},{v:"mene",t:"mène à"}].forEach(function(option){ rel.appendChild(el("option", {value:option.v, text:option.t})); });
+          rel.value = l.rel || "lie";
+          rel.addEventListener("change", function(){ l.rel = rel.value; scheduleSave(true); });
+          row.appendChild(rel);
+        }
+        row.appendChild(el("button", {type:"button", text:"✕", title:"Retirer ce lien", "aria-label":"Retirer le lien avec " + label, onclick:function(){
+          state.links = state.links.filter(function(x){ return x.id!==l.id; }); changed(other);
         }}));
-        pop.appendChild(ctrl);
+        existingBox.appendChild(row);
+        var sameDiagram = isNodeEntity(entityId) && isNodeEntity(other) && findNodeDiagram(entityId) && findNodeDiagram(entityId)===findNodeDiagram(other);
+        if (sameDiagram){
+          l.dir = l.dir || "right"; l.style = l.style || "solid";
+          var ctrl = el("div", {style:"display:flex; gap:4px; padding:2px 2px 10px; align-items:center;"});
+          [["right","→"],["left","←"],["both","↔"],["none","–"]].forEach(function(d2){
+            ctrl.appendChild(el("button", {class:"btn small ghost", style: l.dir===d2[0] ? "background:var(--accent-soft); color:var(--accent-ink);" : "", text:d2[1], title:"Direction de la flèche : "+d2[0], onclick:function(){
+              l.dir = d2[0]; scheduleSave(true); render(); reopenLinksPopoverFor(entityId);
+            }}));
+          });
+          ctrl.appendChild(el("button", {class:"btn small ghost", text: l.style==="dashed" ? "┄ pointillé" : "▬ plein", title:"Trait plein / pointillé", onclick:function(){
+            l.style = l.style==="dashed" ? "solid" : "dashed"; scheduleSave(true); render(); reopenLinksPopoverFor(entityId);
+          }}));
+          existingBox.appendChild(ctrl);
+        }
+      });
+    }
+    function drawResults(){
+      list.innerHTML = "";
+      var query = normalizeText(input.value.trim());
+      if (!query){
+        var recent = [];
+        try { recent = JSON.parse(localStorage.getItem(recentAnchorsKey || ("atelier-recherche:recent-anchors:" + (ctx && ctx.id))) || "[]").map(anchorById).filter(Boolean).slice(0,6); } catch(e){}
+        if (!recent.length){ list.appendChild(el("p", {class:"lib-hint", text:"Tape quelques mots : la recherche couvre toutes les zones de texte du projet."})); return; }
+        list.appendChild(el("h4", {class:"anchor-results-heading", text:"Récents"}));
+        recent.forEach(function(anchor){ drawResult({id:anchor.id, text:anchor.text, fullText:anchor.fullText, path:anchorPath(anchor), icon:ANCHOR_TYPES[anchor.type].icon}); });
+        return;
       }
+      var words = query.split(/\s+/);
+      var found = allLinkTargets().filter(function(item){
+        if (item.id === entityId) return false;
+        var hay = normalizeText((item.fullText || "") + " " + (item.text || "") + " " + (item.path || ""));
+        return words.every(function(w){ return hay.indexOf(w) >= 0; });
+      });
+      if (!found.length){ list.appendChild(el("p", {class:"lib-hint", text:"Aucune zone de texte ne contient ces mots."})); return; }
+      found.slice(0,40).forEach(drawResult);
+      if (found.length > 40) list.appendChild(el("p", {class:"lib-hint", text:(found.length - 40) + " autres résultats : précise ta recherche."}));
+    }
+    function drawResult(item){
+      var linked = !!linkBetween(item.id);
+      var result = el("button", {class:"anchor-result" + (linked ? " selected" : ""), type:"button", role:"option", "aria-selected":String(linked), title:(linked ? "Retirer le lien : " : "Lier à : ") + (item.fullText || item.text)}, [
+        icon(item.icon || "link"),
+        el("span", {class:"anchor-result-main"}, [el("strong", {text:item.text}), el("small", {text:item.path || ""})]),
+        linked ? icon("check") : el("span", {class:"link-add", text:"+ Lier"})
+      ]);
+      result.addEventListener("click", function(){ toggle(item.id); });
+      list.appendChild(result);
+    }
+    input.addEventListener("input", drawResults);
+    input.addEventListener("keydown", function(e){
+      if (e.key === "Escape") closePopover();
+      if (e.key === "Enter"){ var first = list.querySelector(".anchor-result"); if (first){ e.preventDefault(); first.click(); } }
     });
+    pop.appendChild(existingBox);
+    pop.appendChild(el("h4", {text:"Créer un lien"}));
+    pop.appendChild(input); pop.appendChild(list);
+    drawExisting(); drawResults();
     positionPopover(pop, anchor);
     openPopover = {el:pop};
-    setTimeout(function(){ document.addEventListener("mousedown", outsideCloser, true); },0);
+    setTimeout(function(){ input.focus(); document.addEventListener("mousedown", outsideCloser, true); },0);
   }
 
   function reopenLinksPopoverFor(entityId){
-    var wrap = document.querySelector('[data-entity="'+cssEscape(entityId)+'"]');
+    var wrap = linkHolder(entityId);
     if (!wrap) return;
     var btn = wrap.querySelector(".links-btn");
     if (btn) openLinksPopover(btn, entityId);
@@ -3625,7 +3644,7 @@ window.Editor = (function(){
     attached.forEach(function(item){ contextPanel.appendChild(contextLinkRow(item, contextEntity)); });
     contextPanel.appendChild(el("h4", {text:"Réflexions liées / utilisée par"}));
     incoming.forEach(function(item){ contextPanel.appendChild(contextLinkRow(item, contextEntity)); });
-    contextPanel.appendChild(el("button", {class:"btn small primary", type:"button", text:"+ Rattacher", onclick:function(){ openAnchorPicker(contextEntity); }}));
+    contextPanel.appendChild(el("button", {class:"btn small primary", type:"button", text:"+ Lier", onclick:function(){ openAnchorPicker(contextEntity); }}));
   }
   function contextLinkRow(item, entityId){
     var label = item.anchor ? ANCHOR_TYPES[item.anchor.type].verb + " : " + item.anchor.text : entityLabel(item.other);
