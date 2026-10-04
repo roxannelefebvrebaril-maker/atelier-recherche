@@ -37,6 +37,7 @@ window.Editor = (function(){
     return n;
   }
   function entityKeyForCell(tableId,rowId,colId){ return "t:"+tableId+":"+rowId+":"+colId; }
+  function entityKeyForFiche(ficheId){ return "f:" + ficheId; }
   function findCell(entityId){
     var m = /^t:([^:]+):([^:]+):([^:]+)$/.exec(entityId);
     if (!m) return null;
@@ -62,6 +63,11 @@ window.Editor = (function(){
     var anchor = anchorById(entityId);
     if (anchor) return {kind:"anchor", obj:anchor};
     if (isNodeEntity(entityId)) return { kind:"node", obj: findNode(entityId) };
+    var ficheMatch = /^f:([^:]+)$/.exec(entityId || "");
+    if (ficheMatch){
+      var fiche = state.tables.find(function(table){ return table.id === ficheMatch[1] && table.kind === "fiche"; });
+      if (fiche) return {kind:"fiche", obj:fiche};
+    }
     var c = findCell(entityId);
     return c ? { kind:"cell", obj:c } : null;
   }
@@ -107,7 +113,7 @@ window.Editor = (function(){
     return "";
   }
   function ficheSortKey(table){
-    var title = stripHtml(table && table.title || "").replace(/\s+/g, " ").trim();
+    var title = (table && table.ficheVersion === 2 ? ficheReferenceText(table) : stripHtml(table && table.title || "")).replace(/\s+/g, " ").trim();
     var valid = title && !/^(nouvelle fiche|sans titre|fiche(?:\s+de lecture)?\s*\d*)$/i.test(title);
     var author = valid ? (title.split(/[,\(]/)[0] || "").trim() : "";
     var year = valid && title.match(/\b(\d{4})\b/);
@@ -226,6 +232,7 @@ window.Editor = (function(){
     if (!e) return "(supprimé)";
     if (e.kind === "anchor") return e.obj.fullText || e.obj.text;
     if (e.kind === "node") return stripHtml(e.obj.text) || "(sans titre)";
+    if (e.kind === "fiche") return stripHtml(e.obj.title || "") || "Fiche de lecture";
     var m = /^t:([^:]+):([^:]+):([^:]+)$/.exec(entityId);
     var table = state.tables.find(function(t){return t.id===m[1];});
     var col = table ? table.columns.find(function(c){return c.id===m[3];}) : null;
@@ -248,7 +255,7 @@ window.Editor = (function(){
 
   var ICONS = {
     back:'<path d="M15 18l-6-6 6-6"/>', next:'<path d="M9 18l6-6-6-6"/>',
-    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>', more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>', more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>', search:'<circle cx="10.8" cy="10.8" r="6.4"/><path d="m15.5 15.5 4.2 4.2"/>',
     plus:'<path d="M12 5v14M5 12h14"/>', link:'<path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/>',
     tag:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
     arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>', shape:'<rect x="4" y="6" width="16" height="12" rx="3"/>',
@@ -830,7 +837,10 @@ window.Editor = (function(){
       el("span", {class:"dot"}), el("span", {text: STATUS_LABELS[saveStatus] || "…"})
     ]);
     bar.appendChild(status);
-    bar.appendChild(el("button", {class:"btn small header-search", type:"button", text:"Rechercher", onclick:function(){ openGlobalSearchModal(); }}));
+    var projectSearch = btn("search", "Rechercher", function(){ openGlobalSearchModal(); }, "small header-search");
+    projectSearch.setAttribute("aria-label", "Rechercher dans tout le projet");
+    projectSearch.title = "Rechercher dans tout le projet";
+    bar.appendChild(projectSearch);
     bar.appendChild(el("button", {class:"btn small header-links", type:"button", text:"Liens", onclick:function(){ toggleContextPanel(); }}));
     if (dimAnchor) bar.appendChild(el("button", {class:"btn small", type:"button", text:"× Filtre de lien", title:"Retirer le filtre de lien", onclick:function(){ dimAnchor = null; render(); }}));
     bar.appendChild(iconBtn("help", "Aide : comment utiliser l'outil", function(){ openHelp(); }, "hb-help"));
@@ -1052,11 +1062,13 @@ window.Editor = (function(){
   function createV2Fiche(parent, title, sourceRef, tags){
     var template = window.FICHE_LECTURE_TEMPLATE || {rows:[], tables:[]};
     var rubCol = uid("col"), contCol = uid("col");
-    var fiche = {id:uid("tbl"), parentId:parent.id, title:(title || "").trim() || "Nouvelle fiche", columns:[{id:rubCol,label:"Rubrique"},{id:contCol,label:"Contenu"}], rows:[], kind:"fiche", ficheVersion:2, ficheItems:[], tags:(tags || []).slice(), rowLines:"strong", view:"page"};
+    var reference = (title || "").trim();
+    if (reference === "Nouvelle fiche") reference = "";
+    var fiche = {id:uid("tbl"), parentId:parent.id, title:reference ? shortCitation(reference) : "Nouvelle fiche", columns:[{id:rubCol,label:"Rubrique"},{id:contCol,label:"Contenu"}], rows:[], kind:"fiche", ficheVersion:2, ficheItems:[], tags:(tags || []).slice(), rowLines:"strong", view:"page"};
     (template.rows || []).forEach(function(def){
       var row = {id:uid("row"), key:def.key, hint:def.hint || "", long:!!def.long, cells:{}};
       row.cells[rubCol] = {text:def.label || "", tags:[]};
-      row.cells[contCol] = {text:"", tags:[]};
+      row.cells[contCol] = {text:def.key === "reference" ? reference : "", tags:[]};
       fiche.rows.push(row);
       fiche.ficheItems.push({type:"row", id:row.id});
     });
@@ -1076,6 +1088,37 @@ window.Editor = (function(){
     }).filter(Boolean);
     if (sourceRef) fiche.sourceRef = sourceRef;
     return fiche;
+  }
+
+  function ficheReferenceRow(fiche){
+    return (fiche && fiche.rows || []).find(function(item){ return item.key === "reference"; }) || null;
+  }
+  function ficheReferenceText(fiche){
+    return ficheRowValue(fiche, "reference") || stripHtml(fiche && fiche.title || "").trim();
+  }
+  // La référence APA 7 vit sous le titre, dans l'entête : elle n'est pas une
+  // rubrique déplaçable. Les anciennes fiches (titre = référence) reçoivent
+  // leur titre comme référence de départ.
+  function ensureFicheReferenceRow(fiche){
+    var row = ficheReferenceRow(fiche), changed = false;
+    if (!row){
+      var rub = fiche.columns[0], cont = fiche.columns[1];
+      if (!rub || !cont) return null;
+      row = {id:uid("row"), key:"reference", hint:"", long:true, cells:{}};
+      row.cells[rub.id] = {text:"Référence APA 7", tags:[]};
+      row.cells[cont.id] = {text:fiche.title || "", tags:[]};
+      fiche.rows.push(row);
+      changed = true;
+    }
+    var before = fiche.ficheItems.length;
+    fiche.ficheItems = fiche.ficheItems.filter(function(item){ return !(item.type === "row" && item.id === row.id); });
+    if (fiche.ficheItems.length !== before) changed = true;
+    // Ancien titre = référence complète : on garde la référence dessous et on
+    // raccourcit le titre en « Auteur (année) ».
+    var oldTitle = stripHtml(fiche.title || "").trim();
+    if (changed && oldTitle && oldTitle === ficheRowValue(fiche, "reference") && /\(\d{4}/.test(oldTitle)) fiche.title = shortCitation(oldTitle);
+    if (changed) scheduleSave(true);
+    return row;
   }
 
   function createBlankFiche(title, section){
@@ -1169,9 +1212,11 @@ window.Editor = (function(){
         grid.appendChild(headings[letter]);
       }
       var p = ficheProgress(table);
-      var card = el("button", {class:"ov-card fiche-gallery-card", type:"button", "aria-label":shortCitation(table.title || "Fiche sans référence") + ", " + p.filled + " sur " + p.total + " rubriques", onclick:function(){ setChild(table.id); }}, [
-        el("div", {class:"ov-card-title fiche-gallery-title", text:shortCitation(table.title || "Fiche sans référence")}),
-        el("div", {class:"fiche-gallery-reference", text:table.title || "Référence à compléter"}),
+      var reference = ficheReferenceText(table), ownTitle = stripHtml(table.title || "").trim();
+      var cardTitle = ownTitle && ownTitle !== reference && ownTitle !== "Nouvelle fiche" ? ownTitle : shortCitation(reference || "Fiche sans référence");
+      var card = el("button", {class:"ov-card fiche-gallery-card", type:"button", "aria-label":cardTitle + ", " + p.filled + " sur " + p.total + " rubriques", onclick:function(){ setChild(table.id); }}, [
+        el("div", {class:"ov-card-title fiche-gallery-title", text:cardTitle}),
+        el("div", {class:"fiche-gallery-reference", text:reference || "Référence à compléter"}),
         ficheTagPills(table),
         el("div", {class:"fiche-gallery-progress"}, [progressRing(p, 22), el("span", {text:p.filled + " / " + p.total + " rubriques"})])
       ]);
@@ -1192,7 +1237,7 @@ window.Editor = (function(){
       entries.forEach(function(entry){
         var table = entry.table;
         var labels = (table.tags || []).map(function(id){ var tag = tagById(id); return tag ? tag.label : ""; }).join(" ");
-        var values = [table.title, labels, ficheRowValue(table,"kw"), ficheRowValue(table,"resume"), ficheRowValue(table,"hypothese"), ficheRowValue(table,"notes"), ficheRowValue(table,"f1_09")];
+        var values = [table.title, ficheRowValue(table,"reference"), labels, ficheRowValue(table,"kw"), ficheRowValue(table,"resume"), ficheRowValue(table,"hypothese"), ficheRowValue(table,"notes"), ficheRowValue(table,"f1_09")];
         (table.ficheItems || []).forEach(function(item){
           if (item.type !== "table") return;
           var child = state.tables.find(function(t){ return t.id === item.id; });
@@ -1222,7 +1267,8 @@ window.Editor = (function(){
 
   function ficheProgress(fiche){
     if (fiche && fiche.ficheVersion === 2){
-      var items = fiche.ficheItems || [], filled = 0;
+      var items = fiche.ficheItems || [], filled = 0, reference = ficheReferenceRow(fiche);
+      if (reference && !items.some(function(item){ return item.id === reference.id; })) items = [{type:"row", id:reference.id}].concat(items);
       items.forEach(function(item){
         if (item.type === "row"){
           var row = (fiche.rows || []).find(function(r){ return r.id === item.id; }), col = fiche.columns[1];
@@ -1251,9 +1297,22 @@ window.Editor = (function(){
     return total;
   }
 
+  function renderWholeFicheControls(fiche){
+    fiche.tags = fiche.tags || [];
+    var ficheId = entityKeyForFiche(fiche.id);
+    var label = el("span", {class:"sr-only", id:"fiche-entity-label-" + fiche.id, text:"Fiche entière — " + (fiche.title || "Fiche de lecture")});
+    var controls = el("div", {class:"fiche-v2-entity-controls entity-wrap", "data-entity":ficheId, "aria-labelledby":label.id, "aria-label":"Liens et repères de la fiche"});
+    controls.appendChild(renderIcons(ficheId, fiche));
+    var attachments = renderAttachmentPills(ficheId);
+    if (attachments) controls.appendChild(attachments);
+    controls.appendChild(label);
+    return controls;
+  }
+
   function renderFicheV2Page(content, sec, idx, fiche){
     if (!Array.isArray(fiche.ficheItems)) fiche.ficheItems = [];
     if (!Array.isArray(fiche.tags)) fiche.tags = [];
+    var referenceRow = ensureFicheReferenceRow(fiche);
     var p = ficheProgress(fiche), color = sectionColor(sec, idx);
     content.appendChild(el("nav", {class:"breadcrumb", "aria-label":"Fil d'Ariane"}, [
       el("button", {type:"button", text:"Vue d'ensemble", "aria-label":"Aller à la vue d'ensemble", onclick:function(){ setSection(null); }}),
@@ -1261,11 +1320,11 @@ window.Editor = (function(){
       el("button", {type:"button", text:(idx + 1) + " · " + titleOf(sec.obj), "aria-label":"Retour à la galerie " + titleOf(sec.obj), onclick:function(){ setChild(null); }}),
       el("span", {text:"›"}), el("strong", {text:"Fiche de lecture"})
     ]));
-    var card = el("section", {class:"fiche-v2-card", "data-sec":color, "aria-label":"Fiche de lecture"});
+    var card = el("section", {class:"fiche-v2-card", "data-sec":color, "data-fiche-id":fiche.id, "aria-label":"Fiche de lecture"});
     var head = el("header", {class:"fiche-v2-head"});
-    head.appendChild(el("div", {class:"fiche-v2-kicker", text:"Fiche de lecture · Titre (référence APA)"}));
-    var titleLabel = el("label", {class:"sr-only", id:"fiche-title-label-" + fiche.id, text:"Référence APA 7"});
-    var title = el("div", {class:"fiche-v2-title", contenteditable:"true", spellcheck:"false", role:"textbox", "aria-labelledby":titleLabel.id, "data-ph":"Colle ici la référence APA 7 complète…", text:fiche.title || ""});
+    head.appendChild(el("div", {class:"fiche-v2-kicker", text:"Fiche de lecture"}));
+    var titleLabel = el("label", {class:"sr-only", id:"fiche-title-label-" + fiche.id, text:"Titre de la fiche"});
+    var title = el("div", {class:"fiche-v2-title", contenteditable:"true", spellcheck:"false", role:"textbox", "aria-labelledby":titleLabel.id, "data-ph":"Titre de la fiche…", text:fiche.title || ""});
     plainPaste(title);
     title.addEventListener("input", function(){ fiche.title = title.textContent; dirty = true; });
     title.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); title.blur(); } });
@@ -1275,6 +1334,13 @@ window.Editor = (function(){
       appendFichePager(content, sec, fiche);
     });
     head.appendChild(titleLabel); head.appendChild(title);
+    if (referenceRow){
+      var referenceBox = el("div", {class:"fiche-v2-reference"});
+      var referenceLabelId = "fiche-item-label-" + referenceRow.id;
+      referenceBox.appendChild(el("div", {class:"fiche-v2-reference-label", id:referenceLabelId, text:"Référence APA 7"}));
+      renderFicheV2Text(referenceBox, fiche, referenceRow, referenceLabelId, "Colle ici la référence APA 7 complète…");
+      head.appendChild(referenceBox);
+    }
     var menu = iconBtn("more", "Autres actions sur la fiche", null, "fiche-v2-more");
     menu.addEventListener("click", function(){ openMenu(menu, null, [
       {icon:"download", label:"Exporter cette fiche en Markdown", run:function(){ exportFicheMarkdown(fiche); }},
@@ -1284,6 +1350,7 @@ window.Editor = (function(){
     head.appendChild(menu);
     var deleteButton = el("button", {class:"fiche-v2-delete", type:"button", "aria-label":"Supprimer la fiche", text:"🗑 Supprimer la fiche", onclick:function(){ confirmDeleteFiche(fiche); }});
     head.appendChild(deleteButton);
+    head.appendChild(renderWholeFicheControls(fiche));
     var tagsLine = el("div", {class:"fiche-v2-tags", id:"fiche-v2-tags-" + fiche.id});
     function refreshFicheTags(){
       tagsLine.innerHTML = "";
@@ -1346,17 +1413,29 @@ window.Editor = (function(){
     appendFichePager(content, sec, fiche);
   }
 
-  function renderFicheV2Text(container, fiche, row, labelId){
+  function ficheEntityWrap(eid, cell, editor){
+    var wrap = el("div", {class:"cellwrap entity-wrap fiche-v2-wrap", "data-entity":eid});
+    if (dimTag && (cell.tags || []).indexOf(dimTag) >= 0) wrap.classList.add("tag-match");
+    if (dimAnchor && !entityMatchesAnchor(eid)) wrap.classList.add("dim-anchor");
+    wrap.appendChild(editor);
+    var attachments = renderAttachmentPills(eid);
+    if (attachments) wrap.appendChild(attachments);
+    wrap.appendChild(renderCellTags(cell));
+    wrap.appendChild(renderIcons(eid, cell));
+    return wrap;
+  }
+
+  function renderFicheV2Text(container, fiche, row, labelId, placeholder){
     var col = fiche.columns[1], cell = row.cells[col.id] || (row.cells[col.id] = {text:"", tags:[]});
-    var eid = entityKeyForCell(fiche.id, row.id, col.id), labelId = "fiche-item-label-" + row.id;
+    var eid = entityKeyForCell(fiche.id, row.id, col.id);
+    labelId = labelId || "fiche-item-label-" + row.id;
+    cell.tags = cell.tags || [];
     var isLong = row.long === true || row.custom || row.key === "resume" || row.key === "hypothese" || row.key === "notes" || /^zone_/.test(row.key || "");
-    var editor = el("div", {class:"fiche-v2-editor entity-wrap" + (isLong ? " long" : ""), contenteditable:"true", spellcheck:"false", role:"textbox", "aria-multiline":"true", "aria-labelledby":labelId, "data-ph":row.custom ? "Rédige ici…" : row.hint || "…", "data-entity":eid});
+    var editor = el("div", {class:"fiche-v2-editor" + (isLong && row.key !== "reference" ? " long" : ""), contenteditable:"true", spellcheck:"false", role:"textbox", "aria-multiline":"true", "aria-labelledby":labelId, "data-ph":placeholder || (row.custom ? "Rédige ici…" : row.hint || "…")});
     editor.innerHTML = cell.text || "";
     attachRichText(editor, cell, "text"); plainPaste(editor);
-    editor.addEventListener("focus", function(){ setContextEntity(eid); });
-    container.appendChild(editor);
-    container.appendChild(renderCellTags(cell));
-    container.appendChild(renderIcons(eid, cell));
+    editor.addEventListener("focus", function(){ lastFocus = {kind:"table", tableId:fiche.id, rowId:row.id, colId:col.id, diagramId:null}; setContextEntity(eid); });
+    container.appendChild(ficheEntityWrap(eid, cell, editor));
   }
 
   function renderFicheV2Table(container, fiche, table){
@@ -1378,13 +1457,14 @@ window.Editor = (function(){
       var tr = el("tr");
       table.columns.forEach(function(col, ci){
         var cell = row.cells[col.id] || (row.cells[col.id] = {text:"", tags:[]});
+        cell.tags = cell.tags || [];
         var td = el("td", {class:ci === 0 ? "fiche-v2-term" : ""});
         var eid = entityKeyForCell(table.id, row.id, col.id), labelId = "fiche-col-label-" + col.id;
-        var editor = el("div", {class:"fiche-v2-cell-editor entity-wrap", contenteditable:"true", spellcheck:"false", role:"textbox", "aria-multiline":"true", "aria-labelledby":labelId, "data-ph":col.label + "…", "data-entity":eid});
+        var editor = el("div", {class:"fiche-v2-cell-editor", contenteditable:"true", spellcheck:"false", role:"textbox", "aria-multiline":"true", "aria-labelledby":labelId, "data-ph":col.label + "…"});
         editor.innerHTML = cell.text || "";
         attachRichText(editor, cell, "text"); plainPaste(editor);
         editor.addEventListener("focus", function(){ lastFocus = {kind:"table", tableId:table.id, rowId:row.id, colId:col.id, diagramId:null}; setContextEntity(eid); });
-        td.appendChild(editor); td.appendChild(renderCellTags(cell)); td.appendChild(renderIcons(eid, cell)); tr.appendChild(td);
+        td.appendChild(ficheEntityWrap(eid, cell, editor)); tr.appendChild(td);
       });
       var action = el("td", {class:"fiche-v2-row-action"});
       action.appendChild(el("button", {class:"fiche-v2-row-remove", type:"button", "aria-label":"Supprimer cette ligne", title:"Supprimer cette ligne", text:"×", onclick:function(){
@@ -1582,7 +1662,7 @@ window.Editor = (function(){
   }
 
   function exportFicheMarkdown(fiche){
-    var out = ["## Référence", "", fiche.title || "", ""];
+    var out = ["# " + (fiche.title || "Fiche de lecture"), "", "## Référence APA 7", "", ficheReferenceText(fiche), ""];
     (fiche.ficheItems || []).forEach(function(item){
       if (item.type === "row"){
         var row = fiche.rows.find(function(candidate){ return candidate.id === item.id; });
@@ -1636,6 +1716,7 @@ window.Editor = (function(){
     var meta = el("div", {class:"fiche-meta"}, [
       el("h2", {class:"fiche-title", contenteditable:"true", spellcheck:"false", text:titleOf(table)}),
       ficheDeleteActions(table),
+      renderWholeFicheControls(table),
       fullRef ? el("div", {class:"fiche-ref", text:fullRef}) : null,
       el("div", {class:"tagbar"}, [status ? el("span", {class:"mini-tag", text:status}) : null, relevance ? el("span", {class:"mini-tag", text:relevance}) : null, table.sourceRef ? el("button", {class:"mini-tag", type:"button", text:"Référence", onclick:function(){ goTo(table.sourceRef); }}) : null]),
       legacyFicheTags
@@ -2747,6 +2828,7 @@ window.Editor = (function(){
   function allReflections(){
     var result = [];
     state.tables.forEach(function(table){
+      if (table.kind === "fiche") result.push({id:entityKeyForFiche(table.id), text:shortCitation(table.title || "Fiche de lecture"), fullText:table.title || "", path:"Fiches de lecture"});
       if (inheritedAnchorType(table)) return;
       (table.rows || []).forEach(function(row){
         if (row.kind) return;
@@ -3443,10 +3525,12 @@ window.Editor = (function(){
       anchorTarget.scrollIntoView({behavior:"smooth", block:"center"}); anchorTarget.classList.add("flash");
       setTimeout(function(){ anchorTarget.classList.remove("flash"); }, 1200); return;
     }
+    var ficheMatch = /^f:([^:]+)$/.exec(entityId || "");
     var m = /^t:([^:]+):/.exec(entityId);
-    var owner = m ? ["table", m[1]] : (findNodeDiagram(entityId) ? ["diagram", findNodeDiagram(entityId).id] : null);
+    var owner = ficheMatch ? ["table", ficheMatch[1]] : (m ? ["table", m[1]] : (findNodeDiagram(entityId) ? ["diagram", findNodeDiagram(entityId).id] : null));
     if (owner && ensureSectionFor(owner[0], owner[1])) return setTimeout(function(){ goTo(entityId); }, 30);
     var target = document.querySelector('[data-entity="'+cssEscape(entityId)+'"]');
+    if (!target && ficheMatch) target = document.querySelector('.fiche-v2-card[data-fiche-id="' + cssEscape(ficheMatch[1]) + '"]');
     if (!target) return;
     target.scrollIntoView({behavior:"smooth", block:"center"});
     target.classList.add("flash");
@@ -3533,7 +3617,8 @@ window.Editor = (function(){
   function removeEntitiesForTable(tableId){
     var prefix = "t:"+tableId+":";
     var anchorPrefix = "r:"+tableId+":";
-    state.links = state.links.filter(function(l){ return l.a.indexOf(prefix)!==0 && l.b.indexOf(prefix)!==0 && l.a.indexOf(anchorPrefix)!==0 && l.b.indexOf(anchorPrefix)!==0; });
+    var ficheEntity = entityKeyForFiche(tableId);
+    state.links = state.links.filter(function(l){ return l.a !== ficheEntity && l.b !== ficheEntity && l.a.indexOf(prefix)!==0 && l.b.indexOf(prefix)!==0 && l.a.indexOf(anchorPrefix)!==0 && l.b.indexOf(anchorPrefix)!==0; });
   }
   function removeEntitiesForRow(tableId, rowId){
     var cellPrefix = "t:" + tableId + ":" + rowId + ":";

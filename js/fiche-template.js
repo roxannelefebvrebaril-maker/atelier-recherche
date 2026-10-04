@@ -41,6 +41,7 @@ window.FICHE_LECTURE_TEMPLATE = {
     { "id": "cont", "label": "Contenu" }
   ],
   "rows": [
+    { "key": "reference", "label": "Référence APA 7", "hint": "", "long": true },
     { "key": "kw", "label": "Mots-clés", "hint": "Mots-clés de l'auteur·e et les miens, séparés par des virgules", "long": false },
     { "key": "resume", "label": "Résumé", "hint": "L'essentiel du texte, dans mes mots", "long": true },
     { "key": "hypothese", "label": "Hypothèse", "hint": "Ce que l'auteur·e cherche à démontrer ou à vérifier", "long": true },
