@@ -714,11 +714,10 @@ window.Editor = (function(){
   }
 
   function renderSidebar(secs){
-    var side = el("aside", {class:"ed-sidebar", "aria-label":"Sections du projet"});
-    var top = el("div", {class:"sb-top"});
-    top.appendChild(btn("back", "Mes projets", function(){ if (ctx && ctx.onBack) ctx.onBack(); }, "ghost sb-back"));
-    top.appendChild(iconBtn("close", "Fermer le menu", function(){ document.body.classList.remove("nav-open"); }, "sb-close"));
-    side.appendChild(top);
+    var side = el("aside", {class:"ed-sidebar", id:"app-nav", "aria-label":"Menu de navigation"});
+    // Table des matières du projet ouvert ; le menu commun (projets, gabarits) l'insère sous ce projet.
+    var toc = el("div", {class:"sb-toc"});
+    var realSide = side; side = toc;
 
     var total = {total:0, filled:0};
     secs.forEach(function(s){ var p = sectionProgress(s); total.total += p.total; total.filled += p.filled; });
@@ -774,7 +773,34 @@ window.Editor = (function(){
       btn("canvas", "Espace libre", function(){ addTopDiagram(); }, "ghost small"),
       btn("download", "Importer une section", importSection, "ghost small")
     ]));
+    side = realSide;
+    if (ctx && ctx.navTree) side.appendChild(ctx.navTree(toc));
+    else {
+      var top = el("div", {class:"sb-top"});
+      top.appendChild(btn("back", "Mes projets", function(){ if (ctx && ctx.onBack) ctx.onBack(); }, "ghost sb-back"));
+      top.appendChild(iconBtn("close", "Fermer le menu", function(){ toggleNav(false); }, "sb-close"));
+      side.appendChild(top); side.appendChild(toc);
+    }
     return side;
+  }
+
+  // Menu de gauche : sur grand écran il se replie (l'app s'en souvient) ; sur téléphone il glisse par-dessus.
+  var NAV_KEY = "atelier-recherche:nav-collapsed";
+  function isNarrow(){ return window.matchMedia && window.matchMedia("(max-width:960px)").matches; }
+  function navIsOpen(){ return isNarrow() ? document.body.classList.contains("nav-open") : !document.body.classList.contains("nav-collapsed"); }
+  function toggleNav(open){
+    if (open === undefined) open = !navIsOpen();
+    if (isNarrow()) document.body.classList.toggle("nav-open", open);
+    else {
+      document.body.classList.toggle("nav-collapsed", !open);
+      try { localStorage.setItem(NAV_KEY, open ? "0" : "1"); } catch(e){}
+    }
+    Array.prototype.forEach.call(document.querySelectorAll(".hb-menu"), function(b){ b.setAttribute("aria-expanded", String(open)); });
+  }
+  function restoreNav(){
+    var collapsed = false;
+    try { collapsed = localStorage.getItem(NAV_KEY) === "1"; } catch(e){}
+    document.body.classList.toggle("nav-collapsed", collapsed);
   }
 
   function addTopTable(){
@@ -887,7 +913,9 @@ window.Editor = (function(){
 
   function renderHeaderBar(secs){
     var bar = el("div", {class:"ed-header"});
-    bar.appendChild(iconBtn("menu", "Afficher les sections", function(){ document.body.classList.add("nav-open"); }, "hb-menu"));
+    var burger = iconBtn("menu", "Afficher ou masquer le menu", function(){ toggleNav(); }, "hb-menu");
+    burger.setAttribute("aria-controls", "app-nav"); burger.setAttribute("aria-expanded", String(navIsOpen()));
+    bar.appendChild(burger);
     var crumb = el("div", {class:"hb-crumb"});
     if (activeSection){
       var idx = secs.findIndex(function(s){ return s.id===activeSection; });
@@ -4008,6 +4036,7 @@ window.Editor = (function(){
   return {
     open: open,
     close: close,
+    toggleNav: toggleNav, restoreNav: restoreNav, navIsOpen: navIsOpen,
     flush: function(){ if (dirty) doSave(); },
     isDirty: function(){ return dirty; },
     currentId: function(){ return ctx ? ctx.id : null; },

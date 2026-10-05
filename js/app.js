@@ -409,6 +409,62 @@
     return c;
   }
 
+  /* ---------------- menu de gauche (projets, gabarits, table des matières) ---------------- */
+
+  var NAV_GROUPS_KEY = "atelier-recherche:nav-groups";
+  function navGroupsState(){ try { return JSON.parse(localStorage.getItem(NAV_GROUPS_KEY) || "{}") || {}; } catch(e){ return {}; } }
+
+  // Arbre du menu. toc : table des matières du projet ouvert (fournie par l'éditeur), placée sous ce projet.
+  function navTree(toc){
+    var current = Editor.currentId(), saved = navGroupsState();
+    var wrap = h("div", {class:"app-nav"});
+    wrap.appendChild(h("div", {class:"app-nav-top"}, [
+      h("button", {class:"app-nav-home" + (!current ? " active" : ""), type:"button", onclick:function(){ go("#/"); }}, [h("span", {class:"app-nav-home-kicker", text:"Atelier de recherche"}), h("span", {text:"Accueil · Mes projets"})]),
+      h("button", {class:"ibtn app-nav-close", type:"button", title:"Fermer le menu", "aria-label":"Fermer le menu", text:"×", onclick:function(){ Editor.toggleNav(false); }})
+    ]));
+    function group(key, label, items, emptyText){
+      var hasCurrent = items.some(function(m){ return m.id === current; });
+      var open = hasCurrent || (key in saved ? saved[key] : key === "projects");
+      var details = h("details", {class:"app-nav-group"});
+      if (open) details.open = true;
+      details.appendChild(h("summary", {}, [h("span", {text:label}), h("span", {class:"app-nav-count", text:String(items.length)})]));
+      details.addEventListener("toggle", function(){ var st = navGroupsState(); st[key] = details.open; try { localStorage.setItem(NAV_GROUPS_KEY, JSON.stringify(st)); } catch(e){} });
+      var list = h("ul", {class:"app-nav-list"});
+      if (!items.length) list.appendChild(h("li", {class:"app-nav-empty", text:emptyText}));
+      items.forEach(function(m){
+        var isCurrent = m.id === current;
+        var li = h("li", {class:"app-nav-item" + (isCurrent ? " current" : "")});
+        li.appendChild(h("button", {class:"app-nav-link", type:"button", "aria-current":isCurrent ? "page" : null, title:m.title, onclick:function(){
+          if (isCurrent){ li.classList.toggle("toc-hidden"); return; }
+          if (window.matchMedia("(max-width:960px)").matches) document.body.classList.remove("nav-open");
+          go("#/p/" + m.id);
+        }}, [h("span", {class:"app-nav-chevron", "aria-hidden":"true"}), h("span", {class:"app-nav-title", text:m.title})]));
+        if (isCurrent && toc) li.appendChild(toc);
+        list.appendChild(li);
+      });
+      details.appendChild(list);
+      return details;
+    }
+    wrap.appendChild(group("projects", "Projets de recherche", Store.list("project"), "Aucun projet pour l'instant."));
+    wrap.appendChild(group("templates", "Gabarits", orderedTemplates(), "Aucun gabarit."));
+    return wrap;
+  }
+
+  // Bibliothèque : même menu à gauche, et un bouton ☰ pour l'ouvrir ou le fermer.
+  function wrapLibraryWithNav(){
+    var kids = Array.prototype.slice.call(libraryEl.childNodes);
+    var main = h("div", {class:"lib-main"});
+    var burger = h("button", {class:"ibtn hb-menu lib-burger", type:"button", "aria-controls":"app-nav", "aria-expanded":String(Editor.navIsOpen()), "aria-label":"Afficher ou masquer le menu", title:"Afficher ou masquer le menu", onclick:function(){ Editor.toggleNav(); }}, [h("span", {class:"burger-lines", "aria-hidden":"true"})]);
+    main.appendChild(h("div", {class:"lib-navbar"}, [burger, h("span", {class:"lib-navbar-title", text:"Atelier de recherche"})]));
+    kids.forEach(function(k){ main.appendChild(k); });
+    var side = h("aside", {class:"ed-sidebar lib-sidebar", id:"app-nav", "aria-label":"Menu de navigation"}, [navTree(null)]);
+    libraryEl.innerHTML = "";
+    libraryEl.appendChild(h("div", {class:"ed-shell lib-shell"}, [
+      h("div", {class:"nav-scrim", onclick:function(){ document.body.classList.remove("nav-open"); }}), side, main
+    ]));
+    document.body.classList.add("with-nav");
+  }
+
   /* ---------------- publication des gabarits (administration) ---------------- */
 
   // Copie publiable : sans liens vers d'autres projets ni documents déposés (propres à ce compte).
@@ -520,6 +576,7 @@
         }})
       : h("span", {text:"Atelier de recherche"});
     libraryEl.appendChild(h("footer", {class:"foot"}, [footLeft, footRight]));
+    wrapLibraryWithNav();
   }
 
   /* ---------------- routeur ---------------- */
@@ -534,6 +591,7 @@
       save: function(s){ Store.save(id, s); document.title = (s.title || "Sans titre") + " · Atelier de recherche"; },
       onBack: function(){ go("#/"); },
       onAccount: Cloud.isCloud() ? openAccount : null,
+      navTree: navTree,
       onExport: function(kind){
         if (kind === "json") exportJSON(id);
         else if (kind === "md") exportMarkdown(id);
@@ -565,9 +623,11 @@
       if (Editor.currentId() === id) return;
       Editor.close();
       libraryEl.hidden = true;
+      libraryEl.innerHTML = "";   // un seul menu (#app-nav) à la fois dans la page
       openEditor(id, meta, state);
     } else {
       Editor.close();
+      document.body.classList.remove("nav-open");
       document.title = "Atelier de recherche";
       libraryEl.hidden = false;
       renderLibrary();
@@ -623,6 +683,7 @@
   // Page d'accueil : présentation de l'app et formulaire (connexion, premier compte, nouveau mot de passe).
   function authPage(opts){
     Editor.close();
+    document.body.classList.remove("with-nav", "nav-open");
     libraryEl.hidden = false;
     libraryEl.innerHTML = "";
     var err = h("p", {class:"login-error", role:"alert", text: opts.message || ""});
@@ -902,6 +963,7 @@
     }
   });
 
+  Editor.restoreNav();
   var isLocalStatic = location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "::1";
   (isLocalStatic ? Promise.resolve({mode:"local", reason:"local"}) : Cloud.init()).then(function(res){
     if (res.mode === "setup") return renderSetup(res.possible);
