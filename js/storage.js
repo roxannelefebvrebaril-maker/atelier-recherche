@@ -51,7 +51,7 @@ window.Store = (function(){
   }
 
   // Métadonnées facultatives qui voyagent avec la synchronisation (gabarits fournis ou publiés).
-  var SYNCED_META = ["builtinKey", "builtinVersion", "builtinHash", "publishedKey", "publishedVersion"];
+  var SYNCED_META = ["builtinKey", "builtinVersion", "builtinHash", "publishedKey", "publishedVersion", "position"];
 
   // Used by the sync engine: write what came from the server without marking it pending.
   function putFromServer(meta, state){
@@ -202,6 +202,53 @@ window.Store = (function(){
     return changed;
   }
 
+  // Ordre choisi par la personne (glisser-déposer) : un nombre « position » dans les métadonnées,
+  // synchronisé entre appareils. ids = nouvel ordre complet d'une liste (projets ou gabarits).
+  // Seuls les éléments déplacés reçoivent une nouvelle position (les autres gardent la leur),
+  // pour ne renvoyer en ligne que ce qui a vraiment bougé.
+  function reorder(ids){
+    var idx = readIndex(), byId = {};
+    idx.forEach(function(m){ byId[m.id] = m; });
+    var pos = ids.map(function(id){ var m = byId[id]; return m && typeof m.position === "number" ? m.position : null; });
+    // Plus longue suite déjà croissante : ces éléments ne bougent pas.
+    var n = ids.length, best = [], prev = [], keep = {};
+    for (var i = 0; i < n; i++){
+      best[i] = pos[i] === null ? 0 : 1; prev[i] = -1;
+      if (pos[i] === null) continue;
+      for (var j = 0; j < i; j++) if (pos[j] !== null && pos[j] < pos[i] && best[j] + 1 > best[i]){ best[i] = best[j] + 1; prev[i] = j; }
+    }
+    var end = -1;
+    for (var k = 0; k < n; k++) if (best[k] > 0 && (end < 0 || best[k] > best[end])) end = k;
+    for (; end >= 0; end = prev[end]) keep[end] = true;
+    var changed = [];
+    for (var a = 0; a < n; ){
+      if (keep[a]){ a++; continue; }
+      var b = a; while (b < n && !keep[b]) b++;
+      var lo = a > 0 ? pos[a - 1] : null, hi = b < n ? pos[b] : null, count = b - a;
+      for (var c = 0; c < count; c++){
+        var p;
+        if (lo !== null && hi !== null) p = lo + (hi - lo) * (c + 1) / (count + 1);
+        else if (lo !== null) p = lo + c + 1;
+        else if (hi !== null) p = hi - (count - c);
+        else p = c + 1;
+        pos[a + c] = p;
+        var m = byId[ids[a + c]];
+        if (m){ m.position = p; m.pending = true; m.lv = (m.lv || 0) + 1; changed.push(m.id); }
+      }
+      a = b;
+    }
+    if (changed.length){ writeIndex(idx); changed.forEach(function(id){ emit("save", id); }); }
+    return changed.length;
+  }
+
+  // Trie selon l'ordre choisi. Les éléments sans position gardent l'ordre par défaut,
+  // en tête (nouveaux projets) ou en fin de liste (nouveaux gabarits).
+  function byPosition(list, unpositionedFirst){
+    var placed = list.filter(function(m){ return typeof m.position === "number"; }).sort(function(a, b){ return a.position - b.position; });
+    var rest = list.filter(function(m){ return typeof m.position !== "number"; });
+    return unpositionedFirst ? rest.concat(placed) : placed.concat(rest);
+  }
+
   function usage(){
     var bytes = 0;
     for (var i=0; i<localStorage.length; i++){
@@ -216,7 +263,7 @@ window.Store = (function(){
     onChange: onChange, putFromServer: putFromServer, patchMeta: patchMeta, forget: forget, readIndex: readIndex,
     list: list, meta: meta, load: load, save: save, create: create, rename: rename, remove: remove,
     structureOnly: structureOnly, exportAll: exportAll, exportOne: exportOne, importData: importData,
-    seedIfEmpty: seedIfEmpty, ensureBuiltinTemplates: ensureBuiltinTemplates, SYNCED_META: SYNCED_META, usage: usage, clone: clone
+    seedIfEmpty: seedIfEmpty, ensureBuiltinTemplates: ensureBuiltinTemplates, SYNCED_META: SYNCED_META, reorder: reorder, byPosition: byPosition, usage: usage, clone: clone
   };
   return api;
 })();

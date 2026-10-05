@@ -101,10 +101,60 @@
       if (i >= 0) return 1 + i;
       return m.builtinKey ? 1 + builtin.length : 2 + builtin.length;
     }
-    return Store.list("template").map(function(m, i){ return {m:m, i:i}; })
+    var byDefault = Store.list("template").map(function(m, i){ return {m:m, i:i}; })
       .sort(function(a, b){ return (rank(a.m) - rank(b.m)) || (a.i - b.i); })
       .map(function(x){ return x.m; });
+    return Store.byPosition(byDefault, false);   // l'ordre choisi par la personne l'emporte
   }
+  function orderedProjects(){ return Store.byPosition(Store.list("project"), true); }
+
+  /* ---------------- réordonner (projets, gabarits) ---------------- */
+
+  // Glisser-déposer par la poignée ⠿ (souris, doigt) ou flèches ↑ ↓ du clavier sur la poignée.
+  // onDone reçoit le nouvel ordre complet des ids.
+  function makeSortable(container, itemSelector, onDone){
+    function items(){ return Array.prototype.filter.call(container.children, function(el){ return el.matches(itemSelector); }); }
+    function finish(){ onDone(items().map(function(el){ return el.getAttribute("data-id"); })); }
+    items().forEach(function(item){
+      var handle = item.querySelector(".drag-handle-lib");
+      if (!handle) return;
+      handle.addEventListener("click", function(e){ e.stopPropagation(); e.preventDefault(); });
+      handle.addEventListener("keydown", function(e){
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown" && e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        e.preventDefault(); e.stopPropagation();
+        var list = items(), i = list.indexOf(item), up = e.key === "ArrowUp" || e.key === "ArrowLeft";
+        var other = list[up ? i - 1 : i + 1];
+        if (!other) return;
+        container.insertBefore(item, up ? other : other.nextSibling);
+        handle.focus(); finish();
+      });
+      handle.addEventListener("pointerdown", function(e){
+        if (e.button !== 0) return;
+        e.preventDefault(); e.stopPropagation();
+        var moved = false;
+        item.classList.add("is-dragging");
+        // Écoute sur le document : déplacer l'élément dans la page ferait perdre le suivi du pointeur.
+        function move(ev){
+          var under = document.elementFromPoint(ev.clientX, ev.clientY);
+          var target = under && under.closest(itemSelector);
+          if (!target || target === item || target.parentNode !== container) return;
+          var list = items();
+          container.insertBefore(item, list.indexOf(target) > list.indexOf(item) ? target.nextSibling : target);
+          moved = true;
+        }
+        function up(){
+          document.removeEventListener("pointermove", move); document.removeEventListener("pointerup", up); document.removeEventListener("pointercancel", up);
+          item.classList.remove("is-dragging");
+          if (moved) finish();
+        }
+        document.addEventListener("pointermove", move); document.addEventListener("pointerup", up); document.addEventListener("pointercancel", up);
+      });
+    });
+  }
+  function dragHandle(title){
+    return h("span", {class:"drag-handle-lib", role:"button", tabindex:"0", title:"Glisser pour déplacer « " + title + " » (ou flèches ↑ ↓)", "aria-label":"Déplacer « " + title + " » : glisser, ou flèches haut et bas", text:"⠿"});
+  }
+  function saveOrder(ids){ Store.reorder(ids); }
 
   function newProject(templateId){
     var templates = orderedTemplates();
@@ -391,8 +441,8 @@
         prog = h("div", {class:"lib-card-progress"}, [bar, h("span", {text: v + " %"})]);
       } catch(e){}
     }
-    var c = h("article", {class:"lib-card" + (isTpl ? " is-template" : ""), tabindex:"0", "data-sec": CARD_COLORS[(cardIndex++) % CARD_COLORS.length]}, [
-      h("div", {class:"lib-card-kind"}, [h("span", {text: isTpl ? "Gabarit" : "Projet"}),
+    var c = h("article", {class:"lib-card" + (isTpl ? " is-template" : ""), tabindex:"0", "data-id": m.id, "data-sec": CARD_COLORS[(cardIndex++) % CARD_COLORS.length]}, [
+      h("div", {class:"lib-card-kind"}, [h("span", {text: isTpl ? "Gabarit" : "Projet"}), dragHandle(m.title),
         published ? h("span", {class:"pub-badge", text:"Publié · v" + m.publishedVersion}) : null,
         isTpl && m.builtinKey && /^pub-/.test(m.builtinKey) ? h("span", {class:"pub-badge", text:"Fourni par l'administration"}) : null]),
       h("h3", {text: m.title}),
@@ -433,7 +483,8 @@
       if (!items.length) list.appendChild(h("li", {class:"app-nav-empty", text:emptyText}));
       items.forEach(function(m){
         var isCurrent = m.id === current;
-        var li = h("li", {class:"app-nav-item" + (isCurrent ? " current" : "")});
+        var li = h("li", {class:"app-nav-item" + (isCurrent ? " current" : ""), "data-id": m.id});
+        if (items.length > 1) li.appendChild(dragHandle(m.title));
         li.appendChild(h("button", {class:"app-nav-link", type:"button", "aria-current":isCurrent ? "page" : null, title:m.title, onclick:function(){
           if (isCurrent){ li.classList.toggle("toc-hidden"); return; }
           if (window.matchMedia("(max-width:960px)").matches) document.body.classList.remove("nav-open");
@@ -443,9 +494,10 @@
         list.appendChild(li);
       });
       details.appendChild(list);
+      if (items.length > 1) makeSortable(list, ".app-nav-item", function(ids){ saveOrder(ids); });
       return details;
     }
-    wrap.appendChild(group("projects", "Projets de recherche", Store.list("project"), "Aucun projet pour l'instant."));
+    wrap.appendChild(group("projects", "Projets de recherche", orderedProjects(), "Aucun projet pour l'instant."));
     wrap.appendChild(group("templates", "Gabarits", orderedTemplates(), "Aucun gabarit."));
     return wrap;
   }
@@ -527,6 +579,7 @@
     var grid = h("div", {class:"lib-grid"});
     if (!items.length) grid.appendChild(h("div", {class:"lib-empty", text: emptyText}));
     items.forEach(function(m){ grid.appendChild(card(m)); });
+    if (items.length > 1) makeSortable(grid, ".lib-card", function(ids){ saveOrder(ids); });
     return h("section", {class:"lib-section"}, [
       h("div", {class:"lib-section-head"}, [h("div", {}, [h("h2", {text: title}), h("p", {class:"lib-hint", text: hint})]), headerBtn]),
       grid
@@ -536,7 +589,7 @@
   function renderLibrary(){
     libraryEl.innerHTML = "";
     cardIndex = 0;
-    var projects = Store.list("project");
+    var projects = orderedProjects();
     var templates = orderedTemplates();
     var kb = Math.round(Store.usage() / 1024);
 

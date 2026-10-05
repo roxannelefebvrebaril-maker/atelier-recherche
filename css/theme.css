@@ -700,3 +700,15 @@ body.with-nav{ max-width:none; padding:0; }
 }
 .app-nav-item .sb-project .sb-kind, .app-nav-item .sb-project .sb-title{ display:none; }
 .app-nav-item .sb-project{ padding:8px 10px; margin:0; }
+
+/* Réordonner projets et gabarits : poignée ⠿ */
+.drag-handle-lib{ flex:none; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; color:var(--ink-faint); font-size:15px; line-height:1; cursor:grab; touch-action:none; user-select:none; opacity:.55; }
+.drag-handle-lib:hover, .drag-handle-lib:focus-visible{ opacity:1; background:var(--surface-2); color:var(--ink); outline:none; box-shadow:0 0 0 2px var(--accent-soft); }
+.lib-card .drag-handle-lib{ margin-left:auto; }
+.app-nav-item{ position:relative; display:flex; flex-wrap:wrap; align-items:center; }
+.app-nav-item > .drag-handle-lib{ position:absolute; left:-4px; top:6px; opacity:0; }
+.app-nav-item:hover > .drag-handle-lib, .app-nav-item > .drag-handle-lib:focus-visible{ opacity:.7; }
+.app-nav-item > .app-nav-link{ flex:1; min-width:0; }
+.app-nav-item > .sb-toc{ flex-basis:100%; }
+.is-dragging{ opacity:.55; outline:2px dashed var(--accent); outline-offset:2px; border-radius:12px; }
+@media (hover:none){ .app-nav-item > .drag-handle-lib{ opacity:.6; position:static; } }
