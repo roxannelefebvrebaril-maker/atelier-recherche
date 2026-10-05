@@ -90,8 +90,23 @@
 
   /* ---------------- actions ---------------- */
 
+  // Ordre des gabarits : Projet de recherche (UQTR), puis les gabarits fournis dans l'ordre de
+  // window.SEEDS_GABARITS (baccalauréat, maîtrise, doctorat), puis les gabarits personnels
+  // (du plus récent au plus ancien, comme avant).
+  function orderedTemplates(){
+    var builtin = (window.SEEDS_GABARITS || []).map(function(seed){ return seed.key; });
+    function rank(m){
+      if (!m.builtinKey && m.title === "Projet de recherche (UQTR)") return 0;
+      var i = m.builtinKey ? builtin.indexOf(m.builtinKey) : -1;
+      return i >= 0 ? 1 + i : 1 + builtin.length;
+    }
+    return Store.list("template").map(function(m, i){ return {m:m, i:i}; })
+      .sort(function(a, b){ return (rank(a.m) - rank(b.m)) || (a.i - b.i); })
+      .map(function(x){ return x.m; });
+  }
+
   function newProject(templateId){
-    var templates = Store.list("template");
+    var templates = orderedTemplates();
     modal(function(box, close){
       var title = h("input", {class:"field", type:"text", placeholder:"Ex. : Les pratiques numériques des aîné·es"});
       var select = h("select", {class:"field"});
@@ -399,7 +414,7 @@
     libraryEl.innerHTML = "";
     cardIndex = 0;
     var projects = Store.list("project");
-    var templates = Store.list("template");
+    var templates = orderedTemplates();
     var kb = Math.round(Store.usage() / 1024);
 
     libraryEl.appendChild(h("header", {class:"lib-top"}, [
