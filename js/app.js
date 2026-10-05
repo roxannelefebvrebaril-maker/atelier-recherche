@@ -760,7 +760,11 @@
   function startCloud(){
     libraryEl.innerHTML = "";
     libraryEl.appendChild(h("p", {class:"lib-loading", text:"Synchronisation de tes projets…"}));
-    Cloud.sync().then(function(){ route(); });
+    Cloud.sync().then(function(res){
+      // Seulement après une synchronisation réussie : sinon un 2e appareil créerait un doublon.
+      if (res && res.ok) Store.ensureBuiltinTemplates();
+      route();
+    });
   }
 
   Cloud.hooks.onAuthLost = function(){ Editor.flush(); renderLogin("Ta session a expiré. Reconnecte-toi : tes modifications non envoyées sont gardées sur l'appareil."); };
@@ -810,6 +814,7 @@
     if (res.mode === "cloud") return res.offline ? route() : startCloud();
     localReason = res.reason;
     Store.seedIfEmpty();
+    Store.ensureBuiltinTemplates();
     route();
   });
 })();

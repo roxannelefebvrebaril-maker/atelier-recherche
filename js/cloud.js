@@ -139,7 +139,7 @@ window.Cloud = (function(){
     var sentLv = meta.lv || 0;
     setStatus("syncing");
     var p = api("PUT", "/api/data?id=" + encodeURIComponent(id), {
-      meta: {id:id, kind:meta.kind, title:meta.title, createdAt:meta.createdAt, fromTemplate:meta.fromTemplate || null},
+      meta: Object.assign({id:id, kind:meta.kind, title:meta.title, createdAt:meta.createdAt, fromTemplate:meta.fromTemplate || null}, meta.builtinKey ? {builtinKey:meta.builtinKey} : {}),
       state: state, baseRev: opts.force ? -1 : (meta.rev || 0), snapshot: !!opts.snapshot
     }).then(function(res){
       inflight[id] = null;
@@ -248,7 +248,7 @@ window.Cloud = (function(){
       return jobs.reduce(function(p, job){ return p.then(job); }, Promise.resolve()).then(function(){
         refreshStatus();
         if (changed.length && hooks.onRemoteUpdate) hooks.onRemoteUpdate(changed);
-        return {changed: changed};
+        return {changed: changed, ok: true};
       });
     }).catch(function(e){
       if (e && e.message && e.message !== "sync" && e.message !== "Failed to fetch"){ setStatus("error"); }

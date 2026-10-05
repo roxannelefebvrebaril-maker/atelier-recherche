@@ -57,6 +57,7 @@ window.Store = (function(){
     var m = idx.find(function(x){ return x.id === meta.id; });
     var clean = {id:meta.id, kind:meta.kind === "template" ? "template" : "project", title:meta.title || state.title || "Sans titre",
       createdAt:meta.createdAt, updatedAt:meta.updatedAt, fromTemplate:meta.fromTemplate || null, rev:meta.rev || 0, pending:false, lv:0};
+    if (meta.builtinKey) clean.builtinKey = meta.builtinKey;
     if (m) Object.assign(m, clean); else idx.push(clean);
     writeIndex(idx);
   }
@@ -151,6 +152,30 @@ window.Store = (function(){
     return true;
   }
 
+  // Gabarits fournis avec l'app (window.SEEDS_GABARITS) : ajoutés une seule fois par compte.
+  // Le gabarit est marqué par builtinKey dans ses métadonnées (synchronisées, jamais recopiées par
+  // « Utiliser »). Les clés déjà installées sont retenues : un gabarit supprimé ne revient pas.
+  function builtinSeenKey(){ return PREFIX + "builtin-installed"; }
+  function ensureBuiltinTemplates(){
+    var seeds = window.SEEDS_GABARITS || [], seen = [];
+    try { seen = JSON.parse(localStorage.getItem(builtinSeenKey()) || "[]"); } catch(e){}
+    if (!Array.isArray(seen)) seen = [];
+    var present = {};
+    readIndex().forEach(function(m){ if (m.kind === "template" && m.builtinKey) present[m.builtinKey] = true; });
+    var added = 0;
+    seeds.forEach(function(seed){
+      if (!seed || !seed.key || !seed.state) return;
+      if (present[seed.key]){ if (seen.indexOf(seed.key) < 0) seen.push(seed.key); return; }
+      if (seen.indexOf(seed.key) >= 0) return;
+      var state = clone(seed.state);
+      if (seed.title) state.title = seed.title;
+      create("template", state, {builtinKey: seed.key});
+      seen.push(seed.key); added++;
+    });
+    try { localStorage.setItem(builtinSeenKey(), JSON.stringify(seen)); } catch(e){}
+    return added;
+  }
+
   function usage(){
     var bytes = 0;
     for (var i=0; i<localStorage.length; i++){
@@ -165,7 +190,7 @@ window.Store = (function(){
     onChange: onChange, putFromServer: putFromServer, patchMeta: patchMeta, forget: forget, readIndex: readIndex,
     list: list, meta: meta, load: load, save: save, create: create, rename: rename, remove: remove,
     structureOnly: structureOnly, exportAll: exportAll, exportOne: exportOne, importData: importData,
-    seedIfEmpty: seedIfEmpty, usage: usage, clone: clone
+    seedIfEmpty: seedIfEmpty, ensureBuiltinTemplates: ensureBuiltinTemplates, usage: usage, clone: clone
   };
   return api;
 })();
