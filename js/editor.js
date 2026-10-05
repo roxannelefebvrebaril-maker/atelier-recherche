@@ -1352,6 +1352,7 @@ window.Editor = (function(){
       var referenceLabelId = "fiche-item-label-" + referenceRow.id;
       referenceBox.appendChild(el("div", {class:"fiche-v2-reference-label", id:referenceLabelId, text:"Référence APA 7"}));
       renderFicheV2Text(referenceBox, fiche, referenceRow, referenceLabelId, "Colle ici la référence APA 7 complète…");
+      referenceBox.appendChild(renderFicheDocuments(fiche));
       head.appendChild(referenceBox);
     }
     var menu = iconBtn("more", "Autres actions sur la fiche", null, "fiche-v2-more");
@@ -1424,6 +1425,78 @@ window.Editor = (function(){
     ]);
     card.appendChild(add); content.appendChild(card);
     appendFichePager(content, sec, fiche);
+  }
+
+  function formatFileSize(bytes){
+    if (bytes < 1024) return bytes + " o";
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + " Ko";
+    return (bytes / 1024 / 1024).toFixed(1).replace(".", ",") + " Mo";
+  }
+  // Espace de dépôt : documents (PDF, Word, images…) rattachés à la fiche, sous la référence.
+  function renderFicheDocuments(fiche){
+    if (!Array.isArray(fiche.documents)) fiche.documents = [];
+    var box = el("div", {class:"fiche-docs"});
+    var list = el("ul", {class:"fiche-docs-list", "aria-label":"Documents de la fiche"});
+    var status = el("div", {class:"fiche-docs-status", role:"status", "aria-live":"polite"});
+    var input = el("input", {type:"file", multiple:"multiple", hidden:true, "aria-hidden":"true", tabindex:"-1"});
+    var drop = el("div", {class:"fiche-docs-drop", role:"button", tabindex:"0", "aria-label":"Déposer un document dans la fiche"}, [
+      icon("plus"), el("span", {text:"Dépose un document ici ou clique pour le choisir"}), el("small", {text:"PDF, Word, image… 30 Mo max."})
+    ]);
+    function draw(){
+      list.innerHTML = "";
+      fiche.documents.forEach(function(doc){
+        var item = el("li", {class:"fiche-doc"});
+        item.appendChild(el("button", {class:"fiche-doc-open", type:"button", title:"Ouvrir « " + doc.name + " »", onclick:function(){ openDoc(doc); }}, [
+          el("span", {class:"fiche-doc-icon", "aria-hidden":"true", text:/pdf/i.test(doc.type) || /\.pdf$/i.test(doc.name) ? "PDF" : "📄"}),
+          el("span", {class:"fiche-doc-name", text:doc.name}),
+          el("small", {text:formatFileSize(doc.size || 0)})
+        ]));
+        item.appendChild(el("button", {class:"fiche-doc-remove", type:"button", title:"Retirer ce document", "aria-label":"Retirer le document « " + doc.name + " »", text:"✕", onclick:function(){
+          askConfirm("Retirer le document « " + doc.name + " » de la fiche ? Le fichier sera supprimé.", function(){
+            fiche.documents = fiche.documents.filter(function(d){ return d.id !== doc.id; });
+            scheduleSave(true); draw();
+            Files.remove(doc).catch(function(){});
+          }, "Retirer");
+        }}));
+        list.appendChild(item);
+      });
+      list.hidden = !fiche.documents.length;
+    }
+    function openDoc(doc){
+      var viewable = /^(application\/pdf|image\/|text\/)/.test(doc.type || "");
+      var win = viewable ? window.open("", "_blank") : null;
+      status.textContent = "Ouverture de « " + doc.name + " »…";
+      Files.get(doc).then(function(blob){
+        var url = URL.createObjectURL(blob);
+        status.textContent = "";
+        if (win) win.location.href = url;
+        else { var a = el("a", {href:url, download:doc.name}); document.body.appendChild(a); a.click(); a.remove(); }
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+      }).catch(function(err){ if (win) win.close(); status.textContent = ""; showToast(err.message || "Impossible d'ouvrir le document.", null); });
+    }
+    function upload(files){
+      files = Array.prototype.slice.call(files || []);
+      var i = 0;
+      function next(){
+        if (i >= files.length){ status.textContent = ""; return; }
+        var file = files[i++];
+        status.textContent = "Envoi de « " + file.name + " »…";
+        Files.put(file, function(p){ status.textContent = "Envoi de « " + file.name + " »… " + Math.round(p * 100) + " %"; }).then(function(meta){
+          fiche.documents.push(meta); scheduleSave(true); draw(); next();
+        }).catch(function(err){ showToast(err.message || "L'envoi du document a échoué.", null); next(); });
+      }
+      next();
+    }
+    drop.addEventListener("click", function(){ input.click(); });
+    drop.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); input.click(); } });
+    input.addEventListener("change", function(){ upload(input.files); input.value = ""; });
+    ["dragenter", "dragover"].forEach(function(type){ drop.addEventListener(type, function(e){ e.preventDefault(); drop.classList.add("dragging"); }); });
+    ["dragleave", "drop"].forEach(function(type){ drop.addEventListener(type, function(){ drop.classList.remove("dragging"); }); });
+    drop.addEventListener("drop", function(e){ e.preventDefault(); upload(e.dataTransfer && e.dataTransfer.files); });
+    box.appendChild(el("div", {class:"fiche-v2-reference-label", text:"Documents"}));
+    box.appendChild(list); box.appendChild(drop); box.appendChild(input); box.appendChild(status);
+    draw();
+    return box;
   }
 
   function ficheEntityWrap(eid, cell, editor){
@@ -1676,6 +1749,7 @@ window.Editor = (function(){
 
   function exportFicheMarkdown(fiche){
     var out = ["# " + (fiche.title || "Fiche de lecture"), "", "## Référence APA 7", "", ficheReferenceText(fiche), ""];
+    if ((fiche.documents || []).length) out.push("**Documents** : " + fiche.documents.map(function(doc){ return doc.name; }).join(", "), "");
     (fiche.ficheItems || []).forEach(function(item){
       if (item.type === "row"){
         var row = fiche.rows.find(function(candidate){ return candidate.id === item.id; });

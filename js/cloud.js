@@ -249,6 +249,7 @@ window.Cloud = (function(){
 
   return {
     init: init, login: login, logout: logout, sync: sync, push: push, history: history, version: version,
+    request: api,
     isCloud: function(){ return mode === "cloud"; },
     status: function(){ return status; },
     lastSync: function(){ return lastSync; },
