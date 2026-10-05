@@ -134,3 +134,4 @@ body{ margin:0 auto; }
 .temp-line{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
 .temp-password{ padding:3px 8px; border-radius:6px; background:var(--surface); border:1px solid var(--border); font-size:15px; letter-spacing:.5px; }
 .temp-box small{ color:var(--ink-soft); }
+.invite-message{ width:100%; margin:4px 0 6px; font:inherit; font-size:12.5px; line-height:1.5; resize:vertical; background:var(--surface); }

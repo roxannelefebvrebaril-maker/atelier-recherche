@@ -432,7 +432,7 @@
       ])
     ]));
 
-    libraryEl.appendChild(section("Projets", "Tes recherches en cours.", projects, "Aucun projet pour l'instant — crée-en un à partir d'un gabarit.", null));
+    libraryEl.appendChild(section("Projets", "Tes recherches en cours.", projects, "Aucun projet pour l'instant. Choisis plus bas le gabarit qui convient à tes besoins (baccalauréat, maîtrise, doctorat ou projet de recherche), puis « Utiliser ce gabarit ».", null));
     libraryEl.appendChild(section("Gabarits", "Des structures de départ réutilisables. « Utiliser » crée un nouveau projet ; « Modifier » change le gabarit lui-même.", templates,
       "Aucun gabarit. Ouvre un projet et choisis « En faire un gabarit ».",
       h("button", {class:"btn small", text:"+ Gabarit vide", onclick: function(){
@@ -702,16 +702,29 @@
   }
 
   // Montre un mot de passe provisoire à transmettre soi-même à la personne.
-  function showTempPassword(box, user, temp, intro){
-    var code = h("code", {class:"temp-password", text:temp});
-    var copy = h("button", {class:"btn small", type:"button", text:"Copier", onclick:function(){
-      if (navigator.clipboard) navigator.clipboard.writeText(temp).then(function(){ copy.textContent = "Copié ✓"; }).catch(function(){});
-    }});
+  // Montre le mot de passe provisoire et une invitation prête à envoyer : elle dirige simplement
+  // la personne vers la page d'accueil, où elle se connecte puis choisit son gabarit.
+  function showTempPassword(box, user, temp, intro, isReset){
+    var home = location.origin + "/";
+    var hello = "Bonjour" + (user.name ? " " + user.name : "") + ",";
+    var message = isReset
+      ? [hello, "", "Ton mot de passe de l'Atelier de recherche a été réinitialisé.", "", "Page d'accueil : " + home, "Courriel : " + user.email, "Mot de passe provisoire : " + temp, "", "Connecte-toi, puis choisis ton nouveau mot de passe."].join("\n")
+      : [hello, "", "Tu as maintenant accès à l'Atelier de recherche.", "", "Page d'accueil : " + home, "Courriel : " + user.email, "Mot de passe provisoire : " + temp, "", "À ta première connexion, tu choisiras ton propre mot de passe. Tu pourras ensuite créer ton projet à partir du gabarit qui convient à tes besoins (baccalauréat, maîtrise, doctorat ou projet de recherche)."].join("\n");
+    function copyButton(label, text){
+      var button = h("button", {class:"btn small", type:"button", text:label, onclick:function(){
+        if (navigator.clipboard) navigator.clipboard.writeText(text).then(function(){ button.textContent = "Copié ✓"; }).catch(function(){ area.select(); });
+        else area.select();
+      }});
+      return button;
+    }
+    var area = h("textarea", {class:"field invite-message", readonly:"readonly", rows:"9", "aria-label":"Message d'invitation à envoyer"});
+    area.value = message;
     box.appendChild(h("div", {class:"temp-box", role:"status"}, [
       h("p", {text:intro}),
-      h("p", {class:"temp-line"}, [h("span", {text:"Courriel : " + user.email})]),
-      h("p", {class:"temp-line"}, [h("span", {text:"Mot de passe provisoire : "}), code, copy]),
-      h("small", {text:"Transmets-le toi-même à la personne (il ne sera plus affiché). Elle choisira son propre mot de passe à la première connexion."})
+      h("p", {class:"temp-line"}, [h("span", {text:"Mot de passe provisoire : "}), h("code", {class:"temp-password", text:temp}), copyButton("Copier", temp)]),
+      h("p", {class:"temp-line"}, [h("strong", {text:"Message à envoyer"}), copyButton("Copier l'invitation", message)]),
+      area,
+      h("small", {text:"Envoie ce message toi-même (courriel, Teams…) : le mot de passe provisoire ne sera plus affiché. La personne arrive sur la page d'accueil, se connecte et choisit son gabarit."})
     ]));
   }
 
@@ -739,7 +752,7 @@
           var run = function(){
             usersApi("POST", {action:action, id:user.id}).then(function(d){
               notice.innerHTML = "";
-              if (d.tempPassword) showTempPassword(notice, d.user, d.tempPassword, "Nouveau mot de passe provisoire pour " + (d.user.name || d.user.email) + ".");
+              if (d.tempPassword) showTempPassword(notice, d.user, d.tempPassword, "Nouveau mot de passe provisoire pour " + (d.user.name || d.user.email) + ".", true);
               else toast(action === "disable" ? "Compte désactivé." : "Compte réactivé.");
               load();
             }).catch(function(e){ toast(e.message); });
