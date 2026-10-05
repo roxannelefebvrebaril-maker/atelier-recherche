@@ -940,10 +940,13 @@ window.Editor = (function(){
       el("span", {class:"dot"}), el("span", {text: STATUS_LABELS[saveStatus] || "…"})
     ]);
     bar.appendChild(status);
-    var projectSearch = btn("search", "Rechercher", function(){ openGlobalSearchModal(); }, "small header-search");
-    projectSearch.setAttribute("aria-label", "Rechercher dans tout le projet");
-    projectSearch.title = "Rechercher dans tout le projet";
-    bar.appendChild(projectSearch);
+    if (ctx && ctx.searchBox) bar.appendChild(ctx.searchBox());
+    else {
+      var projectSearch = btn("search", "Rechercher", function(){ openGlobalSearchModal(); }, "small header-search");
+      projectSearch.setAttribute("aria-label", "Rechercher dans tout le projet");
+      projectSearch.title = "Rechercher dans tout le projet";
+      bar.appendChild(projectSearch);
+    }
     bar.appendChild(el("button", {class:"btn small header-links", type:"button", text:"Liens", onclick:function(){ toggleContextPanel(); }}));
     if (dimAnchor) bar.appendChild(el("button", {class:"btn small", type:"button", text:"× Filtre de lien", title:"Retirer le filtre de lien", onclick:function(){ dimAnchor = null; render(); }}));
     bar.appendChild(iconBtn("help", "Aide : comment utiliser l'outil", function(){ openHelp(); }, "hb-help"));
@@ -3754,6 +3757,9 @@ window.Editor = (function(){
       location.hash = "#/p/" + ext.project;
       return;
     }
+    // Section, tableau ou espace libre (résultat de la recherche)
+    if (state.tables.some(function(t){ return t.id === entityId; })) return goToBlock("table", entityId);
+    if (state.diagrams.some(function(d){ return d.id === entityId; })) return goToBlock("diagram", entityId);
     var anchor = anchorById(entityId);
     if (anchor){
       if (ensureSectionFor("table", anchor.table.id)) return setTimeout(function(){ goTo(entityId); }, 30);
@@ -4036,7 +4042,7 @@ window.Editor = (function(){
   return {
     open: open,
     close: close,
-    toggleNav: toggleNav, restoreNav: restoreNav, navIsOpen: navIsOpen,
+    toggleNav: toggleNav, restoreNav: restoreNav, navIsOpen: navIsOpen, goTo: function(id){ if (state) goTo(id); },
     flush: function(){ if (dirty) doSave(); },
     isDirty: function(){ return dirty; },
     currentId: function(){ return ctx ? ctx.id : null; },

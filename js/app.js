@@ -507,7 +507,7 @@
     var kids = Array.prototype.slice.call(libraryEl.childNodes);
     var main = h("div", {class:"lib-main"});
     var burger = h("button", {class:"ibtn hb-menu lib-burger", type:"button", "aria-controls":"app-nav", "aria-expanded":String(Editor.navIsOpen()), "aria-label":"Afficher ou masquer le menu", title:"Afficher ou masquer le menu", onclick:function(){ Editor.toggleNav(); }}, [h("span", {class:"burger-lines", "aria-hidden":"true"})]);
-    main.appendChild(h("div", {class:"lib-navbar"}, [burger, h("span", {class:"lib-navbar-title", text:"Atelier de recherche"})]));
+    main.appendChild(h("div", {class:"lib-navbar"}, [burger, h("span", {class:"lib-navbar-title", text:"Atelier de recherche"}), searchBox()]));
     kids.forEach(function(k){ main.appendChild(k); });
     var side = h("aside", {class:"ed-sidebar lib-sidebar", id:"app-nav", "aria-label":"Menu de navigation"}, [navTree(null)]);
     libraryEl.innerHTML = "";
@@ -516,6 +516,193 @@
     ]));
     document.body.classList.add("with-nav");
   }
+
+  /* ---------------- recherche dans tous les projets ---------------- */
+
+  function norm(text){ return String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+  function plain(html){
+    if (!html) return "";
+    var d = document.createElement("div"); d.innerHTML = String(html).replace(/<br\s*\/?>/gi, " ").replace(/<\/(p|div|li)>/gi, " ");
+    return (d.textContent || "").replace(/\s+/g, " ").trim();
+  }
+
+  // Tout ce qu'on peut retrouver dans un projet ou un gabarit : titres, sections, cases, fiches,
+  // documents déposés, formes et notes des espaces libres, et les repères posés sur les cases.
+  function searchEntries(meta, state){
+    var out = [], isTpl = meta.kind === "template";
+    var base = {project:meta.id, projectTitle:meta.title || state.title || "Sans titre", kindLabel:isTpl ? "Gabarit" : "Projet"};
+    function add(type, title, text, entity, extra){ out.push(Object.assign({type:type, title:title, text:text || "", entity:entity}, base, extra || {})); }
+    var tags = {}; (state.tags || []).forEach(function(t){ tags[t.id] = t.label; });
+    var tables = state.tables || [], byId = {};
+    tables.forEach(function(t){ byId[t.id] = t; });
+    function path(t){ var parts = []; while (t){ parts.unshift(plain(t.title) || "Sans titre"); t = t.parentId ? byId[t.parentId] : null; } return parts.join(" › "); }
+    add(isTpl ? "Gabarit" : "Projet", base.projectTitle, plain(state.sub), null);
+    tables.forEach(function(t){
+      var where = path(t);
+      if (t.kind === "fiche") add("Fiche de lecture", plain(t.title) || "Fiche de lecture", "", t.id, {where:where});
+      else add(t.parentId ? "Tableau" : "Section", plain(t.title) || "Sans titre", "", t.id, {where:where});
+      (t.documents || []).forEach(function(doc){ add("Document", doc.name, "", "f:" + t.id, {where:where}); });
+      var cols = t.columns || [];
+      (t.rows || []).forEach(function(row){
+        cols.forEach(function(col, ci){
+          var cell = row.cells && row.cells[col.id];
+          var text = plain(cell && cell.text);
+          var tagLabels = ((cell && cell.tags) || []).map(function(id){ return tags[id]; }).filter(Boolean);
+          if (!text && !tagLabels.length) return;
+          var label = t.kind === "fiche" && ci === 1 && row.cells[cols[0].id] ? plain(row.cells[cols[0].id].text) : plain(col.label);
+          add(row.kind === "header" ? "Sous-titre" : "Texte", where + (label && !row.kind ? " › " + label : ""), text, "t:" + t.id + ":" + row.id + ":" + col.id, {tags:tagLabels});
+        });
+      });
+    });
+    (state.diagrams || []).forEach(function(d){
+      var where = plain(d.title) || "Espace libre";
+      add("Espace libre", where, "", d.id);
+      (d.nodes || []).concat(d.notes || []).forEach(function(item){
+        var text = plain(item.text);
+        if (text) add("Note", where, text, item.id, {tags:((item.tags) || []).map(function(id){ return tags[id]; }).filter(Boolean)});
+      });
+    });
+    return out;
+  }
+
+  function buildSearchIndex(){
+    var current = Editor.currentId(), entries = [];
+    Store.list().forEach(function(meta){
+      var state = meta.id === current && Editor.getState() ? Editor.getState() : Store.load(meta.id);
+      if (state) entries = entries.concat(searchEntries(meta, state));
+    });
+    // Une case se trouve par son contenu et ses repères (pas par le nom de son tableau, affiché à part).
+    entries.forEach(function(e){
+      var content = e.text ? e.text : e.title;
+      e.hayTitle = e.text ? "" : norm(e.title);
+      e.hay = norm(content + " " + (e.tags || []).join(" "));
+    });
+    return entries;
+  }
+
+  function searchIndex(index, query){
+    var words = norm(query).split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
+    var current = Editor.currentId();
+    var typeWeight = {"Projet":40, "Gabarit":30, "Section":25, "Fiche de lecture":25, "Espace libre":15, "Tableau":15, "Document":15, "Sous-titre":10, "Texte":0, "Note":0};
+    return index.filter(function(e){ return words.every(function(w){ return e.hay.indexOf(w) >= 0; }); })
+      .map(function(e){
+        var score = (typeWeight[e.type] || 0) + (e.project === current ? 20 : 0);
+        words.forEach(function(w){
+          if (e.hayTitle.indexOf(w) >= 0) score += 12;
+          if ((" " + e.hay).indexOf(" " + w) >= 0) score += 4;   // début de mot
+        });
+        if (e.kindLabel === "Gabarit") score -= 8;
+        return {e:e, score:score};
+      })
+      .sort(function(a, b){ return b.score - a.score; })
+      .map(function(x){ return x.e; });
+  }
+
+  // Extrait autour du premier mot trouvé, mots en surbrillance (nœuds texte : pas de HTML injecté).
+  function snippetNode(text, words, max){
+    var n = norm(text), first = -1;
+    words.forEach(function(w){ var i = n.indexOf(w); if (i >= 0 && (first < 0 || i < first)) first = i; });
+    var start = Math.max(0, (first < 0 ? 0 : first) - 40), end = Math.min(text.length, start + (max || 150));
+    var piece = text.slice(start, end), np = n.slice(start, end);
+    var marks = [];
+    words.forEach(function(w){ var i = np.indexOf(w); while (i >= 0){ marks.push([i, i + w.length]); i = np.indexOf(w, i + w.length); } });
+    marks.sort(function(a, b){ return a[0] - b[0]; });
+    var span = h("span", {class:"gsearch-snippet"}), pos = 0;
+    if (start > 0) span.appendChild(document.createTextNode("…"));
+    marks.forEach(function(m){
+      if (m[0] < pos) return;
+      span.appendChild(document.createTextNode(piece.slice(pos, m[0])));
+      span.appendChild(h("mark", {text:piece.slice(m[0], m[1])}));
+      pos = m[1];
+    });
+    span.appendChild(document.createTextNode(piece.slice(pos) + (end < text.length ? "…" : "")));
+    return span;
+  }
+
+  function openSearchResult(e){
+    if (Editor.currentId() === e.project){ if (e.entity) Editor.goTo(e.entity); return; }
+    if (e.entity){ try { sessionStorage.setItem("atelier-recherche:goto", JSON.stringify({project:e.project, entity:e.entity})); } catch(err){} }
+    go("#/p/" + e.project);
+  }
+
+  // Barre de recherche avec suggestions (accueil et en-tête des projets).
+  var searchCount = 0;
+  function searchBox(){
+    var id = "gsearch-list-" + (++searchCount), index = null, results = [], active = -1;
+    var input = h("input", {class:"gsearch-input", type:"search", role:"combobox", autocomplete:"off", "aria-autocomplete":"list", "aria-expanded":"false", "aria-controls":id,
+      placeholder:"Rechercher dans tous mes projets…", "aria-label":"Rechercher dans tous mes projets et gabarits"});
+    var panel = h("div", {class:"gsearch-panel", id:id, role:"listbox", "aria-label":"Suggestions"});
+    panel.hidden = true;
+    var wrap = h("div", {class:"gsearch", role:"search"}, [h("span", {class:"gsearch-icon", "aria-hidden":"true"}), input, panel]);
+    function close(){ panel.hidden = true; input.setAttribute("aria-expanded", "false"); active = -1; }
+    function setActive(i){
+      var opts = panel.querySelectorAll(".gsearch-option");
+      if (!opts.length) return;
+      active = (i + opts.length) % opts.length;
+      Array.prototype.forEach.call(opts, function(o, k){ o.setAttribute("aria-selected", String(k === active)); });
+      opts[active].scrollIntoView({block:"nearest"});
+      input.setAttribute("aria-activedescendant", opts[active].id);
+    }
+    function draw(){
+      var q = input.value.trim();
+      panel.innerHTML = ""; active = -1; input.removeAttribute("aria-activedescendant");
+      if (!q){ close(); return; }
+      if (!index) index = buildSearchIndex();
+      results = searchIndex(index, q);
+      var words = norm(q).split(/\s+/).filter(Boolean);
+      if (!results.length){
+        panel.appendChild(h("p", {class:"gsearch-empty", text:"Aucun résultat pour « " + q + " »."}));
+      } else {
+        var shown = results.slice(0, 40), groups = [], byProject = {};
+        shown.forEach(function(e){ if (!byProject[e.project]){ byProject[e.project] = []; groups.push(e.project); } byProject[e.project].push(e); });
+        groups.forEach(function(pid){
+          var first = byProject[pid][0];
+          panel.appendChild(h("div", {class:"gsearch-group", role:"presentation"}, [h("span", {class:"gsearch-kind", text:first.kindLabel}), h("span", {text:first.projectTitle})]));
+          byProject[pid].forEach(function(e){
+            var opt = h("button", {class:"gsearch-option", type:"button", role:"option", id:id + "-" + results.indexOf(e), "aria-selected":"false"}, [
+              h("span", {class:"gsearch-type", text:e.type}),
+              h("span", {class:"gsearch-main"}, [
+                snippetNode(e.text ? e.text : e.title, words, e.text ? 150 : 90),
+                h("small", {text:(e.text ? e.title : (e.where || "")) + ((e.tags || []).length ? "  ·  Repères : " + e.tags.join(", ") : "")})
+              ])
+            ]);
+            opt.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+            opt.addEventListener("click", function(){ close(); input.blur(); openSearchResult(e); });
+            panel.appendChild(opt);
+          });
+        });
+        panel.appendChild(h("p", {class:"gsearch-count", text: results.length > shown.length ? shown.length + " premiers résultats sur " + results.length + " : précise ta recherche." : results.length + " résultat" + (results.length > 1 ? "s" : "") + "."}));
+      }
+      panel.hidden = false; input.setAttribute("aria-expanded", "true");
+      // Téléphone : la liste occupe la largeur de l'écran, juste sous la barre.
+      if (window.matchMedia("(max-width:640px)").matches){
+        var rect = wrap.getBoundingClientRect();
+        panel.style.top = Math.round(rect.bottom + 6) + "px";
+        panel.style.maxHeight = Math.max(200, window.innerHeight - rect.bottom - 18) + "px";
+      } else { panel.style.top = ""; panel.style.maxHeight = ""; }
+    }
+    var timer = null;
+    input.addEventListener("focus", function(){ index = null; if (input.value.trim()) draw(); });
+    input.addEventListener("input", function(){ clearTimeout(timer); timer = setTimeout(draw, 80); });
+    input.addEventListener("keydown", function(e){
+      if (e.key === "ArrowDown"){ e.preventDefault(); if (panel.hidden) draw(); setActive(active + 1); }
+      else if (e.key === "ArrowUp"){ e.preventDefault(); setActive(active - 1); }
+      else if (e.key === "Enter"){ var opts = panel.querySelectorAll(".gsearch-option"); var pick = opts[active >= 0 ? active : 0]; if (pick){ e.preventDefault(); pick.click(); } }
+      else if (e.key === "Escape"){ if (!panel.hidden){ e.stopPropagation(); close(); } else input.blur(); }
+    });
+    input.addEventListener("blur", function(){ setTimeout(close, 150); });
+    return wrap;
+  }
+
+  // Touche « / » : aller à la barre de recherche (hors zone d'écriture).
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    var field = Array.prototype.find.call(document.querySelectorAll(".gsearch-input"), function(f){ return f.offsetParent !== null; });
+    if (field){ e.preventDefault(); field.focus(); }
+  });
 
   /* ---------------- publication des gabarits (administration) ---------------- */
 
@@ -645,6 +832,7 @@
       onBack: function(){ go("#/"); },
       onAccount: Cloud.isCloud() ? openAccount : null,
       navTree: navTree,
+      searchBox: searchBox,
       onExport: function(kind){
         if (kind === "json") exportJSON(id);
         else if (kind === "md") exportMarkdown(id);
