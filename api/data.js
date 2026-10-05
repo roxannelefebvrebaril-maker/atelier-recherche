@@ -6,16 +6,19 @@
 //   DELETE /api/data?id=X                -> { ok }   (copie gardée 30 jours dans la corbeille)
 //   GET    /api/data?id=X&history=1      -> { versions: [{i, t, title}] }
 //   GET    /api/data?id=X&version=N      -> { state, t }
-const { PREFIX, configured, missingConfig, redis, pipeline, authorized, send, readBody } = require("./_lib/common");
+// Chaque compte a son propre espace de clés (voir nsFor) : personne ne voit les projets des autres.
+const { configured, missingConfig, redis, pipeline, requireUser, nsFor, send, readBody } = require("./_lib/common");
 
-const K = {
-  index: PREFIX + "index",
-  doc: id => PREFIX + "doc:" + id,
-  rev: id => PREFIX + "rev:" + id,
-  hist: id => PREFIX + "hist:" + id,
-  histTs: id => PREFIX + "histts:" + id,
-  trash: id => PREFIX + "trash:" + id
-};
+function keys(ns){
+  return {
+    index: ns + "index",
+    doc: id => ns + "doc:" + id,
+    rev: id => ns + "rev:" + id,
+    hist: id => ns + "hist:" + id,
+    histTs: id => ns + "histts:" + id,
+    trash: id => ns + "trash:" + id
+  };
+}
 
 const HISTORY_EVERY = 10 * 60;   // au plus une version archivée toutes les 10 minutes…
 const HISTORY_KEEP = 60;         // …et on garde les 60 dernières.
@@ -47,12 +50,14 @@ function validId(id){ return typeof id === "string" && /^[\w-]{1,64}$/.test(id);
 
 module.exports = async function handler(req, res){
   if (!configured()) return send(res, 503, { error: "not_configured", missing: missingConfig() });
-  if (!authorized(req)) return send(res, 401, { error: "unauthorized" });
-
   const q = req.query || Object.fromEntries(new URL(req.url, "http://x").searchParams);
   const id = q.id;
 
   try {
+    const user = await requireUser(req, res);
+    if (!user) return;
+    const K = keys(nsFor(user));
+
     if (req.method === "GET" && !id){
       const flat = await redis(["HGETALL", K.index]) || [];
       const items = [];

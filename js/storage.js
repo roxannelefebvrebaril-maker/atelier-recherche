@@ -2,9 +2,18 @@
 // Index : liste des métadonnées ; chaque document est stocké sous sa propre clé.
 window.Store = (function(){
   "use strict";
-  var PREFIX = "atelier-recherche:v1:";
+  var BASE = "atelier-recherche:v1:";
+  var PREFIX = BASE;
   var INDEX_KEY = PREFIX + "index";
   var DOC_KEY = function(id){ return PREFIX + "doc:" + id; };
+
+  // Copie locale séparée par compte : deux personnes sur le même ordinateur ne voient pas
+  // les projets l'une de l'autre. Le compte d'origine (legacy) garde les clés existantes.
+  function useAccount(user){
+    PREFIX = user && !user.legacy ? BASE + "u:" + user.id + ":" : BASE;
+    INDEX_KEY = PREFIX + "index";
+    api.PREFIX = PREFIX;
+  }
 
   var listeners = [];
   function emit(type, id, extra){ listeners.forEach(function(fn){ try { fn(type, id, extra); } catch(e){ console.error(e); } }); }
@@ -133,11 +142,12 @@ window.Store = (function(){
     return created;
   }
 
-  function seedIfEmpty(){
+  // opts.example === false : nouveau compte, on ne met que le gabarit de départ.
+  function seedIfEmpty(opts){
     if (localStorage.getItem(INDEX_KEY) !== null) return false;
     var seeds = window.SEEDS || {};
     var tpl = seeds.template ? create("template", Object.assign(clone(seeds.template), {title:"Projet de recherche (UQTR)"})) : null;
-    if (seeds.example) create("project", seeds.example, {fromTemplate: tpl ? tpl.title : null});
+    if (seeds.example && !(opts && opts.example === false)) create("project", seeds.example, {fromTemplate: tpl ? tpl.title : null});
     return true;
   }
 
@@ -150,11 +160,12 @@ window.Store = (function(){
     return bytes;
   }
 
-  return {
-    PREFIX: PREFIX, DOC_KEY: DOC_KEY,
+  var api = {
+    PREFIX: PREFIX, DOC_KEY: DOC_KEY, useAccount: useAccount,
     onChange: onChange, putFromServer: putFromServer, patchMeta: patchMeta, forget: forget, readIndex: readIndex,
     list: list, meta: meta, load: load, save: save, create: create, rename: rename, remove: remove,
     structureOnly: structureOnly, exportAll: exportAll, exportOne: exportOne, importData: importData,
     seedIfEmpty: seedIfEmpty, usage: usage, clone: clone
   };
+  return api;
 })();

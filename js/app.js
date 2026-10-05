@@ -410,6 +410,7 @@
       ]),
       h("div", {class:"lib-toolbar"}, [
         Cloud.isCloud() ? syncBadge() : null,
+        Cloud.isCloud() && Cloud.user() ? h("button", {class:"btn lib-account", type:"button", text:"Mon compte · " + (Cloud.user().name || Cloud.user().email), onclick:openAccount}) : null,
         h("button", {class:"btn primary", text:"+ Nouveau projet", onclick: function(){ newProject(); }}),
         h("button", {class:"btn", text:"Importer (.json)", onclick: importFile}),
         h("button", {class:"btn", text:"Tout sauvegarder (.json)", onclick: exportAll})
@@ -432,10 +433,8 @@
           ? "Sauvegarde en ligne pas encore configurée dans Vercel : pour l'instant, les données restent sur cet appareil (" + kb + " Ko)."
           : "Mode local : les données restent dans ce navigateur (" + kb + " Ko). Exporte une sauvegarde régulièrement."});
     var footRight = Cloud.isCloud()
-      ? h("button", {class:"btn small ghost", text:"Se déconnecter de cet appareil", onclick:function(){
-          confirmBox("Se déconnecter ? Il faudra entrer le mot de passe à nouveau sur cet appareil. Tes projets restent en ligne.", "Se déconnecter", function(){
-            Cloud.sync().then(function(){ Cloud.logout(); renderLogin(); });
-          });
+      ? h("button", {class:"btn small ghost", text:"Se déconnecter", onclick:function(){
+          confirmBox("Se déconnecter ? Il faudra entrer ton courriel et ton mot de passe à nouveau sur cet appareil. Tes projets restent en ligne.", "Se déconnecter", signOut);
         }})
       : h("span", {text:"Atelier de recherche"});
     libraryEl.appendChild(h("footer", {class:"foot"}, [footLeft, footRight]));
@@ -452,6 +451,7 @@
       initialStatus: Cloud.isCloud() ? (meta.pending ? (Cloud.status() === "offline" ? "offline" : "syncing") : "synced") : "saved",
       save: function(s){ Store.save(id, s); document.title = (s.title || "Sans titre") + " · Atelier de recherche"; },
       onBack: function(){ go("#/"); },
+      onAccount: Cloud.isCloud() ? openAccount : null,
       onExport: function(kind){
         if (kind === "json") exportJSON(id);
         else if (kind === "md") exportMarkdown(id);
@@ -536,31 +536,225 @@
     });
   }
 
-  /* ---------------- connexion ---------------- */
+  /* ---------------- page d'accueil et connexion ---------------- */
 
-  function renderLogin(message){
+  // Page d'accueil : présentation de l'app et formulaire (connexion, premier compte, nouveau mot de passe).
+  function authPage(opts){
     Editor.close();
     libraryEl.hidden = false;
     libraryEl.innerHTML = "";
-    var input = h("input", {class:"field", type:"password", autocomplete:"current-password", placeholder:"Mot de passe"});
-    var err = h("p", {class:"login-error", text: message || ""});
-    var btn = h("button", {class:"btn primary", text:"Se connecter"});
-    function submit(e){
-      if (e) e.preventDefault();
-      if (!input.value) { input.focus(); return; }
-      btn.disabled = true; err.textContent = "";
-      Cloud.login(input.value).then(function(){ startCloud(); })
-        .catch(function(e){ btn.disabled = false; err.textContent = e.message; input.select(); });
-    }
+    var err = h("p", {class:"login-error", role:"alert", text: opts.message || ""});
+    var btn = h("button", {class:"btn primary", type:"submit", text: opts.submit});
+    var inputs = {};
+    var fields = opts.fields.map(function(f){
+      var input = h("input", {class:"field", type:f.type || "text", autocomplete:f.autocomplete || "off", required:"required"});
+      inputs[f.name] = input;
+      return h("label", {class:"login-field"}, [h("span", {text:f.label}), input]);
+    });
     var form = h("form", {class:"login-card"}, [
-      h("div", {class:"eyebrow", text:"Atelier de recherche"}),
-      h("h1", {text:"Connexion"}),
-      h("p", {class:"sub", text:"Entre le mot de passe de l'application pour retrouver tes projets, quel que soit l'appareil."}),
-      input, err, btn
-    ]);
-    form.addEventListener("submit", submit);
-    libraryEl.appendChild(form);
-    setTimeout(function(){ input.focus(); }, 0);
+      h("h2", {text: opts.title}),
+      opts.intro ? h("p", {class:"sub", text: opts.intro}) : null
+    ].concat(fields).concat([err, btn, opts.footer || null]));
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      var values = {};
+      Object.keys(inputs).forEach(function(k){ values[k] = inputs[k].value; });
+      var problem = opts.check ? opts.check(values) : null;
+      if (problem){ err.textContent = problem; return; }
+      btn.disabled = true; err.textContent = "";
+      opts.onSubmit(values).catch(function(e){ btn.disabled = false; err.textContent = e.message; });
+    });
+    libraryEl.appendChild(h("div", {class:"welcome"}, [
+      h("section", {class:"welcome-intro"}, [
+        h("div", {class:"eyebrow", text:"Atelier de recherche"}),
+        h("h1", {text:"Ta recherche, reliée d'un bout à l'autre."}),
+        h("p", {text:"Cartographie tes projets de recherche, rédige tes fiches de lecture, garde tes documents et relie tes idées d'un projet à l'autre. Tout est enregistré en ligne et disponible sur tous tes appareils."})
+      ]),
+      form
+    ]));
+    setTimeout(function(){ var first = form.querySelector("input"); if (first) first.focus(); }, 0);
+  }
+
+  function samePasswords(v){
+    if ((v.next || "").length < 8) return "Le mot de passe doit contenir au moins 8 caractères.";
+    if (v.next !== v.confirm) return "Les deux mots de passe ne sont pas identiques.";
+    return null;
+  }
+
+  function renderLogin(message){
+    authPage({
+      title:"Connexion", intro:"Entre ton courriel et ton mot de passe pour retrouver tes projets.", message: message,
+      fields:[{name:"email", label:"Courriel", type:"email", autocomplete:"username"}, {name:"password", label:"Mot de passe", type:"password", autocomplete:"current-password"}],
+      submit:"Se connecter",
+      footer: h("p", {class:"login-help", text:"Mot de passe oublié ? Demande une réinitialisation à la personne qui gère les comptes. Les comptes se créent sur invitation."}),
+      onSubmit:function(v){ return Cloud.login(v.email, v.password).then(afterLogin); }
+    });
+  }
+
+  function renderSetup(possible){
+    if (!possible){
+      authPage({title:"Configuration à terminer", intro:"Aucun compte n'existe encore, et l'ancien mot de passe de l'application (APP_PASSWORD) est absent de Vercel. Ajoute-le dans Vercel, puis recharge cette page pour créer le compte administrateur.", fields:[], submit:"Recharger", onSubmit:function(){ location.reload(); return Promise.resolve(); }});
+      return;
+    }
+    authPage({
+      title:"Créer ton compte", intro:"Première connexion depuis l'arrivée des comptes. Confirme avec le mot de passe actuel de l'application, puis choisis ton courriel et ton nouveau mot de passe. Ce compte (administrateur) garde tous tes projets, fiches et documents.",
+      fields:[
+        {name:"password", label:"Mot de passe actuel de l'application", type:"password", autocomplete:"current-password"},
+        {name:"name", label:"Ton nom", autocomplete:"name"},
+        {name:"email", label:"Ton courriel", type:"email", autocomplete:"username"},
+        {name:"next", label:"Nouveau mot de passe (8 caractères ou plus)", type:"password", autocomplete:"new-password"},
+        {name:"confirm", label:"Confirme le nouveau mot de passe", type:"password", autocomplete:"new-password"}
+      ],
+      submit:"Créer mon compte", check:samePasswords,
+      onSubmit:function(v){ return Cloud.setup({password:v.password, name:v.name, email:v.email, newPassword:v.next}).then(afterLogin); }
+    });
+  }
+
+  // Mot de passe provisoire (invitation ou réinitialisation) : à remplacer avant d'accéder aux projets.
+  function renderForcePassword(){
+    var user = Cloud.user() || {};
+    authPage({
+      title:"Choisis ton mot de passe", intro:"Bienvenue" + (user.name ? ", " + user.name : "") + " ! Remplace le mot de passe provisoire reçu par un mot de passe à toi.",
+      fields:[
+        {name:"current", label:"Mot de passe provisoire", type:"password", autocomplete:"current-password"},
+        {name:"next", label:"Nouveau mot de passe (8 caractères ou plus)", type:"password", autocomplete:"new-password"},
+        {name:"confirm", label:"Confirme le nouveau mot de passe", type:"password", autocomplete:"new-password"}
+      ],
+      submit:"Enregistrer et continuer", check:samePasswords,
+      onSubmit:function(v){ return Cloud.changePassword(v.current, v.next).then(function(){ startCloud(); }); }
+    });
+  }
+
+  function afterLogin(user){
+    if (user && user.mustChange) renderForcePassword(); else startCloud();
+  }
+
+  /* ---------------- mon compte ---------------- */
+
+  function openAccount(){
+    var user = Cloud.user();
+    if (!user) return;
+    modal(function(box, close){
+      box.classList.add("account-modal");
+      box.appendChild(h("h3", {text:"Mon compte"}));
+      box.appendChild(h("p", {class:"account-who"}, [h("strong", {text:user.name || user.email}), user.name ? h("span", {text:user.email}) : null, user.role === "admin" ? h("span", {class:"account-role", text:"Administration"}) : null]));
+      var actions = h("div", {class:"account-actions"}, [
+        h("button", {class:"btn", type:"button", text:"Changer mon mot de passe", onclick:function(){ close(); openPasswordChange(); }}),
+        user.role === "admin" ? h("button", {class:"btn", type:"button", text:"Gérer les comptes", onclick:function(){ close(); openUsers(); }}) : null,
+        h("button", {class:"btn ghost", type:"button", text:"Se déconnecter", onclick:function(){ close(); signOut(); }})
+      ]);
+      box.appendChild(actions);
+      box.appendChild(h("div", {class:"row"}, [h("button", {class:"btn primary", type:"button", text:"Fermer", onclick:close})]));
+    });
+  }
+
+  function signOut(){
+    Editor.flush();
+    Cloud.sync().catch(function(){}).then(function(){ return Cloud.logout(); }).then(function(){
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+      renderLogin();
+    });
+  }
+
+  function openPasswordChange(){
+    modal(function(box, close){
+      var fields = {}, err = h("p", {class:"login-error", role:"alert"});
+      box.appendChild(h("h3", {text:"Changer mon mot de passe"}));
+      [["current","Mot de passe actuel","current-password"],["next","Nouveau mot de passe (8 caractères ou plus)","new-password"],["confirm","Confirme le nouveau mot de passe","new-password"]].forEach(function(f){
+        fields[f[0]] = h("input", {class:"field", type:"password", autocomplete:f[2]});
+        box.appendChild(h("label", {class:"login-field"}, [h("span", {text:f[1]}), fields[f[0]]]));
+      });
+      box.appendChild(err);
+      var save = h("button", {class:"btn primary", type:"button", text:"Enregistrer", onclick:function(){
+        var v = {current:fields.current.value, next:fields.next.value, confirm:fields.confirm.value};
+        var problem = samePasswords(v);
+        if (problem){ err.textContent = problem; return; }
+        save.disabled = true;
+        Cloud.changePassword(v.current, v.next).then(function(){ close(); toast("Mot de passe changé. Tes autres appareils devront se reconnecter."); })
+          .catch(function(e){ save.disabled = false; err.textContent = e.message; });
+      }});
+      box.appendChild(h("div", {class:"row"}, [h("button", {class:"btn ghost", type:"button", text:"Annuler", onclick:close}), save]));
+    });
+  }
+
+  /* ---------------- gestion des comptes (administration) ---------------- */
+
+  function usersApi(method, body){
+    return Cloud.request(method, "/api/users", body).then(function(res){
+      if (!res.ok) throw new Error(res.data.error || "Action impossible.");
+      return res.data;
+    });
+  }
+
+  // Montre un mot de passe provisoire à transmettre soi-même à la personne.
+  function showTempPassword(box, user, temp, intro){
+    var code = h("code", {class:"temp-password", text:temp});
+    var copy = h("button", {class:"btn small", type:"button", text:"Copier", onclick:function(){
+      if (navigator.clipboard) navigator.clipboard.writeText(temp).then(function(){ copy.textContent = "Copié ✓"; }).catch(function(){});
+    }});
+    box.appendChild(h("div", {class:"temp-box", role:"status"}, [
+      h("p", {text:intro}),
+      h("p", {class:"temp-line"}, [h("span", {text:"Courriel : " + user.email})]),
+      h("p", {class:"temp-line"}, [h("span", {text:"Mot de passe provisoire : "}), code, copy]),
+      h("small", {text:"Transmets-le toi-même à la personne (il ne sera plus affiché). Elle choisira son propre mot de passe à la première connexion."})
+    ]));
+  }
+
+  function openUsers(){
+    modal(function(box, close){
+      box.classList.add("users-modal");
+      box.appendChild(h("h3", {text:"Gérer les comptes"}));
+      box.appendChild(h("p", {class:"sub", text:"Les comptes se créent sur invitation. Chaque personne ne voit que ses propres projets, fiches et documents."}));
+      var notice = h("div", {class:"users-notice"});
+      var list = h("div", {class:"users-list", "aria-live":"polite"}, [h("p", {class:"lib-hint", text:"Chargement…"})]);
+      var name = h("input", {class:"field", type:"text", placeholder:"Nom", "aria-label":"Nom de la personne"});
+      var email = h("input", {class:"field", type:"email", placeholder:"Courriel", "aria-label":"Courriel de la personne"});
+      var err = h("p", {class:"login-error", role:"alert"});
+      var create = h("button", {class:"btn primary", type:"button", text:"Créer le compte", onclick:function(){
+        if (!email.value.trim()){ err.textContent = "Indique le courriel de la personne."; email.focus(); return; }
+        create.disabled = true; err.textContent = "";
+        usersApi("POST", {action:"create", name:name.value, email:email.value}).then(function(d){
+          create.disabled = false; name.value = ""; email.value = "";
+          notice.innerHTML = ""; showTempPassword(notice, d.user, d.tempPassword, "Compte créé pour " + (d.user.name || d.user.email) + ".");
+          load();
+        }).catch(function(e){ create.disabled = false; err.textContent = e.message; });
+      }});
+      function act(user, action, label){
+        return h("button", {class:"btn small" + (action === "disable" ? " ghost" : ""), type:"button", text:label, onclick:function(){
+          var run = function(){
+            usersApi("POST", {action:action, id:user.id}).then(function(d){
+              notice.innerHTML = "";
+              if (d.tempPassword) showTempPassword(notice, d.user, d.tempPassword, "Nouveau mot de passe provisoire pour " + (d.user.name || d.user.email) + ".");
+              else toast(action === "disable" ? "Compte désactivé." : "Compte réactivé.");
+              load();
+            }).catch(function(e){ toast(e.message); });
+          };
+          if (action === "disable") confirmBox("Désactiver le compte de " + (user.name || user.email) + " ? La personne ne pourra plus se connecter ; ses données sont gardées.", "Désactiver", run, true);
+          else if (action === "reset") confirmBox("Créer un nouveau mot de passe provisoire pour " + (user.name || user.email) + " ? L'ancien ne fonctionnera plus.", "Réinitialiser", run);
+          else run();
+        }});
+      }
+      function load(){
+        usersApi("GET").then(function(d){
+          list.innerHTML = "";
+          var me = Cloud.user() || {};
+          d.users.forEach(function(u){
+            var state = u.disabled ? "Désactivé" : (u.mustChange ? "En attente de première connexion" : (u.lastLoginAt ? "Dernière connexion : " + fmtDate(u.lastLoginAt) : "Actif"));
+            list.appendChild(h("div", {class:"user-row" + (u.disabled ? " disabled" : "")}, [
+              h("div", {class:"user-main"}, [h("strong", {text:(u.name || u.email) + (u.id === me.id ? " (toi)" : "")}), h("span", {text:u.email}), h("small", {text:(u.role === "admin" ? "Administration · " : "") + state})]),
+              u.id === me.id ? null : h("div", {class:"user-actions"}, [act(u, "reset", "Nouveau mot de passe"), u.disabled ? act(u, "enable", "Réactiver") : act(u, "disable", "Désactiver")])
+            ]));
+          });
+        }).catch(function(e){ list.innerHTML = ""; list.appendChild(h("p", {class:"login-error", text:e.message})); });
+      }
+      box.appendChild(list);
+      box.appendChild(h("h4", {text:"Inviter une personne"}));
+      box.appendChild(h("div", {class:"users-create"}, [name, email, create]));
+      box.appendChild(err);
+      box.appendChild(notice);
+      box.appendChild(h("div", {class:"row"}, [h("button", {class:"btn ghost", type:"button", text:"Fermer", onclick:close})]));
+      load();
+    });
   }
 
   function startCloud(){
@@ -569,7 +763,7 @@
     Cloud.sync().then(function(){ route(); });
   }
 
-  Cloud.hooks.onAuthLost = function(){ Editor.flush(); renderLogin("Ta session a expiré (le mot de passe a peut-être changé). Reconnecte-toi : tes modifications non envoyées sont gardées sur l'appareil."); };
+  Cloud.hooks.onAuthLost = function(){ Editor.flush(); renderLogin("Ta session a expiré. Reconnecte-toi : tes modifications non envoyées sont gardées sur l'appareil."); };
   Cloud.hooks.onRemoteUpdate = function(ids){
     var open = Editor.currentId();
     if (open && ids.indexOf(open) >= 0){ if (reloadOpen(false)) toast("Mis à jour depuis un autre appareil."); }
@@ -610,7 +804,9 @@
 
   var isLocalStatic = location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "::1";
   (isLocalStatic ? Promise.resolve({mode:"local", reason:"local"}) : Cloud.init()).then(function(res){
+    if (res.mode === "setup") return renderSetup(res.possible);
     if (res.mode === "login") return renderLogin();
+    if (res.mode === "password") return renderForcePassword();
     if (res.mode === "cloud") return res.offline ? route() : startCloud();
     localReason = res.reason;
     Store.seedIfEmpty();

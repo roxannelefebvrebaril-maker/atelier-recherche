@@ -6,23 +6,24 @@
 //   GET    /api/files?id=F                                       -> { meta }
 //   GET    /api/files?id=F&i=N                                   -> { data }
 //   DELETE /api/files?id=F                                       -> { ok }
-const { PREFIX, configured, missingConfig, redis, pipeline, authorized, send, readBody } = require("./_lib/common");
+const { configured, missingConfig, redis, pipeline, requireUser, nsFor, send, readBody } = require("./_lib/common");
 
 const MAX_CHUNKS = 40;              // environ 30 Mo par document
 const MAX_CHUNK_LENGTH = 1500000;   // base64
 
-const K = {
-  meta: id => PREFIX + "file:" + id + ":meta",
-  chunk: (id, i) => PREFIX + "file:" + id + ":" + i
-};
+// Rangés dans l'espace du compte : chacun ne voit que ses propres documents.
+function keys(ns){
+  return {
+    meta: id => ns + "file:" + id + ":meta",
+    chunk: (id, i) => ns + "file:" + id + ":" + i
+  };
+}
 
 function validId(id){ return typeof id === "string" && /^[\w-]{1,64}$/.test(id); }
 function validIndex(i){ return Number.isInteger(i) && i >= 0 && i < MAX_CHUNKS; }
 
 module.exports = async function handler(req, res){
   if (!configured()) return send(res, 503, { error: "not_configured", missing: missingConfig() });
-  if (!authorized(req)) return send(res, 401, { error: "unauthorized" });
-
   const q = req.query || Object.fromEntries(new URL(req.url, "http://x").searchParams);
   const id = q.id;
   if (!validId(id)) return send(res, 400, { error: "id invalide" });
@@ -30,6 +31,10 @@ module.exports = async function handler(req, res){
   const index = Number(q.i);
 
   try {
+    const user = await requireUser(req, res);
+    if (!user) return;
+    const K = keys(nsFor(user));
+
     if (req.method === "POST" && q.done){
       const body = await readBody(req);
       const chunks = Number(body.chunks);

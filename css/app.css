@@ -102,3 +102,35 @@ body{ margin:0 auto; }
 .history-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 8px; border-radius:8px; border:1px solid var(--border); }
 .history-row strong{ color:var(--ink); font-weight:600; }
 .history-actions{ display:flex; gap:4px; flex:none; }
+
+/* Page d'accueil et connexion */
+.welcome{ display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,400px); gap:40px; align-items:center; max-width:1000px; margin:10vh auto 40px; }
+.welcome-intro .eyebrow{ color:var(--accent-ink); }
+.welcome-intro h1{ margin:10px 0 14px; font-size:clamp(28px,4.4vw,44px); line-height:1.15; }
+.welcome-intro p{ color:var(--ink-soft); font-size:16px; line-height:1.6; max-width:52ch; }
+.welcome .login-card{ margin:0; max-width:none; }
+.login-card h2{ margin:0; font-size:22px; }
+.login-field{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+.login-help{ margin:4px 0 0; color:var(--ink-faint); font-size:12px; line-height:1.45; }
+@media (max-width:760px){ .welcome{ grid-template-columns:1fr; gap:22px; margin-top:4vh; } }
+/* Mon compte et gestion des comptes */
+.account-who{ display:flex; flex-direction:column; gap:2px; }
+.account-who span{ color:var(--ink-soft); font-size:13px; }
+.account-who .account-role{ align-self:flex-start; margin-top:4px; padding:1px 8px; border-radius:999px; background:var(--accent-soft); color:var(--accent-ink); font-size:11px; font-weight:700; }
+.account-actions{ display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+.account-actions .btn{ justify-content:center; }
+.users-modal{ max-width:640px; width:min(640px, calc(100vw - 28px)); max-height:85vh; overflow:auto; }
+.users-modal h4{ margin:16px 0 6px; font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.6px; }
+.users-list{ display:flex; flex-direction:column; gap:6px; }
+.user-row{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; padding:9px 10px; border:1px solid var(--border); border-radius:10px; }
+.user-row.disabled{ opacity:.6; }
+.user-main{ display:flex; flex-direction:column; min-width:0; }
+.user-main span, .user-main small{ color:var(--ink-soft); font-size:12px; overflow-wrap:anywhere; }
+.user-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+.users-create{ display:flex; flex-wrap:wrap; gap:8px; }
+.users-create .field{ flex:1 1 160px; min-width:0; }
+.temp-box{ margin-top:10px; padding:12px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); }
+.temp-box p{ margin:0 0 6px; }
+.temp-line{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.temp-password{ padding:3px 8px; border-radius:6px; background:var(--surface); border:1px solid var(--border); font-size:15px; letter-spacing:.5px; }
+.temp-box small{ color:var(--ink-soft); }

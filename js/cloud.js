@@ -4,8 +4,11 @@
 window.Cloud = (function(){
   "use strict";
 
-  var TOKEN_KEY = "atelier-recherche:token";
-  var DELETES_KEY = "atelier-recherche:pending-deletes";
+  var TOKEN_KEY = "atelier-recherche:session";
+  var USER_KEY = "atelier-recherche:user";
+  var DELETES_BASE = "atelier-recherche:pending-deletes";
+  var DELETES_KEY = DELETES_BASE;
+  var user = null;             // compte connecté (sans données sensibles)
   var mode = "local";          // "local" (pas de serveur) | "cloud"
   var token = null;
   var online = navigator.onLine !== false;
@@ -17,6 +20,20 @@ window.Cloud = (function(){
   var hooks = { onRemoteUpdate: null, onConflict: null, onAuthLost: null };
 
   function readToken(){ try { return localStorage.getItem(TOKEN_KEY); } catch(e){ return null; } }
+  function readUser(){ try { return JSON.parse(localStorage.getItem(USER_KEY) || "null"); } catch(e){ return null; } }
+  // Range la copie locale et la file d'attente des suppressions dans l'espace du compte.
+  function setUser(u){
+    user = u || null;
+    try { if (user) localStorage.setItem(USER_KEY, JSON.stringify(user)); else localStorage.removeItem(USER_KEY); } catch(e){}
+    Store.useAccount(user);
+    DELETES_KEY = user && !user.legacy ? DELETES_BASE + ":" + user.id : DELETES_BASE;
+  }
+  function setSession(data){
+    token = data.token;
+    try { localStorage.setItem(TOKEN_KEY, token); } catch(e){}
+    setUser(data.user);
+    mode = "cloud";
+  }
   function setStatus(s){ status = s; if (s === "synced") lastSync = new Date(); statusListeners.forEach(function(fn){ fn(s); }); }
 
   function api(method, path, body){
@@ -29,7 +46,7 @@ window.Cloud = (function(){
       cache: "no-store"
     }).then(function(r){
       return r.json().catch(function(){ return {}; }).then(function(j){
-        if (r.status === 401 && path.indexOf("/api/login") !== 0){ token = null; try { localStorage.removeItem(TOKEN_KEY); } catch(e){}; if (hooks.onAuthLost) hooks.onAuthLost(); }
+        if (r.status === 401 && path.indexOf("/api/login") !== 0 && path.indexOf("/api/account") !== 0){ token = null; try { localStorage.removeItem(TOKEN_KEY); } catch(e){}; if (hooks.onAuthLost) hooks.onAuthLost(); }
         return {status: r.status, ok: r.ok, data: j};
       });
     });
@@ -37,37 +54,69 @@ window.Cloud = (function(){
 
   /* ---------------- démarrage ---------------- */
 
-  // Résout : {mode:"local"} (pas d'API : test local ou non configuré), {mode:"login"} ou {mode:"cloud"}.
+  // Résout : {mode:"local"} (pas d'API : test local ou non configuré), {mode:"setup"} (aucun compte encore),
+  // {mode:"login"}, {mode:"password"} (mot de passe provisoire à remplacer) ou {mode:"cloud"}.
   function init(){
+    try { localStorage.removeItem("atelier-recherche:token"); } catch(e){}   // ancienne clé (mot de passe unique)
     return fetch("/api/login", {cache:"no-store"}).then(function(r){
       if (!r.ok) return {mode:"local", reason:"no-api"};
       return r.json().then(function(j){
         if (!j.configured) return {mode:"local", reason:"not-configured", missing:j.missing || []};
         mode = "cloud";
+        if (j.setup) return {mode:"setup", possible:!!j.setupPossible};
         token = readToken();
-        return {mode: token ? "cloud" : "login"};
+        if (!token) return {mode:"login"};
+        return api("GET", "/api/account").then(function(res){
+          if (!res.ok){ token = null; return {mode:"login"}; }
+          setUser(res.data.user);
+          return {mode: user.mustChange ? "password" : "cloud"};
+        });
       });
     }).catch(function(){
       // Hors ligne au démarrage : si on s'était déjà connecté, on travaille sur la copie locale.
       token = readToken();
-      if (token){ mode = "cloud"; online = false; setStatus("offline"); return {mode:"cloud", offline:true}; }
+      var cached = readUser();
+      if (token && cached){ mode = "cloud"; setUser(cached); online = false; setStatus("offline"); return {mode:"cloud", offline:true}; }
       return {mode:"local", reason:"no-api"};
     });
   }
 
-  function login(password){
-    return api("POST", "/api/login", {password: password}).then(function(res){
+  function login(email, password){
+    return api("POST", "/api/login", {email: email, password: password}).then(function(res){
       if (!res.ok) throw new Error(res.data.error || "Connexion impossible.");
-      token = res.data.token;
-      try { localStorage.setItem(TOKEN_KEY, token); } catch(e){}
-      mode = "cloud";
+      setSession(res.data);
+      return user;
+    });
+  }
+
+  // Tout premier compte : l'ancien mot de passe de l'application crée le compte administrateur.
+  function setup(fields){
+    return api("POST", "/api/login", Object.assign({action:"setup"}, fields)).then(function(res){
+      if (!res.ok) throw new Error(res.data.error || "Création du compte impossible.");
+      setSession(res.data);
+      return user;
+    });
+  }
+
+  function changePassword(current, next){
+    return api("POST", "/api/account", {action:"password", current: current, next: next}).then(function(res){
+      if (!res.ok) throw new Error(res.data.error || "Changement impossible.");
+      setUser(res.data.user);
+      return user;
     });
   }
 
   function logout(){
-    token = null;
-    try { localStorage.removeItem(TOKEN_KEY); } catch(e){}
+    var ending = token ? api("POST", "/api/account", {action:"logout"}).catch(function(){}) : Promise.resolve();
+    return ending.then(function(){
+      token = null;
+      try { localStorage.removeItem(TOKEN_KEY); } catch(e){}
+      setUser(null);
+    });
   }
+
+  // Appel authentifié pour les autres modules (documents, gestion des comptes).
+  function request(method, path, body){ return api(method, path, body); }
 
   /* ---------------- envoi ---------------- */
 
@@ -172,7 +221,7 @@ window.Cloud = (function(){
       var jobs = [], changed = [];
 
       // Premier démarrage sur un compte vide : on crée le contenu de départ, qui sera envoyé.
-      if (!remote.length && !local.length) { Store.seedIfEmpty(); local = Store.readIndex(); }
+      if (!remote.length && !local.length) { Store.seedIfEmpty({example:false}); local = Store.readIndex(); }
 
       local.forEach(function(m){
         var r = remoteById[m.id];
@@ -249,7 +298,8 @@ window.Cloud = (function(){
 
   return {
     init: init, login: login, logout: logout, sync: sync, push: push, history: history, version: version,
-    request: api,
+    request: request, setup: setup, changePassword: changePassword,
+    user: function(){ return user; },
     isCloud: function(){ return mode === "cloud"; },
     status: function(){ return status; },
     lastSync: function(){ return lastSync; },

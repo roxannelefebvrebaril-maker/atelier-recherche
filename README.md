@@ -17,7 +17,7 @@ Au premier lancement, l'app contient :
 
 ## Où sont les données ?
 
-Une fois la sauvegarde en ligne configurée (voir plus bas), tes projets sont enregistrés **en ligne**, dans une base de données Upstash Redis branchée à Vercel. Tu les retrouves sur tous tes appareils avec le même mot de passe.
+Une fois la sauvegarde en ligne configurée (voir plus bas), tes projets sont enregistrés **en ligne**, dans une base de données Upstash Redis branchée à Vercel. Chaque personne a son compte (courriel et mot de passe) et ne voit que ses propres projets, fiches et documents ; elle les retrouve sur tous ses appareils.
 
 - **Enregistrement continu** : l'app enregistre pendant la frappe (après environ 1 seconde de pause) et envoie aussitôt en ligne. Le point vert « Enregistré en ligne » confirme que c'est fait.
 - **Hors ligne** : tu peux continuer à écrire. Le texte est gardé sur l'appareil et envoyé automatiquement au retour du réseau (point orange).
@@ -42,12 +42,14 @@ Sur ton dépôt GitHub, clique sur **Add file → Upload files** et glisse **tou
 4. Quand Vercel le propose, **connecte** la base à ton projet, sur tous les environnements. Laisse le préfixe par défaut.
    Vercel ajoute alors tout seul les variables `KV_REST_API_URL` et `KV_REST_API_TOKEN`.
 
-### 3. Choisir ton mot de passe
+### 3. Mot de passe de mise en route
+
+`APP_PASSWORD` ne sert qu'une fois : à créer le tout premier compte (administrateur).
 
 1. Dans le projet Vercel, ouvre **Settings → Environment Variables**.
 2. Clique sur **Add** :
    - Key : `APP_PASSWORD`
-   - Value : ton mot de passe, long et que tu n'utilises nulle part ailleurs.
+   - Value : un mot de passe long, que tu n'utilises nulle part ailleurs.
    - Environnements : tous.
 3. Clique sur **Save**.
 
@@ -58,16 +60,15 @@ Les variables ne s'appliquent qu'au prochain déploiement :
 1. Ouvre l'onglet **Deployments**.
 2. Sur le déploiement le plus récent, clique sur **⋯** puis **Redeploy**.
 
-### 5. Se connecter
+### 5. Créer ton compte, puis inviter d'autres personnes
 
-Ouvre l'adresse de l'app et entre le mot de passe. Au premier démarrage :
+À la première visite, l'app demande `APP_PASSWORD`, puis ton nom, ton courriel et ton nouveau mot de passe. Ce compte est **administrateur** et reprend tous les projets déjà enregistrés en ligne. Ensuite, `APP_PASSWORD` ne sert plus : tu peux le retirer de Vercel.
 
-- si le navigateur contenait déjà des projets (version locale), ils sont **envoyés en ligne** automatiquement ;
-- sinon, l'app crée le gabarit UQTR et ta thèse.
-
-Sur un autre appareil, il suffit d'ouvrir la même adresse et d'entrer le même mot de passe.
-
-> Pour changer le mot de passe, modifie `APP_PASSWORD` dans Vercel, puis fais **Redeploy**. Tous les appareils devront se reconnecter ; les données ne sont pas touchées.
+- **Inviter** : **Mon compte → Gérer les comptes**. Entre le nom et le courriel : l'app affiche un mot de passe provisoire, que tu transmets toi-même. La personne choisit son propre mot de passe à sa première connexion.
+- **Mot de passe oublié** : dans **Gérer les comptes**, « Nouveau mot de passe » crée un nouveau mot de passe provisoire.
+- **Désactiver** un compte bloque la connexion ; ses données sont gardées.
+- Chaque compte démarre avec le gabarit « Projet de recherche (UQTR) ».
+- Les mots de passe sont chiffrés à sens unique (scrypt) ; les sessions durent 60 jours.
 
 ## Tester en local
 
@@ -87,7 +88,11 @@ css/theme.css       thème visuel : barre latérale, sections, couleurs, mobile
 js/seeds.js         données de départ (gabarit UQTR + thèse), chargées au 1er lancement
 js/storage.js       copie locale : projets, gabarits, import/export
 js/cloud.js         synchronisation en ligne (envoi, réception, conflits, hors ligne, historique)
-api/login.js        connexion par mot de passe (APP_PASSWORD)
+api/login.js        connexion (courriel + mot de passe), création du premier compte
+api/account.js      mon compte : changer de mot de passe, se déconnecter
+api/users.js        gestion des comptes sur invitation (administration)
+api/files.js        documents déposés dans les fiches (par morceaux, par compte)
+js/files.js         envoi et lecture de ces documents (IndexedDB en mode local)
 api/data.js         lecture/écriture des projets dans Upstash Redis, historique des versions
 api/_lib/common.js  utilitaires partagés par les fonctions
 js/editor.js        l'éditeur de cartographie (tableaux, repères, liens, espaces libres)
@@ -97,6 +102,7 @@ data/*.json         copies lisibles du gabarit et de la thèse, réimportables v
 
 ## Pistes pour la suite
 
-- Comptes individuels, par exemple pour donner un accès en lecture à la direction de recherche.
+- Partage d'un projet entre comptes, par exemple un accès en lecture pour la direction de recherche.
+- Envoi automatique des invitations et des réinitialisations par courriel.
 - Export Word (.docx) du formulaire éthique.
 - Historique des versions et annulation.

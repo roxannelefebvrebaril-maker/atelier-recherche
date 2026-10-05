@@ -921,6 +921,7 @@ window.Editor = (function(){
     bar.appendChild(iconBtn("help", "Aide : comment utiliser l'outil", function(){ openHelp(); }, "hb-help"));
     var exp = btn("download", "Exporter", function(e){ openExportMenu(e.currentTarget); }, "small hb-export");
     bar.appendChild(exp);
+    if (ctx && ctx.onAccount) bar.appendChild(el("button", {class:"btn small hb-account", type:"button", text:"Mon compte", "aria-label":"Mon compte : mot de passe, déconnexion", onclick:function(){ ctx.onAccount(); }}));
     return bar;
   }
 
