@@ -67,7 +67,8 @@ Les variables ne s'appliquent qu'au prochain déploiement :
 - **Inviter** : **Mon compte → Gérer les comptes**. Entre le nom et le courriel : l'app affiche un mot de passe provisoire, que tu transmets toi-même. La personne choisit son propre mot de passe à sa première connexion.
 - **Mot de passe oublié** : dans **Gérer les comptes**, « Nouveau mot de passe » crée un nouveau mot de passe provisoire.
 - **Désactiver** un compte bloque la connexion ; ses données sont gardées.
-- Chaque compte démarre avec le gabarit « Projet de recherche (UQTR) ».
+- Chaque compte reçoit les gabarits fournis : Projet de recherche (UQTR), Baccalauréat, Maîtrise et Doctorat (APA 7).
+- **Publier un gabarit** (administration) : menu ⋯ d'un gabarit → « Publier pour tous les comptes… ». Après l'approbation finale, chaque compte en reçoit sa propre copie à sa prochaine ouverture. « Publier une nouvelle version… » met à jour les copies non modifiées ; « Retirer la publication » l'enlève du catalogue sans effacer les copies déjà reçues.
 - Les mots de passe sont chiffrés à sens unique (scrypt) ; les sessions durent 60 jours.
 
 ## Tester en local
@@ -91,6 +92,7 @@ js/cloud.js         synchronisation en ligne (envoi, réception, conflits, hors 
 api/login.js        connexion (courriel + mot de passe), création du premier compte
 api/account.js      mon compte : changer de mot de passe, se déconnecter
 api/users.js        gestion des comptes sur invitation (administration)
+api/templates.js    catalogue des gabarits publiés par l'administration
 api/files.js        documents déposés dans les fiches (par morceaux, par compte)
 js/files.js         envoi et lecture de ces documents (IndexedDB en mode local)
 api/data.js         lecture/écriture des projets dans Upstash Redis, historique des versions

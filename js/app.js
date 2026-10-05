@@ -98,7 +98,8 @@
     function rank(m){
       if (!m.builtinKey && m.title === "Projet de recherche (UQTR)") return 0;
       var i = m.builtinKey ? builtin.indexOf(m.builtinKey) : -1;
-      return i >= 0 ? 1 + i : 1 + builtin.length;
+      if (i >= 0) return 1 + i;
+      return m.builtinKey ? 1 + builtin.length : 2 + builtin.length;
     }
     return Store.list("template").map(function(m, i){ return {m:m, i:i}; })
       .sort(function(a, b){ return (rank(a.m) - rank(b.m)) || (a.i - b.i); })
@@ -365,6 +366,12 @@
     act("Renommer", function(){
       promptBox("Renommer", "Nouveau titre", m.title, "Renommer", function(v){ Store.rename(m.id, v); renderLibrary(); });
     });
+    var admin = Cloud.isCloud() && Cloud.user() && Cloud.user().role === "admin";
+    var published = isTpl && m.publishedKey && m.publishedVersion > 0;
+    if (isTpl && admin && !m.builtinKey){
+      act(published ? "Publier une nouvelle version…" : "Publier pour tous les comptes…", function(){ approvePublication(m); });
+      if (published) act("Retirer la publication", function(){ unpublishTemplate(m); });
+    }
     act("Dupliquer", function(){ duplicate(m.id); });
     act("Exporter (.json)", function(){ exportJSON(m.id); });
     act("Supprimer", function(){
@@ -385,7 +392,9 @@
       } catch(e){}
     }
     var c = h("article", {class:"lib-card" + (isTpl ? " is-template" : ""), tabindex:"0", "data-sec": CARD_COLORS[(cardIndex++) % CARD_COLORS.length]}, [
-      h("div", {class:"lib-card-kind", text: isTpl ? "Gabarit" : "Projet"}),
+      h("div", {class:"lib-card-kind"}, [h("span", {text: isTpl ? "Gabarit" : "Projet"}),
+        published ? h("span", {class:"pub-badge", text:"Publié · v" + m.publishedVersion}) : null,
+        isTpl && m.builtinKey && /^pub-/.test(m.builtinKey) ? h("span", {class:"pub-badge", text:"Fourni par l'administration"}) : null]),
       h("h3", {text: m.title}),
       prog,
       h("div", {class:"lib-card-meta"}, [
@@ -398,6 +407,64 @@
     c.addEventListener("click", function(){ if (isTpl) newProject(m.id); else go("#/p/" + m.id); });
     c.addEventListener("keydown", function(e){ if (e.key === "Enter" && e.target === c) c.click(); });
     return c;
+  }
+
+  /* ---------------- publication des gabarits (administration) ---------------- */
+
+  // Copie publiable : sans liens vers d'autres projets ni documents déposés (propres à ce compte).
+  function publishableState(state){
+    var copy = Store.clone(state);
+    copy.links = (copy.links || []).filter(function(l){ return !/^@/.test(l.a || "") && !/^@/.test(l.b || ""); });
+    (copy.tables || []).forEach(function(t){ if (t.documents) delete t.documents; });
+    return copy;
+  }
+
+  function approvePublication(m){
+    var state = Store.load(m.id);
+    if (!state) return;
+    var update = m.publishedKey && m.publishedVersion > 0;
+    var sections = (state.tables || []).filter(function(t){ return !t.parentId; }).map(function(t){ return t.title || "(sans titre)"; });
+    modal(function(box, close){
+      box.classList.add("publish-modal");
+      box.appendChild(h("h3", {text: update ? "Publier une nouvelle version" : "Approbation finale avant publication"}));
+      box.appendChild(h("p", {text: update
+        ? "La version " + (m.publishedVersion + 1) + " de « " + m.title + " » remplacera la copie des personnes qui ne l'ont pas modifiée. Les copies modifiées sont laissées telles quelles."
+        : "« " + m.title + " » sera ajouté à la bibliothèque de tous les comptes, à leur prochaine ouverture de l'app. Chaque personne reçoit sa propre copie : elle pourra la modifier ou la supprimer sans toucher à la tienne."}));
+      box.appendChild(h("p", {class:"publish-sections-title", text: sections.length + " section" + (sections.length > 1 ? "s" : "") + " :"}));
+      box.appendChild(h("ol", {class:"publish-sections"}, sections.map(function(t){ return h("li", {text:t}); })));
+      box.appendChild(h("p", {class:"publish-note", text:"Les liens vers tes autres projets et les documents déposés ne sont pas publiés."}));
+      var check = h("input", {type:"checkbox", id:"publish-approve"});
+      box.appendChild(h("label", {class:"publish-approve", for:"publish-approve"}, [check, h("span", {text:"J'ai relu ce gabarit et j'approuve sa publication pour tous les comptes."})]));
+      var err = h("p", {class:"login-error", role:"alert"});
+      box.appendChild(err);
+      var publish = h("button", {class:"btn primary", type:"button", disabled:"disabled", text: update ? "Publier la nouvelle version" : "Publier", onclick:function(){
+        publish.disabled = true; err.textContent = "";
+        Cloud.request("POST", "/api/templates", {action:"publish", key: m.publishedKey || undefined, title: m.title, state: publishableState(state)}).then(function(res){
+          if (!res.ok) throw new Error(res.data.error || "Publication impossible.");
+          Store.patchMeta(m.id, {publishedKey: res.data.template.key, publishedVersion: res.data.template.version, pending: true});
+          Cloud.push(m.id);
+          close(); renderLibrary();
+          toast(update ? "Nouvelle version publiée." : "Gabarit publié pour tous les comptes.");
+        }).catch(function(e){ publish.disabled = false; err.textContent = e.message; });
+      }});
+      check.addEventListener("change", function(){ publish.disabled = !check.checked; });
+      box.appendChild(h("div", {class:"row"}, [
+        h("button", {class:"btn ghost", type:"button", text:"Relire le gabarit", onclick:function(){ close(); go("#/p/" + m.id); }}),
+        h("button", {class:"btn ghost", type:"button", text:"Annuler", onclick:close}),
+        publish
+      ]));
+    });
+  }
+
+  function unpublishTemplate(m){
+    confirmBox("Retirer « " + m.title + " » du catalogue ? Les nouveaux comptes ne le recevront plus. Les personnes qui l'ont déjà gardent leur copie.", "Retirer la publication", function(){
+      Cloud.request("POST", "/api/templates", {action:"unpublish", key:m.publishedKey}).then(function(res){
+        if (!res.ok) throw new Error(res.data.error || "Action impossible.");
+        Store.patchMeta(m.id, {publishedVersion: 0, pending: true});
+        Cloud.push(m.id);
+        renderLibrary(); toast("Publication retirée.");
+      }).catch(function(e){ toast(e.message); });
+    }, true);
   }
 
   function section(title, hint, items, emptyText, headerBtn){
@@ -790,9 +857,10 @@
     libraryEl.appendChild(h("p", {class:"lib-loading", text:"Synchronisation de tes projets…"}));
     Cloud.sync().then(function(res){
       // Seulement après une synchronisation réussie : sinon un 2e appareil créerait un doublon.
-      if (res && res.ok) Store.ensureBuiltinTemplates();
-      route();
-    });
+      if (!(res && res.ok)) return;
+      Store.ensureBuiltinTemplates();
+      return Cloud.publishedTemplates().then(function(list){ if (list.length) Store.ensureBuiltinTemplates(list); });
+    }).then(function(){ route(); });
   }
 
   Cloud.hooks.onAuthLost = function(){ Editor.flush(); renderLogin("Ta session a expiré. Reconnecte-toi : tes modifications non envoyées sont gardées sur l'appareil."); };

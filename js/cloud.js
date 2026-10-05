@@ -115,6 +115,12 @@ window.Cloud = (function(){
     });
   }
 
+  // Catalogue des gabarits publiés par l'administration ([] si indisponible).
+  function publishedTemplates(){
+    if (mode !== "cloud" || !token) return Promise.resolve([]);
+    return api("GET", "/api/templates").then(function(res){ return res.ok ? (res.data.templates || []) : []; }).catch(function(){ return []; });
+  }
+
   // Appel authentifié pour les autres modules (documents, gestion des comptes).
   function request(method, path, body){ return api(method, path, body); }
 
@@ -139,7 +145,8 @@ window.Cloud = (function(){
     var sentLv = meta.lv || 0;
     setStatus("syncing");
     var p = api("PUT", "/api/data?id=" + encodeURIComponent(id), {
-      meta: Object.assign({id:id, kind:meta.kind, title:meta.title, createdAt:meta.createdAt, fromTemplate:meta.fromTemplate || null}, meta.builtinKey ? {builtinKey:meta.builtinKey} : {}),
+      meta: Store.SYNCED_META.reduce(function(out, k){ if (meta[k] != null) out[k] = meta[k]; return out; },
+        {id:id, kind:meta.kind, title:meta.title, createdAt:meta.createdAt, fromTemplate:meta.fromTemplate || null}),
       state: state, baseRev: opts.force ? -1 : (meta.rev || 0), snapshot: !!opts.snapshot
     }).then(function(res){
       inflight[id] = null;
@@ -298,7 +305,7 @@ window.Cloud = (function(){
 
   return {
     init: init, login: login, logout: logout, sync: sync, push: push, history: history, version: version,
-    request: request, setup: setup, changePassword: changePassword,
+    request: request, setup: setup, publishedTemplates: publishedTemplates, changePassword: changePassword,
     user: function(){ return user; },
     isCloud: function(){ return mode === "cloud"; },
     status: function(){ return status; },

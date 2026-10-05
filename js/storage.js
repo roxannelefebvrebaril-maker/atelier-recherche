@@ -50,6 +50,9 @@ window.Store = (function(){
     emit("save", id);
   }
 
+  // Métadonnées facultatives qui voyagent avec la synchronisation (gabarits fournis ou publiés).
+  var SYNCED_META = ["builtinKey", "builtinVersion", "builtinHash", "publishedKey", "publishedVersion"];
+
   // Used by the sync engine: write what came from the server without marking it pending.
   function putFromServer(meta, state){
     localStorage.setItem(DOC_KEY(meta.id), JSON.stringify(state));
@@ -57,7 +60,7 @@ window.Store = (function(){
     var m = idx.find(function(x){ return x.id === meta.id; });
     var clean = {id:meta.id, kind:meta.kind === "template" ? "template" : "project", title:meta.title || state.title || "Sans titre",
       createdAt:meta.createdAt, updatedAt:meta.updatedAt, fromTemplate:meta.fromTemplate || null, rev:meta.rev || 0, pending:false, lv:0};
-    if (meta.builtinKey) clean.builtinKey = meta.builtinKey;
+    SYNCED_META.forEach(function(k){ if (meta[k] != null) clean[k] = meta[k]; });
     if (m) Object.assign(m, clean); else idx.push(clean);
     writeIndex(idx);
   }
@@ -152,28 +155,51 @@ window.Store = (function(){
     return true;
   }
 
-  // Gabarits fournis avec l'app (window.SEEDS_GABARITS) : ajoutés une seule fois par compte.
+  // Gabarits fournis avec l'app (window.SEEDS_GABARITS) et gabarits publiés par l'administration
+  // (passés en paramètre) : ajoutés une seule fois par compte.
   // Le gabarit est marqué par builtinKey dans ses métadonnées (synchronisées, jamais recopiées par
   // « Utiliser »). Les clés déjà installées sont retenues : un gabarit supprimé ne revient pas.
+  // Une nouvelle version (seed.version) remplace la copie seulement si elle n'a pas été modifiée.
   function builtinSeenKey(){ return PREFIX + "builtin-installed"; }
-  function ensureBuiltinTemplates(){
-    var seeds = window.SEEDS_GABARITS || [], seen = [];
+  function contentHash(state){
+    var str = JSON.stringify(state || {}), h = 5381;
+    for (var i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
+    return h.toString(36) + ":" + str.length;
+  }
+  function ensureBuiltinTemplates(list){
+    var seeds = list || window.SEEDS_GABARITS || [], seen = [];
     try { seen = JSON.parse(localStorage.getItem(builtinSeenKey()) || "[]"); } catch(e){}
     if (!Array.isArray(seen)) seen = [];
-    var present = {};
-    readIndex().forEach(function(m){ if (m.kind === "template" && m.builtinKey) present[m.builtinKey] = true; });
-    var added = 0;
+    var present = {}, sources = {};
+    readIndex().forEach(function(m){
+      if (m.kind !== "template") return;
+      if (m.builtinKey) present[m.builtinKey] = m;
+      if (m.publishedKey) sources[m.publishedKey] = true;   // l'original, dans le compte qui l'a publié
+    });
+    var changed = 0;
     seeds.forEach(function(seed){
       if (!seed || !seed.key || !seed.state) return;
-      if (present[seed.key]){ if (seen.indexOf(seed.key) < 0) seen.push(seed.key); return; }
+      var version = seed.version || 1, installed = present[seed.key];
+      if (sources[seed.key]){ if (seen.indexOf(seed.key) < 0) seen.push(seed.key); return; }
+      if (installed){
+        if (seen.indexOf(seed.key) < 0) seen.push(seed.key);
+        if (version > (installed.builtinVersion || 1) && installed.builtinHash && installed.builtinHash === contentHash(load(installed.id))){
+          var fresh = clone(seed.state);
+          if (seed.title) fresh.title = seed.title;
+          save(installed.id, fresh);
+          patchMeta(installed.id, {builtinVersion: version, builtinHash: contentHash(fresh)});
+          changed++;
+        }
+        return;
+      }
       if (seen.indexOf(seed.key) >= 0) return;
       var state = clone(seed.state);
       if (seed.title) state.title = seed.title;
-      create("template", state, {builtinKey: seed.key});
-      seen.push(seed.key); added++;
+      create("template", state, {builtinKey: seed.key, builtinVersion: version, builtinHash: contentHash(state)});
+      seen.push(seed.key); changed++;
     });
     try { localStorage.setItem(builtinSeenKey(), JSON.stringify(seen)); } catch(e){}
-    return added;
+    return changed;
   }
 
   function usage(){
@@ -190,7 +216,7 @@ window.Store = (function(){
     onChange: onChange, putFromServer: putFromServer, patchMeta: patchMeta, forget: forget, readIndex: readIndex,
     list: list, meta: meta, load: load, save: save, create: create, rename: rename, remove: remove,
     structureOnly: structureOnly, exportAll: exportAll, exportOne: exportOne, importData: importData,
-    seedIfEmpty: seedIfEmpty, ensureBuiltinTemplates: ensureBuiltinTemplates, usage: usage, clone: clone
+    seedIfEmpty: seedIfEmpty, ensureBuiltinTemplates: ensureBuiltinTemplates, SYNCED_META: SYNCED_META, usage: usage, clone: clone
   };
   return api;
 })();

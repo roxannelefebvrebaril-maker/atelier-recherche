@@ -135,3 +135,12 @@ body{ margin:0 auto; }
 .temp-password{ padding:3px 8px; border-radius:6px; background:var(--surface); border:1px solid var(--border); font-size:15px; letter-spacing:.5px; }
 .temp-box small{ color:var(--ink-soft); }
 .invite-message{ width:100%; margin:4px 0 6px; font:inherit; font-size:12.5px; line-height:1.5; resize:vertical; background:var(--surface); }
+/* Publication des gabarits */
+.lib-card-kind{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.pub-badge{ padding:1px 8px; border-radius:999px; background:#e1f5ea; color:#155f3e; font-size:10.5px; font-weight:700; letter-spacing:.3px; text-transform:none; }
+.publish-modal{ max-width:560px; max-height:85vh; overflow:auto; }
+.publish-sections-title{ margin:10px 0 4px; font-weight:600; }
+.publish-sections{ margin:0 0 8px; padding-left:22px; color:var(--ink-soft); font-size:13px; line-height:1.55; }
+.publish-note{ color:var(--ink-faint); font-size:12px; }
+.publish-approve{ display:flex; align-items:flex-start; gap:8px; margin:10px 0 4px; padding:10px; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); font-size:13.5px; cursor:pointer; }
+.publish-approve input{ margin-top:3px; }
