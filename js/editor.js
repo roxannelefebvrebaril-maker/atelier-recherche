@@ -67,6 +67,11 @@ window.Editor = (function(){
     return null;
   }
   function getEntity(entityId){
+    var ext = parseExt(entityId);
+    if (ext){
+      var inner = withProject(ext.project, function(){ return getEntity(ext.entity); });
+      return inner ? {kind:"external", project:ext.project, entity:ext.entity, inner:inner, obj:inner.obj} : null;
+    }
     var anchor = anchorById(entityId);
     if (anchor) return {kind:"anchor", obj:anchor};
     if (isNodeEntity(entityId)) return { kind:"node", obj: findNode(entityId) };
@@ -202,9 +207,65 @@ window.Editor = (function(){
     }
     return authors + " (" + match[2] + ")";
   }
+  /* ---------- liens entre projets ----------
+     Une zone d'un autre projet s'écrit « @<id du projet>/<id de la zone> ». Le lien est gardé
+     dans le projet qui l'a créé ; l'autre projet le voit « en retour » (incomingLinks). */
+  var extStates = {};
+  function extId(projectId, entityId){ return "@" + projectId + "/" + entityId; }
+  function parseExt(id){
+    var m = /^@([\w-]+)\/(.+)$/.exec(id || "");
+    return m ? {project:m[1], entity:m[2]} : null;
+  }
+  function otherProjects(){
+    if (typeof Store === "undefined" || !ctx) return [];
+    return Store.list("project").filter(function(m){ return m.id !== ctx.id; });
+  }
+  function projectState(projectId){
+    if (!(projectId in extStates)) extStates[projectId] = typeof Store !== "undefined" ? Store.load(projectId) : null;
+    return extStates[projectId];
+  }
+  function projectTitle(projectId){
+    var m = typeof Store !== "undefined" && Store.meta(projectId);
+    return stripHtml(m && m.title || "Autre projet");
+  }
+  // Exécute fn comme si l'autre projet était ouvert (les fonctions de lecture lisent « state »).
+  function withProject(projectId, fn){
+    var other = projectState(projectId);
+    if (!other) return null;
+    var saved = state; state = other;
+    try { return fn(); } finally { state = saved; }
+  }
+  function incomingLinks(){
+    var result = [];
+    if (!ctx || !ctx.id) return result;
+    var prefix = "@" + ctx.id + "/";
+    otherProjects().forEach(function(m){
+      var other = projectState(m.id);
+      ((other && other.links) || []).forEach(function(link){
+        var aHere = link.a.indexOf(prefix) === 0, bHere = link.b.indexOf(prefix) === 0;
+        if (!aHere && !bHere) return;
+        var here = (aHere ? link.a : link.b).slice(prefix.length), there = aHere ? link.b : link.a;
+        var thereId = parseExt(there) ? there : extId(m.id, there);
+        if (parseExt(thereId).project === ctx.id) thereId = parseExt(thereId).entity;
+        result.push({id:"in:" + m.id + ":" + link.id, a:here, b:thereId, rel:link.rel, external:{project:m.id, linkId:link.id}});
+      });
+    });
+    return result;
+  }
+  function removeLink(link){
+    if (link.external){
+      var owner = typeof Store !== "undefined" ? Store.load(link.external.project) : null;
+      if (owner){
+        owner.links = (owner.links || []).filter(function(l){ return l.id !== link.external.linkId; });
+        Store.save(link.external.project, owner);
+        extStates[link.external.project] = owner;
+      }
+    } else state.links = state.links.filter(function(l){ return l !== link && l.id !== link.id; });
+    buildLinkIndex();
+  }
   function buildLinkIndex(){
     linkIndex = {byEntity:new Map(), byAnchor:new Map()};
-    (state.links || []).forEach(function(link){
+    (state.links || []).concat(incomingLinks()).forEach(function(link){
       [link.a, link.b].forEach(function(entity){
         if (!linkIndex.byEntity.has(entity)) linkIndex.byEntity.set(entity, []);
         linkIndex.byEntity.get(entity).push(link);
@@ -239,6 +300,7 @@ window.Editor = (function(){
   function entityLabel(entityId){
     var e = getEntity(entityId);
     if (!e) return "(supprimé)";
+    if (e.kind === "external") return projectTitle(e.project) + " › " + withProject(e.project, function(){ return entityLabel(e.entity); });
     if (e.kind === "anchor") return e.obj.fullText || e.obj.text;
     if (e.kind === "node") return stripHtml(e.obj.text) || "(sans titre)";
     if (e.kind === "fiche") return stripHtml(e.obj.title || "") || "Fiche de lecture";
@@ -2849,10 +2911,13 @@ window.Editor = (function(){
   }
   function shortLinkLabel(entityId){
     var e = getEntity(entityId), text = "";
-    if (e && e.kind === "fiche") text = stripHtml(e.obj.title || "");
+    if (e && e.kind === "external") e = e.inner;
+    if (e && e.kind === "anchor") text = e.obj.text || "";
+    else if (e && e.kind === "fiche") text = stripHtml(e.obj.title || "");
     else if (e && e.obj) text = stripHtml(e.obj.text || "");
     text = text.replace(/\s+/g, " ").trim() || "Zone liée";
-    return text.length > 32 ? text.slice(0,32) + "…" : text;
+    text = text.length > 32 ? text.slice(0,32) + "…" : text;
+    return parseExt(entityId) ? "📁 " + text : text;
   }
   function renderAttachmentPills(entityId){
     var related = anchorLinksFor(entityId), pills = [];
@@ -2966,6 +3031,16 @@ window.Editor = (function(){
       return {id:anchor.id, text:anchor.text, fullText:anchor.fullText, path:anchorPath(anchor), icon:meta ? meta.icon : "link"};
     });
     allReflections().forEach(function(item){ item.icon = "link"; targets.push(item); });
+    return targets;
+  }
+  function allProjectsLinkTargets(){
+    var targets = allLinkTargets().map(function(item){ item.path = "Ce projet › " + (item.path || ""); return item; });
+    otherProjects().forEach(function(m){
+      var title = projectTitle(m.id);
+      (withProject(m.id, allLinkTargets) || []).forEach(function(item){
+        targets.push({id:extId(m.id, item.id), text:item.text, fullText:item.fullText, path:"📁 " + title + " › " + (item.path || ""), icon:item.icon});
+      });
+    });
     return targets;
   }
   function refreshAttachmentDisplay(entityId){
@@ -3412,7 +3487,7 @@ window.Editor = (function(){
     var input = el("input", {class:"field anchor-search", type:"search", placeholder:"Chercher une zone de texte à lier…", "aria-label":"Chercher une zone de texte dans tout le projet"});
     var list = el("div", {class:"anchor-results", role:"listbox"});
     function linkBetween(other){
-      return state.links.find(function(l){ return (l.a===entityId && l.b===other) || (l.a===other && l.b===entityId); });
+      return linksFor(entityId).find(function(l){ return (l.a===entityId && l.b===other) || (l.a===other && l.b===entityId); });
     }
     function changed(other){
       buildLinkIndex(); scheduleSave(true);
@@ -3421,7 +3496,7 @@ window.Editor = (function(){
     }
     function toggle(other){
       var existing = linkBetween(other);
-      if (existing) state.links = state.links.filter(function(l){ return l !== existing; });
+      if (existing) removeLink(existing);
       else { state.links.push({id:uid("lnk"), a:entityId, b:other, rel:"lie"}); if (anchorById(other)) recentAnchor(other); }
       changed(other);
     }
@@ -3435,7 +3510,7 @@ window.Editor = (function(){
         var label = otherAnchor ? (ANCHOR_TYPES[otherAnchor.type].label + " · " + otherAnchor.text) : entityLabel(other);
         var row = el("div", {class:"row link-existing-row"});
         row.appendChild(el("button", {class:"lbl link-go", type:"button", title:"Aller à : " + label, text:"→ " + label, onclick:function(){ closePopover(); goTo(other); }}));
-        if (!otherAnchor){
+        if (!otherAnchor && !l.external){
           var rel = el("select", {class:"link-relation", "aria-label":"Relation du lien"});
           [{v:"lie",t:"lié à"},{v:"approfondit",t:"approfondit"},{v:"nuance",t:"nuance / contredit"},{v:"mene",t:"mène à"}].forEach(function(option){ rel.appendChild(el("option", {value:option.v, text:option.t})); });
           rel.value = l.rel || "lie";
@@ -3443,7 +3518,7 @@ window.Editor = (function(){
           row.appendChild(rel);
         }
         row.appendChild(el("button", {type:"button", text:"✕", title:"Retirer ce lien", "aria-label":"Retirer le lien avec " + label, onclick:function(){
-          state.links = state.links.filter(function(x){ return x.id!==l.id; }); changed(other);
+          removeLink(l); changed(other);
         }}));
         existingBox.appendChild(row);
         var sameDiagram = isNodeEntity(entityId) && isNodeEntity(other) && findNodeDiagram(entityId) && findNodeDiagram(entityId)===findNodeDiagram(other);
@@ -3468,13 +3543,13 @@ window.Editor = (function(){
       if (!query){
         var recent = [];
         try { recent = JSON.parse(localStorage.getItem(recentAnchorsKey || ("atelier-recherche:recent-anchors:" + (ctx && ctx.id))) || "[]").map(anchorById).filter(Boolean).slice(0,6); } catch(e){}
-        if (!recent.length){ list.appendChild(el("p", {class:"lib-hint", text:"Tape quelques mots : la recherche couvre toutes les zones de texte du projet."})); return; }
+        if (!recent.length){ list.appendChild(el("p", {class:"lib-hint", text:"Tape quelques mots : la recherche couvre toutes les zones de texte de tous tes projets."})); return; }
         list.appendChild(el("h4", {class:"anchor-results-heading", text:"Récents"}));
         recent.forEach(function(anchor){ drawResult({id:anchor.id, text:anchor.text, fullText:anchor.fullText, path:anchorPath(anchor), icon:ANCHOR_TYPES[anchor.type].icon}); });
         return;
       }
       var words = query.split(/\s+/);
-      var found = allLinkTargets().filter(function(item){
+      var found = allProjectsLinkTargets().filter(function(item){
         if (item.id === entityId) return false;
         var hay = normalizeText((item.fullText || "") + " " + (item.text || "") + " " + (item.path || ""));
         return words.every(function(w){ return hay.indexOf(w) >= 0; });
@@ -3643,6 +3718,13 @@ window.Editor = (function(){
   }
 
   function goTo(entityId){
+    var ext = parseExt(entityId);
+    if (ext){
+      if (ext.project === (ctx && ctx.id)) return goTo(ext.entity);
+      try { sessionStorage.setItem("atelier-recherche:goto", JSON.stringify({project:ext.project, entity:ext.entity})); } catch(e){}
+      location.hash = "#/p/" + ext.project;
+      return;
+    }
     var anchor = anchorById(entityId);
     if (anchor){
       if (ensureSectionFor("table", anchor.table.id)) return setTimeout(function(){ goTo(entityId); }, 30);
@@ -3722,7 +3804,7 @@ window.Editor = (function(){
   }
   function contextLinkRow(item, entityId){
     var label = item.anchor ? ANCHOR_TYPES[item.anchor.type].verb + " : " + item.anchor.text : entityLabel(item.other);
-    return el("div", {class:"context-link-row"}, [el("button", {class:"context-link-label", type:"button", text:label, title:item.anchor ? item.anchor.fullText : label, onclick:function(){ goTo(item.other); }}), el("button", {class:"ibtn", type:"button", title:"Retirer ce lien", "aria-label":"Retirer ce lien", text:"×", onclick:function(){ state.links = state.links.filter(function(link){ return link !== item.link; }); buildLinkIndex(); scheduleSave(true); updateContextPanel(); render(); }})]);
+    return el("div", {class:"context-link-row"}, [el("button", {class:"context-link-label", type:"button", text:label, title:item.anchor ? item.anchor.fullText : label, onclick:function(){ goTo(item.other); }}), el("button", {class:"ibtn", type:"button", title:"Retirer ce lien", "aria-label":"Retirer ce lien", text:"×", onclick:function(){ removeLink(item.link); scheduleSave(true); updateContextPanel(); render(); }})]);
   }
   function openAnchorSheet(anchorIdValue){
     var anchor = anchorById(anchorIdValue); if (!anchor) return;
@@ -3883,6 +3965,7 @@ window.Editor = (function(){
     state = docState || defaultState();
     migrateState();
     ctx = options || {};
+    extStates = {};
     persist = ctx.save || null;
     dirty = false; saveStatus = ctx.initialStatus || "saved";
     lastSavedJson = JSON.stringify(state); armedEntity = null; dimTag = null;
@@ -3901,6 +3984,11 @@ window.Editor = (function(){
     render();
     try { if (localStorage.getItem("atelier-recherche:context-panel:" + (ctx && ctx.id)) === "open") toggleContextPanel(); } catch(e){}
     window.scrollTo(0,0);
+    // Arrivée par un lien venu d'un autre projet : aller directement à la zone visée.
+    try {
+      var pending = JSON.parse(sessionStorage.getItem("atelier-recherche:goto") || "null");
+      if (pending && pending.project === ctx.id){ sessionStorage.removeItem("atelier-recherche:goto"); setTimeout(function(){ goTo(pending.entity); }, 50); }
+    } catch(e){}
   }
 
   function close(){
