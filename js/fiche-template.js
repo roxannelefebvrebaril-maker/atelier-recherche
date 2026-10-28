@@ -32,7 +32,7 @@ window.FICHE_LECTURE_TEMPLATE_V1 = {
   "rowLines": "strong"
 };
 
-window.FICHE_LECTURE_TEMPLATE = {
+window.FICHE_LECTURE_TEMPLATE_V2 = {
   "format": "atelier-recherche/fiche-template",
   "version": 2,
   "name": "Fiche de lecture — version 2",
@@ -51,4 +51,35 @@ window.FICHE_LECTURE_TEMPLATE = {
     { "key": "definitions", "label": "Définitions", "hint": "Un mot par ligne et sa définition (avec la page)", "columns": ["Mot", "Définition"] },
     { "key": "concepts", "label": "Concepts et théories", "hint": "Un concept ou une théorie par ligne et ce qu'il ou elle veut dire", "columns": ["Concept ou théorie", "Définition"] }
   ]
+};
+
+// Version 3 : la version 2 complétée par les rubriques de la proposition « Fiche structurée »
+// (cadre théorique, méthodologie, résultats, citations, limites). Les clés de la version 2 sont
+// gardées telles quelles : une fiche v2 peut recevoir les rubriques v3 qui lui manquent.
+// « order » donne l'ordre des rubriques et des tableaux dans une nouvelle fiche.
+window.FICHE_LECTURE_TEMPLATE = {
+  "format": "atelier-recherche/fiche-template",
+  "version": 3,
+  "name": "Fiche de lecture — version 3",
+  "columns": [
+    { "id": "rub", "label": "Rubrique" },
+    { "id": "cont", "label": "Contenu" }
+  ],
+  "rows": [
+    { "key": "reference", "label": "Référence APA 7", "hint": "", "long": true },
+    { "key": "kw", "label": "Mots-clés", "hint": "Mots-clés de l'auteur·e et les miens, séparés par des virgules", "long": false },
+    { "key": "resume", "label": "Résumé", "hint": "L'essentiel du texte, dans mes mots", "long": true },
+    { "key": "hypothese", "label": "Objet et hypothèse", "hint": "La question de l'auteur·e et ce qu'il ou elle cherche à démontrer ou à vérifier", "long": true },
+    { "key": "cadre", "label": "Cadre théorique", "hint": "Auteur·e·s, courants et écoles de pensée mobilisés", "long": true },
+    { "key": "methodo", "label": "Méthodologie", "hint": "Terrain, participant·e·s ou corpus, outils de collecte et d'analyse", "long": true },
+    { "key": "resultats", "label": "Résultats ou thèse centrale", "hint": "Ce que l'auteur·e trouve ou avance", "long": true },
+    { "key": "limites", "label": "Limites et critiques", "hint": "Angles morts, posture épistémologique, compatibilité avec une approche constructiviste", "long": true },
+    { "key": "notes", "label": "Mes réflexions et notes", "hint": "Idées, questions, pistes et lectures à suivre", "long": true }
+  ],
+  "tables": [
+    { "key": "definitions", "label": "Définitions", "hint": "Un mot par ligne et sa définition (avec la page)", "columns": ["Mot", "Définition"] },
+    { "key": "concepts", "label": "Concepts et théories", "hint": "Un concept ou une théorie par ligne et ce qu'il ou elle veut dire", "columns": ["Concept ou théorie", "Définition"] },
+    { "key": "citations", "label": "Citations à garder", "hint": "Une citation exacte par ligne, avec sa page", "columns": ["Citation", "Page"] }
+  ],
+  "order": ["kw", "resume", "hypothese", "cadre", "definitions", "concepts", "methodo", "resultats", "citations", "limites", "notes"]
 };
