@@ -28,6 +28,21 @@ Une fois la sauvegarde en ligne configurée (voir plus bas), tes projets sont en
 
 Sans configuration en ligne, par exemple en test local, l'app fonctionne en **mode local** : les données restent dans le navigateur.
 
+## Fiches de lecture : dictée et rangement par Claude
+
+- **Rubriques (version 3)** : Mots-clés, Résumé, Objet et hypothèse, Cadre théorique, Définitions, Concepts et théories, Méthodologie, Résultats ou thèse centrale, Citations à garder, Limites et critiques, Mes réflexions et notes. Une fiche plus ancienne propose d'ajouter les rubriques qui lui manquent (« Les ajouter à cette fiche ») ; rien de ce qui est écrit n'est modifié.
+- **Micro par rubrique** : le petit micro à droite d'une rubrique écrit ce que tu dis (Chrome, Edge ou Safari ; Firefox n'offre pas la dictée). Le navigateur demande d'autoriser le micro la première fois.
+- **Dicter la fiche** : tu parles de ta lecture d'un bloc, puis « Ranger dans la fiche » demande à Claude de répartir tes propos dans les rubriques et les tableaux. Rien n'est effacé : le texte s'ajoute à ce qui existe.
+- **Liens avec ma thèse** : en bas de chaque fiche, « Rattacher à ma thèse » relie la fiche à un concept, un objectif, une question ou une réflexion. Les sections concernées affichent alors « N fiches de lecture liées ».
+
+### Activer le rangement par Claude (une seule fois)
+
+1. Crée une clé sur [console.anthropic.com](https://console.anthropic.com) (**API Keys → Create Key**). L'usage est facturé à la demande sur ce compte Anthropic.
+2. Dans Vercel : **Settings → Environment Variables → Add**, Key `ANTHROPIC_API_KEY`, Value : la clé, environnements : tous. **Save**.
+3. Redéploie (onglet **Deployments → ⋯ → Redeploy**).
+
+Facultatif : `ANTHROPIC_MODEL` pour choisir un autre modèle (par défaut `claude-sonnet-5-5`).
+
 ## Déployer sur GitHub + Vercel
 
 ### 1. Mettre le code sur GitHub

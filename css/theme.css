@@ -739,3 +739,50 @@ body.with-nav{ max-width:none; padding:0; }
   .gsearch-type{ width:70px; }
 }
 @media (max-width:640px){ .ed-header .hb-crumb{ display:none; } .ed-header .gsearch{ flex:1 1 auto; } }
+
+/* ---------- Fiches : dictée, rangement par Claude, nouvelles rubriques, liens avec la thèse ---------- */
+.fiche-upgrade{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; margin:0; padding:12px 24px; background:var(--sec-amber-bg); border-bottom:1px solid var(--border); font-size:13.5px; }
+.fiche-upgrade p{ margin:0; flex:1 1 320px; min-width:0; }
+.fiche-upgrade-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+
+.fiche-dictee{ padding:12px 24px; border-bottom:1px solid var(--border); background:var(--surface); }
+.fiche-dictee-toggle{ display:flex; align-items:center; flex-wrap:wrap; gap:4px 10px; width:100%; padding:10px 14px; border:1.5px dashed var(--accent); border-radius:12px; background:var(--accent-soft); color:var(--accent-ink); font:inherit; font-size:14px; font-weight:700; text-align:left; cursor:pointer; }
+.fiche-dictee-toggle .ico{ width:18px; height:18px; }
+.fiche-dictee-toggle small{ color:var(--ink-soft); font-size:12.5px; font-weight:500; }
+.fiche-dictee-toggle[aria-expanded="true"]{ border-style:solid; }
+.fiche-dictee-toggle:focus-visible{ outline:2px solid var(--accent-ink); outline-offset:2px; }
+.fiche-dictee-body{ display:flex; flex-direction:column; gap:10px; padding-top:12px; }
+.fiche-dictee-hint{ margin:0; color:var(--ink-soft); font-size:13px; line-height:1.5; max-width:70ch; }
+.fiche-dictee-text{ width:100%; min-height:120px; box-sizing:border-box; resize:vertical; font:inherit; font-size:14.5px; line-height:1.6; }
+.fiche-dictee-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.fiche-dictee-actions .btn{ min-height:42px; }
+.fiche-dictee-mic.recording{ background:var(--accent); border-color:var(--accent); color:#fff; animation:ficheMicPulse 1.4s ease-in-out infinite; }
+.fiche-dictee-status{ color:var(--ink-soft); font-size:12.5px; min-height:1em; }
+
+.cellwrap.fiche-v2-wrap.has-mic{ padding-right:40px; }
+.fiche-mic{ position:absolute; top:4px; right:2px; width:32px; height:32px; border-radius:50%; color:var(--ink-faint); opacity:.75; }
+.fiche-mic:hover, .fiche-mic:focus-visible{ color:var(--accent-ink); opacity:1; background:var(--accent-soft); }
+.fiche-mic.recording{ background:var(--accent); color:#fff; opacity:1; animation:ficheMicPulse 1.4s ease-in-out infinite; }
+.fiche-v2-editor.dictating{ background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent); }
+.dictation-interim{ color:var(--ink-faint); }
+@keyframes ficheMicPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(217,70,127,.45); } 50%{ box-shadow:0 0 0 7px rgba(217,70,127,0); } }
+@media (prefers-reduced-motion: reduce){ .fiche-mic.recording, .fiche-dictee-mic.recording{ animation:none; } }
+
+.fiche-thesis-links{ margin:0; padding:16px 24px 18px; border-top:2px solid var(--border); background:var(--accent-soft); }
+.fiche-thesis-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; margin-bottom:10px; }
+.fiche-thesis-head h3{ margin:0; color:var(--accent-ink); font-family:Inter,system-ui,sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.fiche-thesis-head small{ color:var(--ink-soft); font-size:12.5px; }
+.fiche-thesis-list{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.fiche-thesis-list .attachment-pill{ font-size:12.5px; padding:5px 10px; }
+.fiche-thesis-list .lib-hint{ margin:0; }
+.fiche-thesis-add{ background:var(--surface); }
+
+.section-fiche-links{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:0 0 16px; padding:9px 14px; border-radius:12px; background:var(--accent-soft); color:var(--accent-ink); font-size:13px; }
+.section-fiche-links .ico{ width:15px; height:15px; }
+.section-fiche-links strong{ margin-right:4px; font-weight:700; }
+.section-fiche-links button{ padding:3px 10px; border:1px solid var(--border-strong); border-radius:999px; background:var(--surface); color:var(--ink); font:inherit; font-size:12.5px; cursor:pointer; }
+.section-fiche-links button:hover, .section-fiche-links button:focus-visible{ border-color:var(--accent); color:var(--accent-ink); }
+
+@media (max-width:640px){
+  .fiche-dictee, .fiche-upgrade, .fiche-thesis-links{ padding-left:14px; padding-right:14px; }
+}

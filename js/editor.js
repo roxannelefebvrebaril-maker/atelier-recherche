@@ -340,7 +340,7 @@ window.Editor = (function(){
     check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     palette:'<circle cx="12" cy="12" r="9"/><circle cx="8" cy="10" r="1.2"/><circle cx="12" cy="7.5" r="1.2"/><circle cx="16" cy="10" r="1.2"/>',
     table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>', canvas:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M14 15l3-3"/>',
-    column:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>', close:'<path d="M6 6l12 12M18 6L6 18"/>'
+    column:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>', mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>', close:'<path d="M6 6l12 12M18 6L6 18"/>'
     ,anchor:'<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/>', question:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><circle cx="12" cy="17" r=".6"/>', target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>', axis:'<path d="M5 19V5M5 19h14M9 15l3-3 3 2 4-6"/>', concept:'<path d="M9 18h6M10 21h4M8 14a6 6 0 1 1 8 0c-.8.6-1 1.1-1 2H9c0-.9-.2-1.4-1-2z"/>', theory:'<path d="M4 19h16M6 17V9M10 17V6M14 17V9M18 17V4"/>', book:'<path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 0-2 2V4zM5 20h14"/>'
   };
   function icon(name, extraClass){
@@ -1047,6 +1047,7 @@ window.Editor = (function(){
       ])
     ]);
     content.appendChild(head);
+    if (s.kind === "table"){ var ficheLinksBar = renderSectionFicheLinks(s.obj); if (ficheLinksBar) content.appendChild(ficheLinksBar); }
     if (s.kind === "table" && !isFicheGallerySection(s.obj) && normalizeText(s.obj.title) === "fiches de lecture"){
       content.appendChild(el("div", {class:"section-fiche-create"}, [btn("plus", "+ Nouvelle fiche de lecture", function(){ openFicheCreationModal(s.obj); }, "ghost")]));
     }
@@ -1127,6 +1128,7 @@ window.Editor = (function(){
       stat(String(totalSummaries), "résumés rédigés")
     ]));
     content.appendChild(hero);
+    var cardsFicheLinks = renderSectionFicheLinks(root); if (cardsFicheLinks) content.appendChild(cardsFicheLinks);
     var last = null; try { last = localStorage.getItem(viewKey() + ":child:" + sec.id); } catch(e){}
     var lastChild = last && children.find(function(child){ return child.id === last; });
     if (lastChild) content.appendChild(el("button", {class:"ov-resume", type:"button", onclick:function(){ setChild(lastChild.id); }}, [
@@ -1180,21 +1182,356 @@ window.Editor = (function(){
       fiche.ficheItems.push({type:"row", id:row.id});
     });
     var definitions = template.tables || [];
-    var initialOrder = ["kw", "resume", "hypothese", "definitions", "concepts", "notes"];
+    var initialOrder = ficheTemplateOrder(template);
     fiche.ficheItems = initialOrder.map(function(key){
       var row = fiche.rows.find(function(item){ return item.key === key; });
       if (row) return {type:"row", id:row.id};
       var def = definitions.find(function(item){ return item.key === key; });
-      if (!def) return null;
-      var cols = def.columns.map(function(label){ return {id:uid("col"), label:label}; });
-      var firstRow = {id:uid("row"), cells:{}};
-      cols.forEach(function(col){ firstRow.cells[col.id] = {text:"",tags:[]}; });
-      var child = {id:uid("tbl"), parentId:fiche.id, title:def.label, columns:cols, rows:[firstRow], key:def.key, hint:def.hint, rowLines:"strong"};
-      state.tables.push(child);
-      return {type:"table", id:child.id};
+      return def ? createFicheTableFromDef(fiche, def) : null;
     }).filter(Boolean);
+    fiche.ficheTemplateVersion = template.version || 2;
     if (sourceRef) fiche.sourceRef = sourceRef;
     return fiche;
+  }
+
+  function ficheTemplateOrder(template){
+    return template && Array.isArray(template.order) ? template.order : ["kw", "resume", "hypothese", "definitions", "concepts", "notes"];
+  }
+  // Tableau intégré d'une fiche (Définitions, Concepts, Citations…), créé à partir du modèle.
+  function createFicheTableFromDef(fiche, def){
+    var cols = def.columns.map(function(label){ return {id:uid("col"), label:label}; });
+    var firstRow = {id:uid("row"), cells:{}};
+    cols.forEach(function(col){ firstRow.cells[col.id] = {text:"",tags:[]}; });
+    var child = {id:uid("tbl"), parentId:fiche.id, title:def.label, columns:cols, rows:[firstRow], key:def.key, hint:def.hint, rowLines:"strong"};
+    state.tables.push(child);
+    return {type:"table", id:child.id};
+  }
+  function ficheItemKey(fiche, item){
+    if (item.type === "row"){ var row = (fiche.rows || []).find(function(r){ return r.id === item.id; }); return row ? row.key : null; }
+    var table = state.tables.find(function(t){ return t.id === item.id; });
+    return table ? table.key : null;
+  }
+  function ficheHasKey(fiche, key){
+    return (fiche.rows || []).some(function(row){ return row.key === key; }) ||
+      state.tables.some(function(t){ return t.parentId === fiche.id && t.key === key; });
+  }
+  // Rubriques du modèle actuel absentes d'une fiche plus ancienne (fiches v2 seulement).
+  function missingFicheTemplateItems(fiche){
+    var template = window.FICHE_LECTURE_TEMPLATE;
+    if (!template || !fiche || fiche.ficheVersion !== 2) return [];
+    return ficheTemplateOrder(template).filter(function(key){ return !ficheHasKey(fiche, key); }).map(function(key){
+      var rowDef = (template.rows || []).find(function(def){ return def.key === key; });
+      if (rowDef) return {key:key, type:"row", def:rowDef};
+      var tableDef = (template.tables || []).find(function(def){ return def.key === key; });
+      return tableDef ? {key:key, type:"table", def:tableDef} : null;
+    }).filter(Boolean);
+  }
+  // Ajoute à une fiche existante les rubriques qui lui manquent, vides, à leur place dans
+  // l'ordre du modèle. Rien de ce qui est déjà écrit n'est déplacé ni modifié.
+  function upgradeFicheTemplate(fiche){
+    var template = window.FICHE_LECTURE_TEMPLATE, order = ficheTemplateOrder(template);
+    var rub = fiche.columns[0], cont = fiche.columns[1];
+    if (!rub || !cont) return 0;
+    var added = 0;
+    missingFicheTemplateItems(fiche).forEach(function(missing){
+      var item;
+      if (missing.type === "row"){
+        var row = {id:uid("row"), key:missing.key, hint:missing.def.hint || "", long:!!missing.def.long, cells:{}};
+        row.cells[rub.id] = {text:missing.def.label || "", tags:[]};
+        row.cells[cont.id] = {text:"", tags:[]};
+        fiche.rows.push(row);
+        item = {type:"row", id:row.id};
+      } else item = createFicheTableFromDef(fiche, missing.def);
+      var rank = order.indexOf(missing.key), at = fiche.ficheItems.length;
+      for (var i = 0; i < fiche.ficheItems.length; i++){
+        var otherRank = order.indexOf(ficheItemKey(fiche, fiche.ficheItems[i]));
+        if (otherRank > rank){ at = i; break; }
+      }
+      fiche.ficheItems.splice(at, 0, item);
+      added++;
+    });
+    fiche.ficheTemplateVersion = template.version || 3;
+    return added;
+  }
+
+  /* ---------------- fiches : dictée, rangement par Claude, liens avec la thèse ---------------- */
+
+  // Reconnaissance vocale du navigateur (Chrome, Edge, Safari). Firefox ne l'offre pas :
+  // les boutons micro ne s'affichent alors pas et tout se remplit au clavier.
+  var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  var activeDictation = null;
+  function canDictate(){ return !!SpeechRec; }
+  function stopDictation(){ if (activeDictation){ var d = activeDictation; activeDictation = null; d.stop(); } }
+  // onText(finalText, interimText) reçoit tout ce qui a été dit depuis le début de la dictée ;
+  // onEnd(errorCode|null) est appelé une seule fois, quand la dictée s'arrête.
+  function startDictation(onText, onEnd){
+    stopDictation();
+    var rec = new SpeechRec(), finalText = "", stopped = false, ended = false, lastError = null;
+    rec.lang = "fr-CA"; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = function(e){
+      var interim = "";
+      for (var i = e.resultIndex; i < e.results.length; i++){
+        var t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += (finalText && !/\s$/.test(finalText) ? " " : "") + t.trim();
+        else interim += t;
+      }
+      onText(finalText, interim.trim());
+    };
+    rec.onerror = function(e){ lastError = e.error || "error"; };
+    rec.onend = function(){
+      // Chrome coupe la dictée après un silence : on relance tant que la personne n'a pas arrêté.
+      if (!stopped && !lastError){ try { rec.start(); return; } catch(err){} }
+      if (ended) return; ended = true;
+      if (activeDictation && activeDictation.rec === rec) activeDictation = null;
+      onEnd(lastError === "no-speech" || lastError === "aborted" ? null : lastError);
+    };
+    var ctrl = {rec:rec, stop:function(){ stopped = true; try { rec.stop(); } catch(err){} }};
+    activeDictation = ctrl;
+    try { rec.start(); } catch(err){ activeDictation = null; onEnd("start"); }
+    return ctrl;
+  }
+  function dictationErrorText(code){
+    if (code === "not-allowed" || code === "service-not-allowed") return "Le micro est bloqué. Autorise le micro pour ce site dans ton navigateur, puis réessaie.";
+    if (code === "audio-capture") return "Aucun micro n'a été trouvé sur cet appareil.";
+    if (code === "network") return "La dictée a besoin d'Internet. Vérifie ta connexion.";
+    return "La dictée s'est arrêtée. Touche le micro pour reprendre.";
+  }
+  function escapeText(text){
+    return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+  }
+
+  // Bouton micro d'une rubrique : ce qui est dit s'ajoute à la fin du texte déjà écrit.
+  function ficheMicButton(editor, cell, labelText){
+    if (!canDictate()) return null;
+    var button = iconBtn("mic", "Dicter « " + labelText + " »", null, "fiche-mic");
+    var ctrl = null;
+    function setOn(on){
+      button.classList.toggle("recording", on);
+      button.setAttribute("aria-pressed", String(on));
+      button.title = on ? "Arrêter la dictée" : "Dicter « " + labelText + " »";
+      button.setAttribute("aria-label", button.title);
+      editor.classList.toggle("dictating", on);
+    }
+    button.addEventListener("click", function(e){
+      e.stopPropagation();
+      if (ctrl){ ctrl.stop(); return; }
+      var base = editor.innerHTML.replace(/(<br>|\s|&nbsp;)+$/g, "");
+      var sep = stripHtml(base).trim() ? " " : "";
+      setOn(true);
+      ctrl = startDictation(function(finalText, interim){
+        editor.innerHTML = base + sep + escapeText(finalText) + (interim ? '<span class="dictation-interim">' + escapeText((finalText ? " " : "") + interim) + "</span>" : "");
+      }, function(error){
+        ctrl = null; setOn(false);
+        var interimNode = editor.querySelector(".dictation-interim"); if (interimNode) interimNode.remove();
+        cell.text = stripHtml(editor.innerHTML).trim() ? editor.innerHTML : "";
+        dirty = true; scheduleSave(true); updateProgressIndicators();
+        if (error) showToast(dictationErrorText(error), null);
+      });
+    });
+    return button;
+  }
+
+  // Rubriques texte et tableaux de la fiche, tels que Claude doit les remplir.
+  function ficheStructureForRanger(fiche){
+    var rows = [], tables = [];
+    (fiche.ficheItems || []).forEach(function(item){
+      if (item.type === "row"){
+        var row = (fiche.rows || []).find(function(r){ return r.id === item.id; });
+        if (row) rows.push({key:row.id, label:stripHtml(row.cells[fiche.columns[0].id].text || "").trim(), hint:row.hint || ""});
+      } else {
+        var table = state.tables.find(function(t){ return t.id === item.id; });
+        if (table) tables.push({key:table.id, label:stripHtml(table.title || "").trim(), hint:table.hint || "", columns:table.columns.map(function(col){ return col.label; })});
+      }
+    });
+    return {rows:rows, tables:tables};
+  }
+  // Ajoute la réponse de Claude à la fiche, sans jamais effacer ce qui est déjà écrit.
+  function applyRangement(fiche, result){
+    var contCol = fiche.columns[1], added = 0;
+    var refRow = ficheReferenceRow(fiche);
+    if (result.reference && refRow && !stripHtml(refRow.cells[contCol.id].text || "").trim()){
+      refRow.cells[contCol.id].text = escapeText(result.reference); added++;
+      if (!stripHtml(fiche.title || "").trim() || fiche.title === "Nouvelle fiche") fiche.title = shortCitation(result.reference);
+    }
+    Object.keys(result.rows || {}).forEach(function(rowId){
+      var text = String(result.rows[rowId] || "").trim(); if (!text) return;
+      var row = (fiche.rows || []).find(function(r){ return r.id === rowId; }); if (!row) return;
+      var cell = row.cells[contCol.id] || (row.cells[contCol.id] = {text:"", tags:[]});
+      cell.text = stripHtml(cell.text || "").trim() ? cell.text + "<br><br>" + escapeText(text) : escapeText(text);
+      added++;
+    });
+    Object.keys(result.tables || {}).forEach(function(tableId){
+      var table = state.tables.find(function(t){ return t.id === tableId && t.parentId === fiche.id; }); if (!table) return;
+      var lines = Array.isArray(result.tables[tableId]) ? result.tables[tableId] : [];
+      lines.forEach(function(line){
+        if (!Array.isArray(line) || !line.some(function(v){ return String(v || "").trim(); })) return;
+        var empty = table.rows.find(function(row){ return table.columns.every(function(col){ return !stripHtml(row.cells[col.id] && row.cells[col.id].text || "").trim(); }); });
+        var row = empty || {id:uid("row"), cells:{}};
+        table.columns.forEach(function(col, i){ row.cells[col.id] = {text:escapeText(String(line[i] == null ? "" : line[i]).trim()), tags:(row.cells[col.id] && row.cells[col.id].tags) || []}; });
+        if (!empty) table.rows.push(row);
+        added++;
+      });
+    });
+    return added;
+  }
+
+  function renderFicheDictation(fiche){
+    var panel = el("section", {class:"fiche-dictee", "aria-label":"Dicter la fiche"});
+    var open = !!fiche.dictee;
+    var toggle = el("button", {class:"fiche-dictee-toggle", type:"button", "aria-expanded":String(open)}, [icon("mic"), el("span", {text:"Dicter la fiche"}), el("small", {text:"Parle de ta lecture, Claude range tes propos dans les rubriques"})]);
+    var body = el("div", {class:"fiche-dictee-body", hidden:!open});
+    toggle.addEventListener("click", function(){ var now = body.hidden; body.hidden = !now; toggle.setAttribute("aria-expanded", String(now)); if (now) area.focus(); });
+    var areaId = "fiche-dictee-" + fiche.id;
+    var area = el("textarea", {class:"field fiche-dictee-text", id:areaId, rows:"5", "aria-label":"Dictée libre", placeholder:"Ex. : Le texte porte sur… L'autrice s'appuie sur Goffman… Citation, page 120 : « … » Pour ma thèse, je retiens…"});
+    area.value = fiche.dictee || "";
+    area.addEventListener("input", function(){ fiche.dictee = area.value; dirty = true; });
+    area.addEventListener("blur", function(){ fiche.dictee = area.value; scheduleSave(true); });
+    var status = el("div", {class:"fiche-dictee-status", role:"status", "aria-live":"polite"});
+    var actions = el("div", {class:"fiche-dictee-actions"});
+    var mic = null, ctrl = null;
+    if (canDictate()){
+      mic = el("button", {class:"btn fiche-dictee-mic", type:"button", "aria-pressed":"false"}, [icon("mic"), el("span", {text:"Parler"})]);
+      mic.addEventListener("click", function(){
+        if (ctrl){ ctrl.stop(); return; }
+        var base = area.value.replace(/\s+$/, ""), sep = base ? (/[.!?]$/.test(base) ? " " : ". ") : "";
+        mic.classList.add("recording"); mic.setAttribute("aria-pressed", "true"); mic.lastChild.textContent = "Arrêter";
+        status.textContent = "Je t'écoute… Parle naturellement ; touche « Arrêter » quand tu as fini.";
+        ctrl = startDictation(function(finalText, interim){
+          area.value = base + (finalText || interim ? sep : "") + finalText + (interim ? (finalText ? " " : "") + interim : "");
+          area.scrollTop = area.scrollHeight;
+        }, function(error){
+          ctrl = null;
+          mic.classList.remove("recording"); mic.setAttribute("aria-pressed", "false"); mic.lastChild.textContent = "Parler";
+          fiche.dictee = area.value; scheduleSave(true);
+          status.textContent = error ? dictationErrorText(error) : "";
+        });
+      });
+      actions.appendChild(mic);
+    } else {
+      status.textContent = "Ce navigateur n'offre pas la dictée (essaie Chrome, Edge ou Safari). Tu peux aussi utiliser le micro du clavier de ton téléphone.";
+    }
+    var ranger = el("button", {class:"btn primary fiche-dictee-ranger", type:"button"}, [icon("check"), el("span", {text:"Ranger dans la fiche"})]);
+    ranger.addEventListener("click", function(){
+      if (ctrl) ctrl.stop();
+      var text = area.value.trim();
+      if (!text){ status.textContent = "La dictée est vide : parle ou écris d'abord ce que tu retiens de ta lecture."; area.focus(); return; }
+      if (!Cloud.isCloud()){ status.textContent = "Le rangement par Claude fonctionne seulement sur le site en ligne, une fois connectée."; return; }
+      ranger.disabled = true; ranger.lastChild.textContent = "Rangement en cours…";
+      status.textContent = "Claude lit ta dictée et la répartit dans les rubriques. Cela prend quelques secondes.";
+      var structure = ficheStructureForRanger(fiche);
+      Cloud.request("POST", "/api/ranger", {texte:text, reference:ficheReferenceText(fiche), rubriques:structure.rows, tableaux:structure.tables}).then(function(r){
+        ranger.disabled = false; ranger.lastChild.textContent = "Ranger dans la fiche";
+        if (!r.ok){
+          status.textContent = r.data && r.data.error === "not_configured" ? "Le rangement par Claude n'est pas encore activé : il manque la clé ANTHROPIC_API_KEY dans Vercel. Ta dictée est gardée."
+            : (r.data && r.data.error ? r.data.error : "Le rangement n'a pas abouti. Ta dictée est gardée ; réessaie dans un instant.");
+          return;
+        }
+        var added = applyRangement(fiche, r.data || {});
+        if (!added){ status.textContent = "Claude n'a rien trouvé à ranger. Précise ta dictée et réessaie."; return; }
+        fiche.dictee = "";
+        scheduleSave(true); render();
+        showToast(added + (added > 1 ? " éléments ajoutés" : " élément ajouté") + " à la fiche. Relis et ajuste au besoin.", null);
+      }).catch(function(){
+        ranger.disabled = false; ranger.lastChild.textContent = "Ranger dans la fiche";
+        status.textContent = "Impossible de joindre le serveur. Ta dictée est gardée ; réessaie quand la connexion revient.";
+      });
+    });
+    actions.appendChild(ranger);
+    body.appendChild(el("p", {class:"fiche-dictee-hint", text:"Dis tout d'un bloc : de quoi parle le texte, la théorie, la méthode, les résultats, une citation avec sa page, ce que tu en retiens. Claude ajoute tes propos dans les bonnes rubriques sans effacer ce qui est déjà écrit."}));
+    body.appendChild(area); body.appendChild(actions); body.appendChild(status);
+    panel.appendChild(toggle); panel.appendChild(body);
+    return panel;
+  }
+
+  function renderFicheUpgradeBanner(fiche){
+    if (fiche.ficheUpgradeDismissed) return null;
+    var missing = missingFicheTemplateItems(fiche);
+    if (!missing.length) return null;
+    var names = missing.map(function(m){ return m.def.label; }).join(", ");
+    return el("div", {class:"fiche-upgrade", role:"note"}, [
+      el("p", {}, [el("strong", {text:"Nouvelles rubriques disponibles : "}), el("span", {text:names + "."})]),
+      el("div", {class:"fiche-upgrade-actions"}, [
+        el("button", {class:"btn primary", type:"button", text:"Les ajouter à cette fiche", onclick:function(){ var n = upgradeFicheTemplate(fiche); scheduleSave(true); render(); showToast(n + (n > 1 ? " rubriques ajoutées." : " rubrique ajoutée."), null); }}),
+        el("button", {class:"btn ghost", type:"button", text:"Non merci", onclick:function(){ fiche.ficheUpgradeDismissed = true; scheduleSave(true); render(); }})
+      ])
+    ]);
+  }
+
+  // Fiche à laquelle appartient une entité (la fiche elle-même, une de ses cases ou un de ses tableaux).
+  function ficheOfEntity(entityId){
+    var m = /^f:([^:]+)$/.exec(entityId || "");
+    var id = m ? m[1] : (/^[tr]:([^:]+):/.exec(entityId || "") || [])[1];
+    if (!id) return null;
+    var table = state.tables.find(function(t){ return t.id === id; });
+    if (table && table.kind === "fiche") return table;
+    var parent = table && table.parentId && state.tables.find(function(t){ return t.id === table.parentId; });
+    return parent && parent.kind === "fiche" ? parent : null;
+  }
+  function tableIdOfEntity(entityId){ return (/^[tr]:([^:]+):/.exec(entityId || "") || [])[1] || null; }
+  function sectionSubtreeIds(rootId){
+    var ids = {}; ids[rootId] = true;
+    var changed = true;
+    while (changed){
+      changed = false;
+      state.tables.forEach(function(t){ if (t.parentId && ids[t.parentId] && !ids[t.id]){ ids[t.id] = true; changed = true; } });
+    }
+    return ids;
+  }
+  // Fiches reliées à quelque chose dans une section (une case, une ancre : concept, objectif…).
+  function fichesLinkedToSection(root){
+    if (!root || isFicheGallerySection(root)) return [];
+    var ids = sectionSubtreeIds(root.id), found = {}, list = [];
+    (state.links || []).forEach(function(link){
+      [[link.a, link.b], [link.b, link.a]].forEach(function(pair){
+        var here = tableIdOfEntity(pair[0]);
+        if (!here || !ids[here]) return;
+        var fiche = ficheOfEntity(pair[1]);
+        if (fiche && !found[fiche.id]){ found[fiche.id] = true; list.push(fiche); }
+      });
+    });
+    return list.sort(function(a, b){ return shortCitation(a.title || "").localeCompare(shortCitation(b.title || ""), "fr", {sensitivity:"base"}); });
+  }
+  function renderSectionFicheLinks(root){
+    var fiches = fichesLinkedToSection(root);
+    if (!fiches.length) return null;
+    var bar = el("div", {class:"section-fiche-links"}, [icon("link"), el("strong", {text:fiches.length + (fiches.length > 1 ? " fiches de lecture liées" : " fiche de lecture liée")})]);
+    fiches.forEach(function(fiche){
+      bar.appendChild(el("button", {type:"button", title:"Ouvrir la fiche « " + stripHtml(fiche.title || "") + " »", text:shortCitation(stripHtml(fiche.title || "Fiche de lecture")), onclick:function(){ setSection(fiche.parentId); setChild(fiche.id); }}));
+    });
+    return bar;
+  }
+
+  // « Liens avec ma thèse » : tout ce à quoi la fiche est rattachée, en clair, avec un bouton pour en ajouter.
+  function renderFicheThesisLinks(fiche){
+    var fid = entityKeyForFiche(fiche.id);
+    var box = el("section", {class:"fiche-thesis-links", "data-fiche-links":fiche.id, "aria-label":"Liens avec ma thèse"});
+    function draw(){
+      box.innerHTML = "";
+      box.appendChild(el("div", {class:"fiche-thesis-head"}, [
+        el("h3", {text:"Liens avec ma thèse"}),
+        el("small", {text:"Concepts, objectifs, questions, théories ou réflexions que ce texte nourrit. La fiche apparaît ensuite dans ces sections."})
+      ]));
+      var list = el("div", {class:"fiche-thesis-list"});
+      anchorLinksFor(fid).forEach(function(item){
+        if (item.anchor){
+          var meta = ANCHOR_TYPES[item.anchor.type];
+          list.appendChild(el("button", {class:"attachment-pill", type:"button", title:"Aller à : " + item.anchor.fullText, onclick:function(){ goTo(item.anchor.id); }}, [icon(meta.icon), el("span", {text:meta.label + " · " + item.anchor.text})]));
+        } else if (item.other && getEntity(item.other)){
+          list.appendChild(el("button", {class:"attachment-pill attachment-reflection", type:"button", title:"Aller à : " + entityLabel(item.other), onclick:function(){ goTo(item.other); }}, [icon("link"), el("span", {text:shortLinkLabel(item.other)})]));
+        }
+      });
+      if (!list.children.length) list.appendChild(el("p", {class:"lib-hint", text:"Aucun lien pour l'instant."}));
+      box.appendChild(list);
+      var add = btn("plus", "Rattacher à ma thèse", null, "ghost fiche-thesis-add");
+      add.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(add, fid); });
+      box.appendChild(add);
+    }
+    box.redraw = draw;
+    draw();
+    return box;
+  }
+  function refreshFicheThesisLinks(){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-fiche-links]"), function(node){ if (node.redraw) node.redraw(); });
   }
 
   function ficheReferenceRow(fiche){
@@ -1344,7 +1681,7 @@ window.Editor = (function(){
       entries.forEach(function(entry){
         var table = entry.table;
         var labels = (table.tags || []).map(function(id){ var tag = tagById(id); return tag ? tag.label : ""; }).join(" ");
-        var values = [table.title, ficheRowValue(table,"reference"), labels, ficheRowValue(table,"kw"), ficheRowValue(table,"resume"), ficheRowValue(table,"hypothese"), ficheRowValue(table,"notes"), ficheRowValue(table,"f1_09")];
+        var values = [table.title, ficheRowValue(table,"reference"), labels, ficheRowValue(table,"kw"), ficheRowValue(table,"resume"), ficheRowValue(table,"hypothese"), ficheRowValue(table,"notes"), ficheRowValue(table,"cadre"), ficheRowValue(table,"methodo"), ficheRowValue(table,"resultats"), ficheRowValue(table,"limites"), ficheRowValue(table,"f1_09")];
         (table.ficheItems || []).forEach(function(item){
           if (item.type !== "table") return;
           var child = state.tables.find(function(t){ return t.id === item.id; });
@@ -1472,6 +1809,9 @@ window.Editor = (function(){
     ]);
     head.appendChild(progress);
     card.appendChild(head);
+    var upgrade = renderFicheUpgradeBanner(fiche);
+    if (upgrade) card.appendChild(upgrade);
+    card.appendChild(renderFicheDictation(fiche));
 
     var itemList = el("div", {class:"fiche-v2-items", "data-fiche-items":fiche.id});
     fiche.ficheItems.forEach(function(item, itemIndex){
@@ -1512,6 +1852,7 @@ window.Editor = (function(){
       itemList.appendChild(itemEl);
     });
     card.appendChild(itemList);
+    card.appendChild(renderFicheThesisLinks(fiche));
     var add = el("footer", {class:"fiche-v2-add"}, [
       el("button", {class:"fiche-add-table", type:"button", "aria-label":"Insérer un tableau dans la fiche", text:"+ Insérer un tableau", onclick:function(){ addFicheTable(fiche, itemList); }}),
       el("button", {class:"fiche-add-zone", type:"button", "aria-label":"Ajouter une zone de rédaction", text:"+ Ajouter une zone de rédaction", onclick:function(){ addFicheZone(fiche, itemList); }}),
@@ -1615,7 +1956,10 @@ window.Editor = (function(){
     editor.innerHTML = cell.text || "";
     attachRichText(editor, cell, "text"); plainPaste(editor);
     editor.addEventListener("focus", function(){ lastFocus = {kind:"table", tableId:fiche.id, rowId:row.id, colId:col.id, diagramId:null}; setContextEntity(eid); });
-    container.appendChild(ficheEntityWrap(eid, cell, editor));
+    var wrap = ficheEntityWrap(eid, cell, editor);
+    var mic = ficheMicButton(editor, cell, stripHtml(row.cells[fiche.columns[0].id] && row.cells[fiche.columns[0].id].text || "").trim() || "cette rubrique");
+    if (mic){ wrap.classList.add("has-mic"); wrap.appendChild(mic); }
+    container.appendChild(wrap);
   }
 
   function renderFicheV2Table(container, fiche, table){
@@ -3523,7 +3867,7 @@ window.Editor = (function(){
     }
     function changed(other){
       buildLinkIndex(); scheduleSave(true);
-      refreshAttachmentDisplay(entityId); refreshAttachmentDisplay(other);
+      refreshAttachmentDisplay(entityId); refreshAttachmentDisplay(other); refreshFicheThesisLinks();
       drawExisting(); drawResults();
     }
     function toggle(other){
