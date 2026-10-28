@@ -793,3 +793,102 @@ body.with-nav{ max-width:none; padding:0; }
 .modal.fiche-paste-modal{ width:min(680px, calc(100vw - 32px)); max-width:none; }
 .fiche-paste-text{ width:100%; box-sizing:border-box; min-height:260px; resize:vertical; font:inherit; font-size:13.5px; line-height:1.55; }
 .fiche-paste-preview{ min-height:1.2em; margin:8px 0 12px; color:var(--ink-soft); font-size:12.5px; }
+
+/* ==========================================================================
+   Fiche de lecture — visuel « Fiche structurée » (proposition A)
+   Palette et typographie propres à la fiche, reprises de la maquette.
+   ========================================================================== */
+.fiche-a{
+  --fa-bg:#fbedf1; --fa-surface:#fffbfc; --fa-surface-2:#f9e6ec; --fa-ink:#3a2530; --fa-ink-soft:#6b4a57; --fa-ink-faint:#8a6474;
+  --fa-border:#f0d3de; --fa-border-strong:#e0aec4; --fa-accent:#b0577f; --fa-accent-ink:#7a3a58; --fa-label:#8a4466; --fa-soft:#f9dfea;
+  display:flex; flex-direction:column; gap:18px; padding:28px clamp(16px, 4vw, 44px) 24px; border-radius:20px; background:var(--fa-bg); color:var(--fa-ink); font-family:Inter, system-ui, sans-serif;
+}
+.fa-top{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px 16px; }
+.fa-kicker{ color:var(--fa-ink-faint); font-size:11.5px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; }
+.fa-top-actions{ display:flex; align-items:center; gap:8px; }
+.fa-statut{ appearance:none; -webkit-appearance:none; height:30px; padding:0 14px; border:0; border-radius:999px; font:inherit; font-size:12px; font-weight:600; cursor:pointer; background:var(--fa-surface-2); color:var(--fa-ink-soft); }
+.fa-statut-en-cours{ background:#fbe8d4; color:#7a5228; }
+.fa-statut-lue{ background:#e1f0e2; color:#3f6b47; }
+.fa-statut-relue{ background:#dfeaf5; color:#3d5f80; }
+.fa-statut:focus-visible{ outline:2px solid var(--fa-accent-ink); outline-offset:2px; }
+.fa-dicter{ display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 20px; border:0; border-radius:999px; background:var(--fa-accent); color:#fff; font:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+.fa-dicter .ico{ width:18px; height:18px; }
+.fa-dicter[aria-expanded="true"]{ background:var(--fa-accent-ink); }
+.fa-dicter:focus-visible{ outline:2px solid var(--fa-accent-ink); outline-offset:3px; }
+.fa-more{ background:var(--fa-surface); }
+
+.fa-head{ display:flex; flex-direction:column; gap:10px; padding:22px 24px; border:1px solid var(--fa-border); border-radius:14px; background:var(--fa-surface); }
+.fa-title{ min-height:34px; margin:0 -4px; padding:2px 4px; border-radius:8px; outline:none; font-family:'Source Serif 4', Georgia, serif; font-size:clamp(22px, 3vw, 28px); font-weight:600; line-height:1.2; text-wrap:balance; overflow-wrap:anywhere; }
+.fa-title:empty::before{ content:attr(data-ph); color:var(--fa-ink-faint); }
+.fa-title:focus{ background:var(--fa-surface-2); box-shadow:0 0 0 3px var(--fa-soft); }
+.fa-reference .cellwrap.fiche-v2-wrap{ padding-bottom:0; }
+.fa-reference .fiche-v2-editor{ min-height:0; padding:2px 4px; margin:0 -4px; color:var(--fa-ink-soft); font-size:14.5px; line-height:1.5; background:transparent; }
+.fa-tags{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.fa-tags .mini-tag{ font-size:12px; font-weight:600; padding:4px 10px; border-radius:999px; }
+.fa-add-tag{ padding:4px 10px; border:1px dashed var(--fa-border-strong); border-radius:999px; background:transparent; color:var(--fa-ink-soft); font:inherit; font-size:12px; cursor:pointer; }
+.fa-progress{ margin-top:2px; }
+.fa-progress .pbar>span{ background:var(--fa-accent); }
+.fa-docs summary{ color:var(--fa-ink-faint); font-size:12px; font-weight:600; cursor:pointer; }
+.fa-docs .fiche-docs > .fiche-v2-reference-label{ display:none; }
+.fa-head .fiche-v2-entity-controls{ margin-top:0; }
+
+.fiche-a .fiche-upgrade, .fiche-a .fiche-dictee{ border:1px solid var(--fa-border); border-radius:14px; }
+.fiche-a .fiche-dictee{ background:var(--fa-surface); }
+.fiche-a .fiche-dictee-toggle{ display:none; }
+.fiche-a .fiche-dictee-body{ padding-top:0; }
+.fiche-a .fiche-dictee-ranger{ background:var(--fa-accent); border-color:var(--fa-accent); }
+
+.fa-grid{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; align-items:start; }
+.fa-col{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+.fa-card{ position:relative; min-width:0; padding:16px 18px; border:1px solid var(--fa-border); border-radius:12px; background:var(--fa-surface); }
+.fa-card-notes, .fa-card-custom{ border-style:dashed; border-color:var(--fa-border-strong); }
+.fa-label{ margin:0 28px 8px 0; color:var(--fa-label); font-family:Inter, system-ui, sans-serif; font-size:11.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.fa-label-name[contenteditable="true"]{ outline:none; border-radius:4px; }
+.fa-label-name[contenteditable="true"]:focus{ background:var(--fa-surface-2); }
+.fa-card-more{ position:absolute; top:10px; right:10px; width:28px; height:28px; opacity:.45; }
+.fa-card:hover .fa-card-more, .fa-card-more:focus-visible{ opacity:1; }
+.fa-body .cellwrap.fiche-v2-wrap{ padding-bottom:26px; }
+.fa-body .fiche-v2-editor{ min-height:24px; padding:2px 4px; margin:0 -4px; font-size:14px; line-height:1.6; color:var(--fa-ink); }
+.fa-body .fiche-v2-editor.long{ min-height:48px; }
+.fa-body .fiche-v2-editor:empty::before{ color:var(--fa-ink-faint); font-style:normal; }
+.fa-body .fiche-v2-editor:focus{ background:var(--fa-surface-2); box-shadow:0 0 0 2px var(--fa-soft); }
+
+.fa-list{ display:flex; flex-direction:column; gap:10px; }
+.fa-line{ position:relative; padding-right:24px; }
+.fa-terms .fa-line{ display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 6px; font-size:14px; line-height:1.5; }
+.fa-term{ font-weight:600; color:var(--fa-ink); }
+.fa-dash{ color:var(--fa-ink-faint); }
+.fa-def{ flex:1 1 220px; min-width:0; color:var(--fa-ink-soft); }
+.fa-term, .fa-def, .fa-quote-text, .fa-page-text{ min-width:3ch; padding:1px 3px; border-radius:5px; outline:none; overflow-wrap:anywhere; }
+.fa-term:empty::before, .fa-def:empty::before, .fa-quote-text:empty::before, .fa-page-text:empty::before{ content:attr(data-ph); color:var(--fa-ink-faint); font-weight:400; }
+.fa-term:focus, .fa-def:focus, .fa-quote-text:focus, .fa-page-text:focus{ background:var(--fa-surface-2); box-shadow:0 0 0 2px var(--fa-soft); }
+.fa-quote{ margin:0; padding:2px 0 2px 14px; border-left:3px solid var(--fa-border-strong); }
+.fa-quote-text{ font-family:'Source Serif 4', Georgia, serif; font-size:15.5px; line-height:1.55; color:var(--fa-ink); }
+.fa-page{ display:inline-flex; align-items:baseline; gap:2px; margin-top:2px; color:var(--fa-ink-faint); font-size:12px; }
+.fa-line-remove{ position:absolute; top:0; right:0; width:22px; height:22px; border:0; border-radius:6px; background:transparent; color:var(--fa-ink-faint); font-size:15px; line-height:1; cursor:pointer; opacity:0; }
+.fa-line:hover .fa-line-remove, .fa-line-remove:focus-visible{ opacity:1; }
+.fa-line-remove:hover{ background:#fde3e3; color:#982020; }
+.fa-add-line{ margin-top:10px; padding:0; border:0; background:none; color:var(--fa-accent-ink); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+
+.fiche-a .fa-card-links{ background:var(--fa-soft); border:1.5px solid var(--fa-accent); }
+.fiche-a .fa-card-links .fiche-thesis-head h3{ color:var(--fa-accent-ink); font-size:11.5px; }
+.fiche-a .fa-card-links .attachment-pill{ background:var(--fa-surface); color:var(--fa-accent-ink); border-color:var(--fa-border-strong); }
+
+.fa-foot{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px 16px; color:var(--fa-ink-faint); font-size:12px; }
+.fa-foot-actions{ display:flex; flex-wrap:wrap; gap:8px; }
+
+@media (max-width:760px){
+  .fa-grid{ grid-template-columns:minmax(0, 1fr); }
+  .fa-head{ padding:18px; }
+}
+.fa-terms .fa-line{ display:block; }
+.fa-terms .fa-term, .fa-terms .fa-dash, .fa-terms .fa-def{ display:inline; }
+.fa-terms .fa-dash{ margin:0 4px; }
+.fa-type .cellwrap.fiche-v2-wrap{ padding-bottom:0; }
+.fa-type .fiche-v2-editor{ display:inline-block; min-height:0; padding:3px 10px; margin:0; border-radius:999px; background:var(--fa-surface-2); color:var(--fa-ink-soft); font-size:12.5px; }
+.fa-type .cell-icons, .fa-type .fiche-mic{ display:none; }
+.fa-links-text .cellwrap.fiche-v2-wrap{ padding-bottom:20px; }
+.fa-links-text .fiche-v2-editor{ min-height:24px; padding:6px 8px; margin:0 0 8px; border-radius:8px; background:var(--fa-surface); font-size:13.5px; line-height:1.55; }
+.fiche-thesis-extra:empty{ display:none; }
+.fa-foot .fiche-add-table, .fa-foot .fiche-add-zone{ min-height:36px; padding:0 14px; border:1px dashed var(--fa-border-strong); border-radius:999px; background:var(--fa-surface); color:var(--fa-accent-ink); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+.fa-foot .fiche-add-table:hover, .fa-foot .fiche-add-zone:hover{ border-color:var(--fa-accent); }

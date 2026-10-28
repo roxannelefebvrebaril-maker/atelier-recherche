@@ -1505,12 +1505,15 @@ window.Editor = (function(){
   function renderFicheThesisLinks(fiche){
     var fid = entityKeyForFiche(fiche.id);
     var box = el("section", {class:"fiche-thesis-links", "data-fiche-links":fiche.id, "aria-label":"Liens avec ma thèse"});
+    var extra = el("div", {class:"fiche-thesis-extra"});   // contenu gardé entre deux redessins (notes libres)
+    box.extra = extra;
     function draw(){
       box.innerHTML = "";
       box.appendChild(el("div", {class:"fiche-thesis-head"}, [
         el("h3", {text:"Liens avec ma thèse"}),
         el("small", {text:"Concepts, objectifs, questions, théories ou réflexions que ce texte nourrit. La fiche apparaît ensuite dans ces sections."})
       ]));
+      box.appendChild(extra);
       var list = el("div", {class:"fiche-thesis-list"});
       anchorLinksFor(fid).forEach(function(item){
         if (item.anchor){
@@ -1520,7 +1523,7 @@ window.Editor = (function(){
           list.appendChild(el("button", {class:"attachment-pill attachment-reflection", type:"button", title:"Aller à : " + entityLabel(item.other), onclick:function(){ goTo(item.other); }}, [icon("link"), el("span", {text:shortLinkLabel(item.other)})]));
         }
       });
-      if (!list.children.length) list.appendChild(el("p", {class:"lib-hint", text:"Aucun lien pour l'instant."}));
+      if (!list.children.length) list.appendChild(el("p", {class:"lib-hint", text:"Aucun rattachement pour l'instant : relie la fiche à un concept, un objectif ou une question."}));
       box.appendChild(list);
       var add = btn("plus", "Rattacher à ma thèse", null, "ghost fiche-thesis-add");
       add.addEventListener("click", function(e){ e.stopPropagation(); openLinksPopover(add, fid); });
@@ -1590,7 +1593,7 @@ window.Editor = (function(){
     return lines.map(function(line){ return line.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "").trim(); }).filter(Boolean).map(function(line){
       if (columns.length < 2) return [line];
       var m;
-      if (isCitation && (m = /^(.*?)\s*\(\s*(p{1,2}\.?\s*[^)]*)\)\s*([^()]*)$/i.exec(line))) return [m[1].trim() + (m[3] ? " " + m[3].trim() : ""), m[2].trim()];
+      if (isCitation && (m = /^(.*?)\s*\(\s*p{1,2}\.?\s*([^)]*)\)\s*([^()]*)$/i.exec(line))) return [m[1].trim() + (m[3] ? " " + m[3].trim() : ""), m[2].trim()];
       if (isCitation) return [line, ""];
       m = /^(.+?)\s+[—–]\s+(.+)$/.exec(line) || /^(.+?)\s*\|\s*(.+)$/.exec(line) || /^([^:]{1,80}?)\s*:\s+(.+)$/.exec(line);
       return m ? [m[1].replace(/\*+/g, "").trim(), m[2].trim()] : [line, ""];
@@ -1670,6 +1673,231 @@ window.Editor = (function(){
     box.appendChild(el("div", {class:"row"}, [create, el("button", {class:"btn ghost", type:"button", text:"Annuler", onclick:function(){ overlay.remove(); }})]));
     overlay.appendChild(box); overlay.addEventListener("mousedown", function(e){ if (e.target === overlay) overlay.remove(); });
     document.body.appendChild(overlay); area.focus();
+  }
+
+  /* ---------------- fiche de lecture : visuel « Fiche structurée » (proposition A) ---------------- */
+  // Même données que la fiche v2 (rows, ficheItems, sous-tableaux) : seule la présentation change.
+  // En-tête en carte, puis deux colonnes de rubriques numérotées ; « Liens avec ma thèse » en rose.
+  var FICHE_A_RIGHT_KEYS = {citations:true, limites:true, notes:true};
+  var FICHE_STATUTS = [{v:"a-lire", t:"À lire"}, {v:"en-cours", t:"En cours"}, {v:"lue", t:"Lue"}, {v:"relue", t:"Relue"}];
+
+  function ficheAZoneRole(fiche, entry, isTable){
+    if (isTable || !entry.custom) return null;
+    var label = normalizeText(stripHtml(entry.cells[fiche.columns[0].id].text || "")).replace(/\s+/g, " ").trim();
+    if (/^liens? avec ma these/.test(label)) return "liens";
+    if (/^type( de document)?( et discipline)?$|^discipline$/.test(label)) return "type";
+    return null;
+  }
+  function ficheAItemSide(fiche, item, entry, isTable){
+    var key = entry.key || "";
+    if (FICHE_A_RIGHT_KEYS[key]) return "right";
+    if (!isTable && entry.custom){
+      var label = normalizeText(stripHtml(entry.cells[fiche.columns[0].id].text || ""));
+      if (/liens? avec ma these|reflexion|piste|critique/.test(label)) return "right";
+    }
+    return "left";
+  }
+
+  function renderFicheATable(container, fiche, table){
+    var isCitation = table.key === "citations" || /citation/i.test(table.title || "");
+    var list = el("div", {class:"fa-list" + (isCitation ? " fa-quotes" : " fa-terms")});
+    var c0 = table.columns[0], c1 = table.columns[1];
+    function cellOf(row, col){ return row.cells[col.id] || (row.cells[col.id] = {text:"", tags:[]}); }
+    function editor(cell, cls, ph, label){
+      var ed = el("div", {class:cls, contenteditable:"true", spellcheck:"false", role:"textbox", "aria-label":label, "data-ph":ph});
+      ed.innerHTML = cell.text || "";
+      attachRichText(ed, cell, "text"); plainPaste(ed);
+      return ed;
+    }
+    table.rows.forEach(function(row){
+      var line = el("div", {class:"fa-line", "data-entity":entityKeyForCell(table.id, row.id, c0.id)});
+      if (isCitation){
+        var q = el("blockquote", {class:"fa-quote"});
+        q.appendChild(editor(cellOf(row, c0), "fa-quote-text", "« Citation exacte »", "Citation"));
+        if (c1){
+          var page = el("div", {class:"fa-page"});
+          page.appendChild(el("span", {text:"p."}));
+          page.appendChild(editor(cellOf(row, c1), "fa-page-text", "…", "Page de la citation"));
+          q.appendChild(page);
+        }
+        line.appendChild(q);
+      } else {
+        line.appendChild(editor(cellOf(row, c0), "fa-term", c0.label + "…", c0.label));
+        if (c1){
+          line.appendChild(el("span", {class:"fa-dash", "aria-hidden":"true", text:"—"}));
+          line.appendChild(editor(cellOf(row, c1), "fa-def", c1.label + "…", c1.label));
+        }
+      }
+      line.appendChild(el("button", {class:"fa-line-remove", type:"button", title:"Supprimer cette ligne", "aria-label":"Supprimer cette ligne", text:"×", onclick:function(){
+        removeEntitiesForRow(table.id, row.id); table.rows = table.rows.filter(function(r){ return r.id !== row.id; });
+        if (!table.rows.length){ var r2 = {id:uid("row"), cells:{}}; table.columns.forEach(function(col){ r2.cells[col.id] = {text:"", tags:[]}; }); table.rows.push(r2); }
+        scheduleSave(true); render();
+      }}));
+      list.appendChild(line);
+    });
+    container.appendChild(list);
+    container.appendChild(el("button", {class:"fa-add-line", type:"button", text:isCitation ? "+ Ajouter une citation" : "+ Ajouter une ligne", onclick:function(){
+      var row = {id:uid("row"), cells:{}};
+      table.columns.forEach(function(col){ row.cells[col.id] = {text:"", tags:[]}; });
+      table.rows.push(row); scheduleSave(true); render();
+      setTimeout(function(){ var f = document.querySelector('[data-entity="' + entityKeyForCell(table.id, row.id, c0.id) + '"] [contenteditable="true"]'); if (f) f.focus(); }, 0);
+    }}));
+  }
+
+  function renderFicheAPage(content, sec, idx, fiche){
+    if (!Array.isArray(fiche.ficheItems)) fiche.ficheItems = [];
+    if (!Array.isArray(fiche.tags)) fiche.tags = [];
+    var referenceRow = ensureFicheReferenceRow(fiche);
+    var p = ficheProgress(fiche);
+    content.appendChild(el("nav", {class:"breadcrumb", "aria-label":"Fil d'Ariane"}, [
+      el("button", {type:"button", text:"Vue d'ensemble", onclick:function(){ setSection(null); }}),
+      el("span", {text:"›"}),
+      el("button", {type:"button", text:(idx + 1) + " · " + titleOf(sec.obj), onclick:function(){ setChild(null); }}),
+      el("span", {text:"›"}), el("strong", {text:"Fiche de lecture"})
+    ]));
+    var page = el("article", {class:"fiche-a", "data-fiche-id":fiche.id, "aria-label":"Fiche de lecture"});
+
+    // Barre du haut : numéro, statut, dicter, menu
+    var number = sortedFicheChildren(sec.obj).findIndex(function(item){ return item.id === fiche.id; }) + 1;
+    var top = el("div", {class:"fa-top"});
+    top.appendChild(el("div", {class:"fa-kicker", text:"Fiche de lecture · n° " + String(number || 1).padStart(3, "0")}));
+    var topActions = el("div", {class:"fa-top-actions"});
+    var statut = el("select", {class:"fa-statut fa-statut-" + (fiche.statut || "en-cours"), id:"fa-statut-" + fiche.id, "aria-label":"Statut de lecture"});
+    FICHE_STATUTS.forEach(function(s){ var o = el("option", {value:s.v, text:s.t}); if ((fiche.statut || "en-cours") === s.v) o.selected = true; statut.appendChild(o); });
+    statut.addEventListener("change", function(){ fiche.statut = statut.value; statut.className = "fa-statut fa-statut-" + statut.value; scheduleSave(true); });
+    topActions.appendChild(statut);
+    var dictee = renderFicheDictation(fiche);
+    var dictBtn = el("button", {class:"fa-dicter", type:"button", "aria-expanded":"false"}, [icon("mic"), el("span", {text:"Dicter"})]);
+    dictBtn.addEventListener("click", function(){
+      var body = dictee.querySelector(".fiche-dictee-body"), open = dictee.hidden || body.hidden;
+      dictee.hidden = !open; body.hidden = !open; dictBtn.setAttribute("aria-expanded", String(open));
+      if (open){ var ta = dictee.querySelector("textarea"); if (ta) ta.focus(); }
+    });
+    topActions.appendChild(dictBtn);
+    var menu = iconBtn("more", "Autres actions sur la fiche", null, "fa-more");
+    menu.addEventListener("click", function(){ openMenu(menu, null, [
+      {icon:"download", label:"Exporter cette fiche en Markdown", run:function(){ exportFicheMarkdown(fiche); }},
+      {sep:true},
+      {icon:"trash", label:"Supprimer la fiche", danger:true, run:function(){ confirmDeleteFiche(fiche); }}
+    ]); });
+    topActions.appendChild(menu);
+    top.appendChild(topActions);
+    page.appendChild(top);
+
+    // Carte d'en-tête : titre, référence, repères, avancement
+    var head = el("header", {class:"fa-head"});
+    var titleLabel = el("label", {class:"sr-only", id:"fiche-title-label-" + fiche.id, text:"Titre de la fiche"});
+    var title = el("div", {class:"fa-title", contenteditable:"true", spellcheck:"false", role:"textbox", "aria-labelledby":titleLabel.id, "data-ph":"Titre de la fiche…", text:fiche.title || ""});
+    plainPaste(title);
+    title.addEventListener("input", function(){ fiche.title = title.textContent; dirty = true; });
+    title.addEventListener("keydown", function(e){ if (e.key === "Enter"){ e.preventDefault(); title.blur(); } });
+    title.addEventListener("blur", function(){ fiche.title = title.textContent.trim() || "Nouvelle fiche"; scheduleSave(true); });
+    head.appendChild(titleLabel); head.appendChild(title);
+    if (referenceRow){
+      var refBox = el("div", {class:"fa-reference"});
+      var refLabelId = "fiche-item-label-" + referenceRow.id;
+      refBox.appendChild(el("span", {class:"sr-only", id:refLabelId, text:"Référence APA 7"}));
+      renderFicheV2Text(refBox, fiche, referenceRow, refLabelId, "Référence APA 7 complète…");
+      head.appendChild(refBox);
+    }
+    var tagsLine = el("div", {class:"fa-tags"});
+    function refreshTags(){
+      tagsLine.innerHTML = "";
+      ficheTagPills(fiche).childNodes.forEach(function(pill){ tagsLine.appendChild(pill.cloneNode(true)); });
+      tagsLine.appendChild(el("button", {class:"fa-add-tag", type:"button", text:"+ Repère", onclick:function(){ openFicheTagPicker(fiche, refreshTags); }}));
+    }
+    refreshTags();
+    head.appendChild(tagsLine);
+    head.appendChild(el("div", {class:"fiche-v2-progress fa-progress", "data-fiche-progress":fiche.id}, [progressBar(p), el("span", {text:p.filled + " / " + p.total + " rubriques remplies"})]));
+    // Zone « Type et discipline » (fiches collées) : affichée sous la référence, comme dans la maquette.
+    (fiche.rows || []).forEach(function(row){
+      if (ficheAZoneRole(fiche, row, false) !== "type" || !fiche.ficheItems.some(function(it){ return it.id === row.id; })) return;
+      var typeBox = el("div", {class:"fa-type"});
+      var typeId = "fiche-item-label-" + row.id;
+      typeBox.appendChild(el("span", {class:"sr-only", id:typeId, text:"Type et discipline"}));
+      renderFicheV2Text(typeBox, fiche, row, typeId, "Type de document · discipline");
+      head.insertBefore(typeBox, tagsLine);
+    });
+    var docs = el("details", {class:"fa-docs"}, [el("summary", {text:"Documents" + ((fiche.documents || []).length ? " (" + fiche.documents.length + ")" : "")}), renderFicheDocuments(fiche)]);
+    head.appendChild(docs);
+    head.appendChild(renderWholeFicheControls(fiche));
+    page.appendChild(head);
+
+    var upgrade = renderFicheUpgradeBanner(fiche);
+    if (upgrade) page.appendChild(upgrade);
+    dictee.hidden = !fiche.dictee;
+    if (fiche.dictee){ var b0 = dictee.querySelector(".fiche-dictee-body"); if (b0) b0.hidden = false; dictBtn.setAttribute("aria-expanded", "true"); }
+    page.appendChild(dictee);
+
+    // Deux colonnes de rubriques
+    var grid = el("div", {class:"fa-grid"});
+    var left = el("div", {class:"fa-col"}), right = el("div", {class:"fa-col"});
+    var n = 0, linksPlaced = false, thesis = renderFicheThesisLinks(fiche);
+    thesis.classList.add("fa-card", "fa-card-links");
+    var placed = [], thesisZones = [];
+    fiche.ficheItems.forEach(function(item, itemIndex){
+      var isTable = item.type === "table";
+      var entry = isTable ? state.tables.find(function(t){ return t.id === item.id; }) : (fiche.rows || []).find(function(r){ return r.id === item.id; });
+      if (!entry) return;
+      var role = ficheAZoneRole(fiche, entry, isTable);
+      if (role === "type") return;
+      if (role === "liens"){ thesisZones.push(entry); return; }
+      placed.push({item:item, itemIndex:itemIndex, entry:entry, isTable:isTable, side:ficheAItemSide(fiche, item, entry, isTable)});
+    });
+    // Numérotation dans l'ordre de lecture : colonne de gauche, puis de droite.
+    var ordered = placed.filter(function(x){ return x.side === "left"; }).concat(placed.filter(function(x){ return x.side === "right"; }));
+    ordered.forEach(function(x){
+      var item = x.item, entry = x.entry, isTable = x.isTable;
+      var labelText = isTable ? entry.title : stripHtml(entry.cells[fiche.columns[0].id].text || "");
+      var col = x.side === "right" ? right : left;
+      if (x.side === "right" && entry.key === "notes" && !linksPlaced){ right.appendChild(thesis); linksPlaced = true; }
+      n++;
+      var itemLabelId = "fiche-item-label-" + item.id;
+      var card = el("section", {class:"fa-card" + (entry.key === "notes" ? " fa-card-notes" : "") + (entry.custom ? " fa-card-custom" : ""), "data-fiche-item":item.id, "aria-labelledby":itemLabelId});
+      var h = el("h3", {class:"fa-label"});
+      h.appendChild(el("span", {class:"fa-num", text:n + " · "}));
+      if (entry.custom){
+        var name = el("span", {class:"fa-label-name", id:itemLabelId, contenteditable:"true", spellcheck:"false", role:"textbox", "aria-label":"Nom de la rubrique", text:labelText});
+        plainPaste(name);
+        name.addEventListener("input", function(){ if (isTable) entry.title = name.textContent; else entry.cells[fiche.columns[0].id].text = name.textContent; dirty = true; });
+        name.addEventListener("blur", function(){ scheduleSave(true); });
+        h.appendChild(name);
+      } else h.appendChild(el("span", {class:"fa-label-name", id:itemLabelId, text:labelText}));
+      card.appendChild(h);
+      var more = iconBtn("more", "Options pour « " + labelText + " »", null, "fa-card-more");
+      more.addEventListener("click", function(){ openMenu(more, null, [
+        {icon:"back", label:"Monter", run:function(){ moveFicheItem(fiche, x.itemIndex, -1); }},
+        {icon:"next", label:"Descendre", run:function(){ moveFicheItem(fiche, x.itemIndex, 1); }},
+        entry.custom ? {sep:true} : null,
+        entry.custom ? {icon:"trash", label:"Supprimer « " + labelText + " »", danger:true, run:function(){ deleteFicheItem(fiche, item, entry); }} : null
+      ].filter(Boolean)); });
+      card.appendChild(more);
+      var body = el("div", {class:"fa-body"});
+      if (isTable) renderFicheATable(body, fiche, entry);
+      else renderFicheV2Text(body, fiche, entry, itemLabelId);
+      card.appendChild(body);
+      col.appendChild(card);
+    });
+    if (!linksPlaced) right.appendChild(thesis);
+    // Texte libre « Liens avec ma thèse » (fiches collées) : dans la carte rose, sous les rattachements.
+    thesisZones.forEach(function(zone){
+      var zoneId = "fiche-item-label-" + zone.id, box = el("div", {class:"fa-links-text"});
+      box.appendChild(el("span", {class:"sr-only", id:zoneId, text:"Liens avec ma thèse (notes)"}));
+      renderFicheV2Text(box, fiche, zone, zoneId, "Ce que ce texte apporte à chaque section de ma thèse");
+      thesis.extra.appendChild(box);
+    });
+    grid.appendChild(left); grid.appendChild(right);
+    page.appendChild(grid);
+
+    page.appendChild(el("footer", {class:"fa-foot"}, [
+      el("div", {class:"fa-foot-actions"}, [
+        el("button", {class:"fiche-add-table", type:"button", text:"+ Insérer un tableau", onclick:function(){ addFicheTable(fiche); }}),
+        el("button", {class:"fiche-add-zone", type:"button", text:"+ Ajouter une zone de rédaction", onclick:function(){ addFicheZone(fiche); }})
+      ]),
+      el("span", {text:"Citer en APA 7 · Chaque rubrique : toucher le micro pour dicter"})
+    ]));
+    content.appendChild(page);
+    appendFichePager(content, sec, fiche);
   }
 
   function refreshFicheThesisLinks(){
@@ -2351,7 +2579,7 @@ window.Editor = (function(){
   }
 
   function renderFichePage(content, sec, idx, table){
-    if (table.ficheVersion === 2){ renderFicheV2Page(content, sec, idx, table); return; }
+    if (table.ficheVersion === 2){ renderFicheAPage(content, sec, idx, table); return; }
     var p = {total:(table.rows||[]).filter(function(r){ return !r.kind; }).length || 1, filled:countFilledFicheRows(table)};
     var type = ficheTypeValue(table);
     var status = ficheStatusValue(table);
