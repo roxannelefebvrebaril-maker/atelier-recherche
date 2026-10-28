@@ -786,3 +786,10 @@ body.with-nav{ max-width:none; padding:0; }
 @media (max-width:640px){
   .fiche-dictee, .fiche-upgrade, .fiche-thesis-links{ padding-left:14px; padding-right:14px; }
 }
+
+/* ---------- Coller une fiche préparée ---------- */
+.fiche-add-card{ display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:6px; }
+.fiche-paste-btn{ font-size:12.5px; }
+.modal.fiche-paste-modal{ width:min(680px, calc(100vw - 32px)); max-width:none; }
+.fiche-paste-text{ width:100%; box-sizing:border-box; min-height:260px; resize:vertical; font:inherit; font-size:13.5px; line-height:1.55; }
+.fiche-paste-preview{ min-height:1.2em; margin:8px 0 12px; color:var(--ink-soft); font-size:12.5px; }

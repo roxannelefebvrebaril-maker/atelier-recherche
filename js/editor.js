@@ -1530,6 +1530,148 @@ window.Editor = (function(){
     draw();
     return box;
   }
+  /* ---------------- fiches : coller une fiche préparée (sans Claude, sans clé) ---------------- */
+  // Format reconnu (souple) :
+  //   # Goffman (1973)                       ← titre de la fiche (facultatif)
+  //   Référence : Goffman, E. (1973). …      ← ou une rubrique « ## Référence APA 7 »
+  //   Repères : skin, socialisation          ← repères existants du projet (facultatif)
+  //   ## Résumé                              ← une rubrique par titre « ## »
+  //   texte…
+  //   ## Concepts et théories                ← tableaux : une ligne « - Terme — définition »
+  //   ## Citations à garder                  ← « - « citation » (p. 40) »
+  // Un titre inconnu devient une zone de rédaction portant ce nom.
+  var PREPARED_ALIASES = {
+    reference:["reference", "reference apa 7", "reference apa"],
+    kw:["mots-cles", "mots cles"],
+    resume:["resume", "resume dans mes mots"],
+    hypothese:["objet et hypothese", "hypothese", "objet", "objet et question de l'auteur e", "objet et question", "question de l'auteur e", "problematique et question de recherche"],
+    cadre:["cadre theorique"],
+    methodo:["methodologie", "methodologie ou demarche", "demarche"],
+    resultats:["resultats ou these centrale", "resultats", "these centrale", "principaux resultats ou arguments"],
+    limites:["limites et critiques", "limites", "critiques", "critiques et desaccords"],
+    notes:["mes reflexions et notes", "mes reflexions et pistes", "reflexions", "notes", "questions et idees a creuser"],
+    definitions:["definitions"],
+    concepts:["concepts et theories", "concepts cles", "concepts"],
+    citations:["citations a garder", "citations", "citations a retenir"]
+  };
+  function preparedKey(label){
+    var n = normalizeText(label).replace(/^\s*\d+\s*[·.)\-–—:]?\s*/, "").replace(/[·:]+\s*$/, "").replace(/[^a-z0-9' -]+/g, " ").replace(/\s+/g, " ").trim();
+    var found = null;
+    Object.keys(PREPARED_ALIASES).forEach(function(key){ if (!found && PREPARED_ALIASES[key].indexOf(n) >= 0) found = key; });
+    return {key:found, clean:n};
+  }
+  function parsePreparedFiche(text){
+    var out = {title:"", reference:"", tags:[], sections:[]}, current = null;
+    String(text || "").replace(/\r/g, "").split("\n").forEach(function(raw){
+      var line = raw.replace(/\s+$/, "");
+      var h1 = /^#\s+(.+)$/.exec(line), h2 = /^#{2,4}\s+(.+)$/.exec(line);
+      if (h2){ current = {label:h2[1].replace(/\*+/g, "").trim(), lines:[]}; out.sections.push(current); return; }
+      if (h1 && !out.title && !out.sections.length){ out.title = h1[1].replace(/\*+/g, "").trim(); return; }
+      if (!current){
+        var meta = /^\**\s*(R[ée]f[ée]rence(?:\s+APA\s*7)?|Rep[èe]res)\s*\**\s*:\s*(.+)$/i.exec(line);
+        if (meta){
+          if (/^rep/i.test(normalizeText(meta[1]))) out.tags = meta[2].split(/[,;]/).map(function(s){ return s.trim(); }).filter(Boolean);
+          else out.reference = meta[2].trim();
+        }
+        return;
+      }
+      current.lines.push(line);
+    });
+    out.sections.forEach(function(sec){
+      while (sec.lines.length && !sec.lines[0].trim()) sec.lines.shift();
+      while (sec.lines.length && !sec.lines[sec.lines.length - 1].trim()) sec.lines.pop();
+      var k = preparedKey(sec.label);
+      sec.key = k.key;
+      if (sec.key === "reference"){ out.reference = out.reference || sec.lines.join(" ").trim(); sec.skip = true; }
+    });
+    return out;
+  }
+  function preparedTableRows(lines, columns, isCitation){
+    return lines.map(function(line){ return line.replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "").trim(); }).filter(Boolean).map(function(line){
+      if (columns.length < 2) return [line];
+      var m;
+      if (isCitation && (m = /^(.*?)\s*\(\s*(p{1,2}\.?\s*[^)]*)\)\s*([^()]*)$/i.exec(line))) return [m[1].trim() + (m[3] ? " " + m[3].trim() : ""), m[2].trim()];
+      if (isCitation) return [line, ""];
+      m = /^(.+?)\s+[—–]\s+(.+)$/.exec(line) || /^(.+?)\s*\|\s*(.+)$/.exec(line) || /^([^:]{1,80}?)\s*:\s+(.+)$/.exec(line);
+      return m ? [m[1].replace(/\*+/g, "").trim(), m[2].trim()] : [line, ""];
+    });
+  }
+  function preparedText(lines){
+    return lines.map(function(line){ return escapeText(line.replace(/^\s*[-*]\s+/, "• ").replace(/\*\*(.+?)\*\*/g, "$1")); }).join("<br>");
+  }
+  function createFicheFromPrepared(parsed, section){
+    var parent = ensureFicheContainer(section);
+    if (!parent) return null;
+    var tagIds = [], unknownTags = [];
+    parsed.tags.forEach(function(label){
+      var tag = state.tags.find(function(t){ return normalizeText(t.label) === normalizeText(label); });
+      if (tag) tagIds.push(tag.id); else unknownTags.push(label);
+    });
+    var fiche = createV2Fiche(parent, parsed.reference || "Nouvelle fiche", null, tagIds);
+    if (parsed.title) fiche.title = parsed.title;
+    var rub = fiche.columns[0], cont = fiche.columns[1];
+    parsed.sections.forEach(function(sec){
+      if (sec.skip || !sec.lines.some(function(l){ return l.trim(); })) return;
+      var row = sec.key && fiche.rows.find(function(r){ return r.key === sec.key; });
+      if (row){
+        var cell = row.cells[cont.id];
+        cell.text = stripHtml(cell.text || "").trim() ? cell.text + "<br>" + preparedText(sec.lines) : preparedText(sec.lines);
+        return;
+      }
+      var tableItem = sec.key && fiche.ficheItems.find(function(item){ var t = item.type === "table" && state.tables.find(function(x){ return x.id === item.id; }); return t && t.key === sec.key; });
+      var table = tableItem && state.tables.find(function(t){ return t.id === tableItem.id; });
+      if (table){
+        var rows = preparedTableRows(sec.lines, table.columns, sec.key === "citations");
+        if (rows.length) table.rows = rows.map(function(values){
+          var r = {id:uid("row"), cells:{}};
+          table.columns.forEach(function(col, i){ r.cells[col.id] = {text:escapeText(values[i] || ""), tags:[]}; });
+          return r;
+        });
+        return;
+      }
+      var zone = {id:uid("row"), key:"zone_" + uid("zone"), hint:"", custom:true, long:true, cells:{}};
+      zone.cells[rub.id] = {text:sec.label.replace(/^\s*\d+\s*[·.)\-–—:]?\s*/, ""), tags:[]};
+      zone.cells[cont.id] = {text:preparedText(sec.lines), tags:[]};
+      fiche.rows.push(zone); fiche.ficheItems.push({type:"row", id:zone.id});
+    });
+    state.tables.push(fiche);
+    return {fiche:fiche, unknownTags:unknownTags};
+  }
+  function openFichePasteModal(section){
+    var parent = ensureFicheContainer(section);
+    if (!parent){ showToast("Ouvre d'abord la section « Fiches de lecture ».", null); return; }
+    var overlay = el("div", {class:"overlay"});
+    var box = el("div", {class:"modal fiche-paste-modal", role:"dialog", "aria-modal":"true", "aria-labelledby":"fiche-paste-title"});
+    box.appendChild(el("h3", {id:"fiche-paste-title", text:"Coller une fiche préparée"}));
+    box.appendChild(el("p", {class:"lib-hint", text:"Colle ici une fiche préparée avec Claude dans la conversation. Chaque titre « ## » devient une rubrique ; les concepts et les citations vont dans leurs tableaux."}));
+    var area = el("textarea", {class:"field fiche-paste-text", id:"fiche-paste-text", rows:"12", "aria-label":"Fiche préparée à coller", placeholder:"# Auteur (année)\nRéférence : Auteur, A. (année). Titre…\nRepères : skin, socialisation\n\n## Résumé\n…\n\n## Citations à garder\n- « … » (p. 40)"});
+    var preview = el("div", {class:"fiche-paste-preview", role:"status", "aria-live":"polite"});
+    var create = el("button", {class:"btn primary", type:"button", text:"Créer la fiche", disabled:true});
+    function update(){
+      var parsed = parsePreparedFiche(area.value);
+      var known = parsed.sections.filter(function(s){ return s.key && !s.skip; }).length;
+      var zones = parsed.sections.filter(function(s){ return !s.key && !s.skip; }).map(function(s){ return s.label; });
+      var ok = !!(parsed.reference || parsed.sections.length);
+      create.disabled = !ok;
+      preview.textContent = !area.value.trim() ? "" : !ok ? "Aucune rubrique reconnue : chaque rubrique commence par « ## » suivi de son nom."
+        : (parsed.title || shortCitation(parsed.reference || "Fiche")) + " · " + known + (known > 1 ? " rubriques reconnues" : " rubrique reconnue")
+          + (zones.length ? " · " + zones.length + (zones.length > 1 ? " zones ajoutées : " : " zone ajoutée : ") + zones.join(", ") : "")
+          + (parsed.reference ? "" : " · référence manquante");
+    }
+    area.addEventListener("input", update);
+    create.addEventListener("click", function(){
+      var result = createFicheFromPrepared(parsePreparedFiche(area.value), parent);
+      overlay.remove();
+      if (!result) return;
+      scheduleSave(true); setChild(result.fiche.id);
+      showToast("Fiche créée. Relis-la et rattache-la à ta thèse en bas de la fiche." + (result.unknownTags.length ? " Repères absents du projet : " + result.unknownTags.join(", ") + "." : ""), null);
+    });
+    box.appendChild(area); box.appendChild(preview);
+    box.appendChild(el("div", {class:"row"}, [create, el("button", {class:"btn ghost", type:"button", text:"Annuler", onclick:function(){ overlay.remove(); }})]));
+    overlay.appendChild(box); overlay.addEventListener("mousedown", function(e){ if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay); area.focus();
+  }
+
   function refreshFicheThesisLinks(){
     Array.prototype.forEach.call(document.querySelectorAll("[data-fiche-links]"), function(node){ if (node.redraw) node.redraw(); });
   }
@@ -1644,7 +1786,7 @@ window.Editor = (function(){
 
     function persistFilters(){ try { localStorage.setItem(key, JSON.stringify(saved)); } catch(e){} }
     var grid = el("div", {class:"ov-grid fiche-gallery", "data-sec":sectionColor(sec, idx)});
-    grid.appendChild(el("div", {class:"ov-card ov-add fiche-add-card"}, [btn("plus", "+ Nouvelle fiche de lecture", function(){ openFicheCreationModal(root); }, "ghost")]));
+    grid.appendChild(el("div", {class:"ov-card ov-add fiche-add-card"}, [btn("plus", "+ Nouvelle fiche de lecture", function(){ openFicheCreationModal(root); }, "ghost"), btn("download", "Coller une fiche préparée", function(){ openFichePasteModal(root); }, "ghost fiche-paste-btn")]));
     var headings = {}, entries = [], lastLetter = null;
     fiches.forEach(function(item){
       var table = item.obj, keyInfo = ficheSortKey(table);
